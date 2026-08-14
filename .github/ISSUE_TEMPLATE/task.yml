@@ -1,0 +1,36 @@
+name: Implementation task
+description: Track a bounded roadmap deliverable
+title: "[Task]: "
+labels: [task]
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: State the observable outcome of this task.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: In scope
+      placeholder: "- "
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      placeholder: "- "
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: test-plan
+    attributes:
+      label: Test plan
+      placeholder: "- [ ] "

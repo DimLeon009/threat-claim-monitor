@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate shell scripts
+        run: find scripts infra -type f -name '*.sh' -print0 | xargs -0 -n1 sh -n
+
+      - name: Validate documentation
+        run: python scripts/validate_docs.py
+
+      - name: Validate repository configuration
+        run: sh scripts/validate.sh

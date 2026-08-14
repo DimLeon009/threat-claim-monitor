@@ -1,0 +1,25 @@
+.env
+.env.*
+!.env.example
+
+# Runtime data
+data/
+backups/
+*.log
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local tooling
+.pytest_cache/
+node_modules/
+coverage/
+
+
+# Python
+__pycache__/
+*.py[cod]
