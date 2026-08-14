@@ -29,15 +29,15 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 
 | Milestone | Outcome | Status |
 |---|---|:---:|
-| M0 | Reproducible professional foundation | 🚧 |
-| M1 | First reliable ransomware claim feed | ⏳ |
-| M2 | Deterministic watchlist matching and correlation | Planned |
+| M0 | Reproducible professional foundation | ✅ |
+| M1 | First reliable ransomware claim feed | 🚧 |
+| M2 | Deterministic watchlist matching and correlation | ⏳ |
 | M3 | Evidence-grounded local summaries | Planned |
 | M4 | Auditable multi-channel notifications | Planned |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
 
-## 🚧 M0 — Foundation
+## ✅ M0 — Foundation
 
 ### Objective
 
@@ -58,8 +58,8 @@ Provide a clean repository and reproducible runtime on which every later workflo
 - [x] Issue and pull-request templates
 - [x] Architecture, data model, threat model, and ADR documentation
 - [x] Windows and macOS development guides
-- [ ] Docker Desktop runtime smoke test
-- [ ] Confirm first-start database initialization
+- [x] Docker Desktop runtime smoke test
+- [x] Confirm first-start database initialization
 
 ### Acceptance criteria
 
@@ -76,7 +76,7 @@ Provide a clean repository and reproducible runtime on which every later workflo
 
 A new contributor can clone, configure, start, inspect, stop, and restart the foundation using documented commands.
 
-## ⏳ M1 — ransomware.live collection
+## 🚧 M1 — ransomware.live collection
 
 ### Objective
 
@@ -106,7 +106,7 @@ Collect recent ransomware.live records safely and insert each source observation
 - A source failure does not corrupt partial state.
 - Logs and persisted errors contain no credentials or excessive payloads.
 
-## M2 — Matching and claim correlation
+## ⏳ M2 — Matching and claim correlation
 
 ### Objective
 
