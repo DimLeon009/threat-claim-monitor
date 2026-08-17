@@ -51,6 +51,7 @@ This directory contains the technical, operational, and security documentation f
 |---|---|
 | [Normalization](matching/normalization.md) | Deterministic text, threat-actor, and approved-domain normalization contract |
 | [Exact matching](matching/exact-matching.md) | Domain, official-name, approved-alias, confidence, and collision rules |
+| [Claim correlation](matching/claim-correlation.md) | Transactional 45-day correlation, replay, concurrency, evidence versions, and match persistence |
 
 ### Security
 

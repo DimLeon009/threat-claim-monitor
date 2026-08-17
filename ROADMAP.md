@@ -117,14 +117,14 @@ Identify monitored organizations with explainable rules and correlate source dup
 - [x] Unicode and punctuation normalization contract
 - [x] Registered-domain extraction and normalization
 - [ ] Threat-actor alias normalization
-- [ ] Canonical claim creation
-- [ ] 45-day correlation window
+- [x] Canonical claim creation
+- [x] 45-day correlation window
 - [x] Exact domain, official-name, and alias matching
 - [ ] Review path for token and fuzzy candidates
-- [ ] Match evidence payload
-- [ ] Evidence-version updates
+- [x] Match evidence payload
+- [x] Evidence-version updates
 - [x] Positive, negative, ambiguous, and collision corpus
-- [ ] Concurrency and replay tests
+- [x] Concurrency and replay tests
 
 ### Acceptance criteria
 

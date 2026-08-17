@@ -13,6 +13,8 @@ REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 CORPUS_FILE = REPOSITORY_ROOT / "fixtures/matching/normalization-corpus.json"
 MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/004_matching_normalization.sql"
 EXACT_MATCH_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/005_exact_organization_matching.sql"
+CORRELATION_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/006_transactional_claim_correlation.sql"
+CORRELATION_TEST_FILE = REPOSITORY_ROOT / "scripts/test_correlation_contract.sql"
 DOMAIN_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 ORGANIZATIONS = (
     {
@@ -149,6 +151,33 @@ def main() -> int:
             errors.append(f"exact-match migration is missing {required_fragment}")
     if "fuzzy" in exact_match_migration.lower() or "similarity(" in exact_match_migration:
         errors.append("exact-match evaluation must not contain fuzzy matching")
+
+    correlation_migration = CORRELATION_MIGRATION_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "FUNCTION correlate_observation_exact",
+        "pg_advisory_xact_lock",
+        "interval '45 days'",
+        "ON CONFLICT (observation_id) DO NOTHING",
+        "ON CONFLICT ON CONSTRAINT organization_matches_claim_id_organization_id_key",
+        "evidence_version = claim.evidence_version + 1",
+        "find_exact_organization_matches",
+        "ambiguous claim correlation",
+    ):
+        if required_fragment not in correlation_migration:
+            errors.append(f"claim-correlation migration is missing {required_fragment}")
+
+    correlation_test = CORRELATION_TEST_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "\\set ON_ERROR_STOP on",
+        "BEGIN;",
+        "inside the 45-day window",
+        "outside the 45-day window",
+        "different threat actors",
+        "configuration collision",
+        "ROLLBACK;",
+    ):
+        if required_fragment not in correlation_test:
+            errors.append(f"claim-correlation runtime test is missing {required_fragment}")
 
     if errors:
         print("Matching contract validation failed:", file=sys.stderr)
