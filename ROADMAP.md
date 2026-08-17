@@ -116,7 +116,7 @@ Identify monitored organizations with explainable rules and correlate source dup
 
 - [x] Unicode and punctuation normalization contract
 - [x] Registered-domain extraction and normalization
-- [ ] Threat-actor alias normalization
+- [x] Threat-actor alias normalization
 - [x] Canonical claim creation
 - [x] 45-day correlation window
 - [x] Exact domain, official-name, and alias matching

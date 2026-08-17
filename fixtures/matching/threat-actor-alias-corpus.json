@@ -1,0 +1,26 @@
+{
+  "actors": [
+    {
+      "canonical_name": "Example Syndicate",
+      "enabled": true,
+      "aliases": ["Example-Syn"]
+    },
+    {
+      "canonical_name": "Disabled Group",
+      "enabled": false,
+      "aliases": ["Disabled Alias"]
+    }
+  ],
+  "cases": [
+    {"input": "Example Syndicate", "expected": "example syndicate", "method": "canonical_exact"},
+    {"input": "example-syn", "expected": "example syndicate", "method": "alias_exact"},
+    {"input": "Unknown_Group", "expected": "unknown group", "method": "unmapped"},
+    {"input": "Disabled Alias", "expected": "disabled alias", "method": "unmapped"}
+  ],
+  "collision": {
+    "canonical_name": "Collision Name",
+    "alias_owner": "Example Syndicate",
+    "alias": "Collision-Name",
+    "expected_error": "ambiguous threat actor alias configuration"
+  }
+}

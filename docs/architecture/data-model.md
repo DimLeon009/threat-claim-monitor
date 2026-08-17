@@ -16,6 +16,7 @@ erDiagram
     CLAIMS ||--o{ CLAIM_OBSERVATIONS : groups
     OBSERVATIONS ||--|| CLAIM_OBSERVATIONS : linked_once
     ORGANIZATIONS ||--o{ ORGANIZATION_ALIASES : defines
+    THREAT_ACTORS ||--o{ THREAT_ACTOR_ALIASES : defines
     CLAIMS ||--o{ ORGANIZATION_MATCHES : evaluated_against
     ORGANIZATIONS ||--o{ ORGANIZATION_MATCHES : matched_by
     CLAIMS ||--o{ ANALYSES : summarized_by
@@ -54,6 +55,10 @@ Defines a monitored legal entity or brand.
 Contains explicitly approved alternative names or domains. Each alias defines its matching mode and deterministic confidence score.
 
 Aliases should be narrow. Generic terms, product names, and ambiguous abbreviations must not be auto-alert aliases.
+
+### `threat_actors` and `threat_actor_aliases`
+
+These tables define administrator-approved canonical threat-group names and exact aliases used only for correlation identity. Normalized names are unique within each table, disabled mappings do not resolve, and a name that points to multiple enabled actors fails closed. Unknown actors remain usable under ordinary text normalization; the system never invents an alias through fuzzy similarity.
 
 ## Evidence entities
 
@@ -115,10 +120,10 @@ Model-generated text must never populate the matching method or confidence score
 
 ### M2 normalization and exact-candidate functions
 
-Migrations `004_matching_normalization` and `005_exact_organization_matching` add deterministic database functions without changing stored source evidence:
+Migrations `004_matching_normalization`, `005_exact_organization_matching`, and `008_threat_actor_aliases` add deterministic database functions without changing stored source evidence:
 
 - `normalize_match_text` creates accent-insensitive, punctuation-separated comparison keys;
-- `normalize_threat_actor` applies the text contract before explicit alias resolution;
+- `normalize_threat_actor` applies the text contract and then resolves explicit enabled actor aliases;
 - `normalize_domain` parses and validates an ASCII hostname while failing closed on malformed values;
 - `domain_matches_registered` accepts only an approved registered-domain boundary or its true subdomains;
 - `extract_approved_registered_domain` returns the longest configured boundary match;

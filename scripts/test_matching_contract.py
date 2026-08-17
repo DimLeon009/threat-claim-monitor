@@ -11,6 +11,7 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 CORPUS_FILE = REPOSITORY_ROOT / "fixtures/matching/normalization-corpus.json"
+ACTOR_ALIAS_CORPUS_FILE = REPOSITORY_ROOT / "fixtures/matching/threat-actor-alias-corpus.json"
 MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/004_matching_normalization.sql"
 EXACT_MATCH_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/005_exact_organization_matching.sql"
 CORRELATION_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/006_transactional_claim_correlation.sql"
@@ -21,6 +22,8 @@ COLLECTION_CORRELATION_MIGRATION_FILE = (
 COLLECTION_CORRELATION_TEST_FILE = (
     REPOSITORY_ROOT / "scripts/test_collection_run_correlation_contract.sql"
 )
+ACTOR_ALIAS_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/008_threat_actor_aliases.sql"
+ACTOR_ALIAS_TEST_FILE = REPOSITORY_ROOT / "scripts/test_threat_actor_alias_contract.sql"
 DOMAIN_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 ORGANIZATIONS = (
     {
@@ -99,9 +102,31 @@ def find_exact_match(victim: str, domain: str) -> tuple[str, int] | None:
     return candidates[0]
 
 
+def resolve_actor_alias(actor_corpus: dict[str, object], input_value: str) -> tuple[str, str]:
+    normalized_input = normalize_match_text(input_value)
+    candidates: list[tuple[str, str]] = []
+    for actor in actor_corpus["actors"]:
+        if not actor["enabled"]:
+            continue
+        canonical = normalize_match_text(actor["canonical_name"])
+        if normalized_input == canonical:
+            candidates.append((canonical, "canonical_exact"))
+        for alias in actor["aliases"]:
+            if normalized_input == normalize_match_text(alias):
+                candidates.append((canonical, "alias_exact"))
+
+    distinct_actors = {candidate[0] for candidate in candidates}
+    if len(distinct_actors) > 1:
+        raise ValueError("ambiguous threat actor alias configuration")
+    if not candidates:
+        return normalized_input, "unmapped"
+    return sorted(candidates, key=lambda candidate: candidate[1] != "canonical_exact")[0]
+
+
 def main() -> int:
     errors: list[str] = []
     corpus = json.loads(CORPUS_FILE.read_text(encoding="utf-8"))
+    actor_corpus = json.loads(ACTOR_ALIAS_CORPUS_FILE.read_text(encoding="utf-8"))
 
     for case in corpus["text_cases"] + corpus["actor_cases"]:
         actual = normalize_match_text(case["input"])
@@ -129,6 +154,27 @@ def main() -> int:
                 f"exact-match mismatch for victim {case['victim']!r} and "
                 f"domain {case['domain']!r}: {actual!r}"
             )
+
+    for case in actor_corpus["cases"]:
+        actual = resolve_actor_alias(actor_corpus, case["input"])
+        expected = (case["expected"], case["method"])
+        if actual != expected:
+            errors.append(f"actor-alias mismatch for {case['input']!r}: {actual!r}")
+
+    collision_corpus = json.loads(json.dumps(actor_corpus))
+    collision = collision_corpus["collision"]
+    for actor in collision_corpus["actors"]:
+        if actor["canonical_name"] == collision["alias_owner"]:
+            actor["aliases"].append(collision["alias"])
+    collision_corpus["actors"].append(
+        {"canonical_name": collision["canonical_name"], "enabled": True, "aliases": []}
+    )
+    try:
+        resolve_actor_alias(collision_corpus, collision["alias"])
+        errors.append("actor alias collision must fail closed")
+    except ValueError as error:
+        if str(error) != collision["expected_error"]:
+            errors.append(f"unexpected actor alias collision error: {error}")
 
     migration = MIGRATION_FILE.read_text(encoding="utf-8")
     for function_name in (
@@ -209,13 +255,38 @@ def main() -> int:
         if required_fragment not in collection_test:
             errors.append(f"collection-run correlation runtime test is missing {required_fragment}")
 
+    actor_alias_migration = ACTOR_ALIAS_MIGRATION_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "CREATE TABLE IF NOT EXISTS threat_actors",
+        "CREATE TABLE IF NOT EXISTS threat_actor_aliases",
+        "FUNCTION resolve_threat_actor",
+        "ambiguous threat actor alias configuration",
+        "FUNCTION normalize_threat_actor",
+        "'unmapped'::text",
+    ):
+        if required_fragment not in actor_alias_migration:
+            errors.append(f"actor-alias migration is missing {required_fragment}")
+    if "fuzzy" in actor_alias_migration.lower() or "similarity(" in actor_alias_migration:
+        errors.append("actor-alias resolution must not contain fuzzy matching")
+
+    actor_alias_test = ACTOR_ALIAS_TEST_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "approved actor alias did not resolve",
+        "disabled actor aliases must not resolve",
+        "actor alias collision must fail closed",
+        "canonical actor and approved alias must correlate to one claim",
+        "ROLLBACK;",
+    ):
+        if required_fragment not in actor_alias_test:
+            errors.append(f"actor-alias runtime test is missing {required_fragment}")
+
     if errors:
         print("Matching contract validation failed:", file=sys.stderr)
         for error in errors:
             print(f"- {error}", file=sys.stderr)
         return 1
 
-    case_count = sum(len(corpus[key]) for key in corpus)
+    case_count = sum(len(corpus[key]) for key in corpus) + len(actor_corpus["cases"]) + 1
     print(f"Matching contract validation passed ({case_count} deterministic cases).")
     return 0
 

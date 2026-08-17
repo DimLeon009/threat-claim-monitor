@@ -18,7 +18,7 @@ No fuzzy score can produce an automatic match. The initial M2 increment implemen
 
 For example, `Digit Ré Group` and `DIGIT-RE__Group` both normalize to `digit re group`. `Cap France` remains `cap france`; normalization never joins tokens to manufacture a match with `Capifrance`.
 
-`normalize_threat_actor` currently uses the same transformation. Canonical actor aliases will be an explicit table-driven layer rather than an implicit fuzzy rule.
+`normalize_threat_actor` first uses the same transformation, then resolves enabled canonical names and administrator-approved exact aliases through the table-driven contract documented in `threat-actor-aliases.md`. Unknown actors keep their normalized input, and ambiguous configuration fails closed.
 
 ## Domain normalization
 
