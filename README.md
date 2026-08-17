@@ -190,8 +190,8 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | Milestone | Scope | Status |
 |---|---|---|
 | M0 | Repository, Compose, schema, ADR, documentation, CI | ✅ Complete; runtime validated on macOS |
-| M1 | ransomware.live collection and silent baseline | 🚧 In progress |
-| M2 | Matching and cross-source correlation | Planned |
+| M1 | ransomware.live collection and silent baseline | ✅ Complete; runtime validated on Windows |
+| M2 | Matching and cross-source correlation | 🚧 In progress |
 | M3 | Ollama structured analysis | Planned |
 | M4 | Webhook, email, and Teams notifications | Planned |
 | M5 | Additional source adapters | Planned |

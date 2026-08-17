@@ -113,6 +113,21 @@ The record includes:
 
 Model-generated text must never populate the matching method or confidence score.
 
+### M2 normalization and exact-candidate functions
+
+Migrations `004_matching_normalization` and `005_exact_organization_matching` add deterministic database functions without changing stored source evidence:
+
+- `normalize_match_text` creates accent-insensitive, punctuation-separated comparison keys;
+- `normalize_threat_actor` applies the text contract before explicit alias resolution;
+- `normalize_domain` parses and validates an ASCII hostname while failing closed on malformed values;
+- `domain_matches_registered` accepts only an approved registered-domain boundary or its true subdomains;
+- `extract_approved_registered_domain` returns the longest configured boundary match;
+- `find_exact_organization_matches` evaluates domain, official-name, and approved exact-alias rules.
+
+An exact candidate is `auto_accepted` only when exactly one enabled organization matches. Configuration collisions return every candidate as `pending`, even when a domain rule has nominal confidence 100. The function stores the rule version, normalized comparison evidence, candidate count, collision flag, and automatic-alert eligibility in its result.
+
+Candidate evaluation does not create a claim or write `organization_matches`. Claim correlation and transactional persistence remain separate so one observation can be linked and evaluated atomically in the next M2 increment.
+
 ### `analyses`
 
 Stores a local-model result or deterministic fallback.
@@ -185,4 +200,3 @@ Retention will become configurable before v1.0.0. Deletion must preserve referen
 ## Future extensions
 
 Possible additions include analyst comments, official confirmation evidence, source health snapshots, notification subscriptions, and retention jobs. IOC storage and vector embeddings are deliberately not part of this schema until their use cases are implemented.
-
