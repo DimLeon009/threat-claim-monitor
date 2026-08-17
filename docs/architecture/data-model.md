@@ -131,7 +131,7 @@ Migrations `004_matching_normalization`, `005_exact_organization_matching`, and 
 
 An exact candidate is `auto_accepted` only when exactly one enabled organization matches. Configuration collisions return every candidate as `pending`, even when a domain rule has nominal confidence 100. The function stores the rule version, normalized comparison evidence, candidate count, collision flag, and automatic-alert eligibility in its result.
 
-Candidate evaluation remains read-only when called alone. Migration `006_transactional_claim_correlation` adds the transactional persistence boundary: it serializes the V1 correlation worker with a transaction-scoped advisory lock, reuses at most one exact victim/actor or domain/actor claim within 45 days, links each observation once, advances evidence versions only for new evidence, and persists exact organization matches. Ambiguous existing claim candidates abort without partial writes.
+Candidate evaluation remains read-only when called alone. Migration `006_transactional_claim_correlation` adds the transactional persistence boundary: it serializes the V1 correlation worker with a transaction-scoped advisory lock, reuses at most one exact victim/actor or domain/actor claim within 45 days, links each observation once, advances evidence versions only for new evidence, and persists exact organization matches. Migration `009_review_match_candidates` extends this boundary with pending-only token and fuzzy candidates while preserving exact and human decisions. Ambiguous existing claim candidates abort without partial writes.
 
 ### `analyses`
 

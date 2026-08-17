@@ -28,7 +28,7 @@ This fail-closed rule takes precedence over the nominal confidence score. A scor
 
 Each result includes JSON evidence with rule version `exact-v1` and only the comparison material needed to explain the decision. Domain evidence records the normalized candidate and approved boundary. Name and alias evidence record the normalized values used by the rule.
 
-No fuzzy or token similarity exists in this function. Later review-candidate logic must remain separate and can never set `auto_accepted`.
+No fuzzy or token similarity exists in this function. The separate `find_review_organization_candidates` contract is documented in `review-candidates.md` and can never set `auto_accepted`.
 
 ## Validation
 

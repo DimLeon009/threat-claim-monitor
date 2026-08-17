@@ -31,7 +31,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 |---|---|:---:|
 | M0 | Reproducible professional foundation | ✅ |
 | M1 | First reliable ransomware claim feed | ✅ |
-| M2 | Deterministic watchlist matching and correlation | 🚧 |
+| M2 | Deterministic watchlist matching and correlation | ✅ |
 | M3 | Evidence-grounded local summaries | ⏳ |
 | M4 | Auditable multi-channel notifications | Planned |
 | M5 | Resilient multi-source coverage | Planned |
@@ -106,7 +106,7 @@ Collect recent ransomware.live records safely and insert each source observation
 - A source failure does not corrupt partial state.
 - Logs and persisted errors contain no credentials or excessive payloads.
 
-## 🚧 M2 — Matching and claim correlation
+## ✅ M2 — Matching and claim correlation
 
 ### Objective
 
@@ -120,7 +120,7 @@ Identify monitored organizations with explainable rules and correlate source dup
 - [x] Canonical claim creation
 - [x] 45-day correlation window
 - [x] Exact domain, official-name, and alias matching
-- [ ] Review path for token and fuzzy candidates
+- [x] Review path for token and fuzzy candidates
 - [x] Match evidence payload
 - [x] Evidence-version updates
 - [x] Positive, negative, ambiguous, and collision corpus

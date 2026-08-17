@@ -12,6 +12,7 @@ from pathlib import Path
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 CORPUS_FILE = REPOSITORY_ROOT / "fixtures/matching/normalization-corpus.json"
 ACTOR_ALIAS_CORPUS_FILE = REPOSITORY_ROOT / "fixtures/matching/threat-actor-alias-corpus.json"
+REVIEW_CORPUS_FILE = REPOSITORY_ROOT / "fixtures/matching/review-candidate-corpus.json"
 MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/004_matching_normalization.sql"
 EXACT_MATCH_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/005_exact_organization_matching.sql"
 CORRELATION_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/006_transactional_claim_correlation.sql"
@@ -24,6 +25,8 @@ COLLECTION_CORRELATION_TEST_FILE = (
 )
 ACTOR_ALIAS_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/008_threat_actor_aliases.sql"
 ACTOR_ALIAS_TEST_FILE = REPOSITORY_ROOT / "scripts/test_threat_actor_alias_contract.sql"
+REVIEW_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/009_review_match_candidates.sql"
+REVIEW_TEST_FILE = REPOSITORY_ROOT / "scripts/test_review_candidate_contract.sql"
 DOMAIN_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 ORGANIZATIONS = (
     {
@@ -123,10 +126,17 @@ def resolve_actor_alias(actor_corpus: dict[str, object], input_value: str) -> tu
     return sorted(candidates, key=lambda candidate: candidate[1] != "canonical_exact")[0]
 
 
+def approved_token_alias_matches(candidate: str, approved_alias: str) -> bool:
+    candidate_tokens = set((normalize_match_text(candidate) or "").split())
+    approved_tokens = set((normalize_match_text(approved_alias) or "").split())
+    return len(approved_tokens) >= 2 and approved_tokens <= candidate_tokens
+
+
 def main() -> int:
     errors: list[str] = []
     corpus = json.loads(CORPUS_FILE.read_text(encoding="utf-8"))
     actor_corpus = json.loads(ACTOR_ALIAS_CORPUS_FILE.read_text(encoding="utf-8"))
+    review_corpus = json.loads(REVIEW_CORPUS_FILE.read_text(encoding="utf-8"))
 
     for case in corpus["text_cases"] + corpus["actor_cases"]:
         actual = normalize_match_text(case["input"])
@@ -175,6 +185,24 @@ def main() -> int:
     except ValueError as error:
         if str(error) != collision["expected_error"]:
             errors.append(f"unexpected actor alias collision error: {error}")
+
+    for case in review_corpus["token_cases"]:
+        actual = approved_token_alias_matches(case["candidate"], case["approved_alias"])
+        if actual is not case["expected"]:
+            errors.append(
+                f"token-candidate mismatch for {case['candidate']!r} against "
+                f"{case['approved_alias']!r}: {actual!r}"
+            )
+
+    invariants = review_corpus["invariants"]
+    if (
+        invariants["review_status"] != "pending"
+        or invariants["auto_alert_eligible"] is not False
+        or not 70 <= invariants["token_min_score"] <= invariants["token_max_score"] <= 84
+        or invariants["fuzzy_max_score"] >= 70
+        or not 0 < invariants["fuzzy_min_similarity"] < 1
+    ):
+        errors.append("review-candidate corpus contains unsafe scoring invariants")
 
     migration = MIGRATION_FILE.read_text(encoding="utf-8")
     for function_name in (
@@ -280,13 +308,46 @@ def main() -> int:
         if required_fragment not in actor_alias_test:
             errors.append(f"actor-alias runtime test is missing {required_fragment}")
 
+    review_migration = REVIEW_MIGRATION_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "CREATE EXTENSION IF NOT EXISTS pg_trgm",
+        "confidence_score BETWEEN 70 AND 84",
+        "FUNCTION approved_token_alias_matches",
+        "cardinality(approved.tokens) < 2",
+        "FUNCTION find_review_organization_candidates",
+        "similarity(",
+        "'pending'::text AS review_status",
+        "'auto_alert_eligible', false",
+        "FUNCTION persist_review_organization_candidates",
+        "FUNCTION correlate_observation_exact",
+    ):
+        if required_fragment not in review_migration:
+            errors.append(f"review-candidate migration is missing {required_fragment}")
+
+    review_test = REVIEW_TEST_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "single-token aliases must not produce review candidates",
+        "fuzzy candidate must remain pending",
+        "review candidates must never be auto accepted",
+        "candidate replay must preserve the human review decision",
+        "ROLLBACK;",
+    ):
+        if required_fragment not in review_test:
+            errors.append(f"review-candidate runtime test is missing {required_fragment}")
+
     if errors:
         print("Matching contract validation failed:", file=sys.stderr)
         for error in errors:
             print(f"- {error}", file=sys.stderr)
         return 1
 
-    case_count = sum(len(corpus[key]) for key in corpus) + len(actor_corpus["cases"]) + 1
+    case_count = (
+        sum(len(corpus[key]) for key in corpus)
+        + len(actor_corpus["cases"])
+        + 1
+        + len(review_corpus["token_cases"])
+        + len(review_corpus["fuzzy_cases"])
+    )
     print(f"Matching contract validation passed ({case_count} deterministic cases).")
     return 0
 

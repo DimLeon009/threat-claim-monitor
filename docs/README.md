@@ -53,6 +53,7 @@ This directory contains the technical, operational, and security documentation f
 | [Exact matching](matching/exact-matching.md) | Domain, official-name, approved-alias, confidence, and collision rules |
 | [Claim correlation](matching/claim-correlation.md) | Transactional 45-day correlation, replay, concurrency, evidence versions, and match persistence |
 | [Threat-actor aliases](matching/threat-actor-aliases.md) | Approved canonical actor names, exact aliases, disabled mappings, and fail-closed collisions |
+| [Review candidates](matching/review-candidates.md) | Token and fuzzy candidate rules, bounded scores, evidence, and anti-auto-alert invariants |
 
 ### Security
 
