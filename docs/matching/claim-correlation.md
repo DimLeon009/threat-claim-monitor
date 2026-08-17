@@ -43,3 +43,11 @@ docker compose exec -T postgres psql \
 The reference Compose file does not mount the repository at `/workspace`; on a host, pipe or copy the SQL file into `psql`. The test wraps all synthetic observations, claims, matches, and collision configuration in `BEGIN`/`ROLLBACK`.
 
 It validates replay idempotency, the 45-day boundary, actor separation, evidence-version increments, score-100 domain persistence, and fail-closed collision handling.
+
+## Collection workflow integration
+
+Migration `007_collection_run_correlation` adds `correlate_collection_run_exact`. The wrapper processes every observation inserted under one ransomware.live `collection_run_id`, calls the single-observation transaction for each item in stable order, and records bounded counters in `collection_runs.metadata`.
+
+`WF-10 Collect ransomware.live` calls the wrapper immediately after successful ingestion. Replaying the same collection run is safe: existing observation links do not advance evidence versions. If correlation fails, `record_claim_correlation_failure` marks the collection run `partial` with one allow-listed message and no raw database error. A successful retry restores the run to `succeeded`.
+
+Validate the wrapper with `scripts/test_collection_run_correlation_contract.sql`. Like the single-observation test, it rolls back all synthetic state.

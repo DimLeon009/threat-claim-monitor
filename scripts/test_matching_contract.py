@@ -15,6 +15,12 @@ MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/004_matching_normalization.sql
 EXACT_MATCH_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/005_exact_organization_matching.sql"
 CORRELATION_MIGRATION_FILE = REPOSITORY_ROOT / "db/migrations/006_transactional_claim_correlation.sql"
 CORRELATION_TEST_FILE = REPOSITORY_ROOT / "scripts/test_correlation_contract.sql"
+COLLECTION_CORRELATION_MIGRATION_FILE = (
+    REPOSITORY_ROOT / "db/migrations/007_collection_run_correlation.sql"
+)
+COLLECTION_CORRELATION_TEST_FILE = (
+    REPOSITORY_ROOT / "scripts/test_collection_run_correlation_contract.sql"
+)
 DOMAIN_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 ORGANIZATIONS = (
     {
@@ -178,6 +184,30 @@ def main() -> int:
     ):
         if required_fragment not in correlation_test:
             errors.append(f"claim-correlation runtime test is missing {required_fragment}")
+
+    collection_migration = COLLECTION_CORRELATION_MIGRATION_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "FUNCTION correlate_collection_run_exact",
+        "correlate_observation_exact",
+        "'correlation_status', 'succeeded'",
+        "FUNCTION record_claim_correlation_failure",
+        "'correlation_status', 'failed'",
+        "'correlation_failure_code', 'correlation_failed'",
+    ):
+        if required_fragment not in collection_migration:
+            errors.append(f"collection-run correlation migration is missing {required_fragment}")
+
+    collection_test = COLLECTION_CORRELATION_TEST_FILE.read_text(encoding="utf-8")
+    for required_fragment in (
+        "\\set ON_ERROR_STOP on",
+        "collection run correlation summary is invalid",
+        "collection run replay must not increment evidence_version",
+        "correlation failure must be persisted with sanitized metadata",
+        "successful retry must recover the collection run state",
+        "ROLLBACK;",
+    ):
+        if required_fragment not in collection_test:
+            errors.append(f"collection-run correlation runtime test is missing {required_fragment}")
 
     if errors:
         print("Matching contract validation failed:", file=sys.stderr)

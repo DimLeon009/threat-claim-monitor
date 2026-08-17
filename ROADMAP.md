@@ -125,6 +125,7 @@ Identify monitored organizations with explainable rules and correlate source dup
 - [x] Evidence-version updates
 - [x] Positive, negative, ambiguous, and collision corpus
 - [x] Concurrency and replay tests
+- [x] Collection-workflow correlation integration
 
 ### Acceptance criteria
 

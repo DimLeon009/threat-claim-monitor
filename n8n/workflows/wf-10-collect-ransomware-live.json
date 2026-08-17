@@ -83,6 +83,48 @@
     },
     {
       "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM correlate_collection_run_exact($1::uuid);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ $json.collection_run_id }}"
+        }
+      },
+      "id": "c77ddf40-af06-4b15-a703-23599888124c",
+      "name": "Correlate collection observations",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [384, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM record_claim_correlation_failure($1::uuid);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ $('Insert observations if new').first().json.collection_run_id }}"
+        }
+      },
+      "id": "82e1e76b-28cc-44ae-88a2-988738e20bb5",
+      "name": "Record sanitized correlation failure",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [640, 80]
+    },
+    {
+      "parameters": {
+        "errorType": "errorMessage",
+        "errorMessage": "={{ $json.error_message }}"
+      },
+      "id": "3219edb7-c78e-42f8-a364-25282a18380d",
+      "name": "Stop with sanitized correlation failure",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [896, 80]
+    },
+    {
+      "parameters": {
         "mode": "runOnceForAllItems",
         "language": "javaScript",
         "jsCode": "return [{ json: { failure_code: 'fetch_failed' } }];"
@@ -166,9 +208,18 @@
     },
     "Insert observations if new": {
       "main": [
-        [],
+        [{"node": "Correlate collection observations", "type": "main", "index": 0}],
         [{"node": "Classify ingestion failure", "type": "main", "index": 0}]
       ]
+    },
+    "Correlate collection observations": {
+      "main": [
+        [],
+        [{"node": "Record sanitized correlation failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Record sanitized correlation failure": {
+      "main": [[{"node": "Stop with sanitized correlation failure", "type": "main", "index": 0}]]
     },
     "Classify fetch failure": {
       "main": [[{"node": "Record sanitized failure", "type": "main", "index": 0}]]

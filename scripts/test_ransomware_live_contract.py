@@ -56,6 +56,9 @@ def main() -> int:
         "Fetch recent victims",
         "Validate and allow-list response",
         "Insert observations if new",
+        "Correlate collection observations",
+        "Record sanitized correlation failure",
+        "Stop with sanitized correlation failure",
         "Classify fetch failure",
         "Classify validation failure",
         "Classify ingestion failure",
@@ -79,6 +82,7 @@ def main() -> int:
         "Fetch recent victims": "Classify fetch failure",
         "Validate and allow-list response": "Classify validation failure",
         "Insert observations if new": "Classify ingestion failure",
+        "Correlate collection observations": "Record sanitized correlation failure",
     }
     for node_name, failure_target in guarded_nodes.items():
         node = nodes.get(node_name, {})
@@ -113,6 +117,39 @@ def main() -> int:
         errors.append("failure recorder must bind the classified failure code")
     if target_names(connections, "Record sanitized failure", 0) != ["Stop with sanitized failure"]:
         errors.append("failure recorder must terminate through Stop with sanitized failure")
+
+    if target_names(connections, "Insert observations if new", 0) != ["Correlate collection observations"]:
+        errors.append("successful ingestion must target collection-run correlation")
+
+    correlation = nodes.get("Correlate collection observations", {})
+    correlation_query = correlation.get("parameters", {}).get("query", "")
+    correlation_replacement = correlation.get("parameters", {}).get("options", {}).get(
+        "queryReplacement", ""
+    )
+    if "correlate_collection_run_exact" not in correlation_query:
+        errors.append("correlation node must call correlate_collection_run_exact")
+    if "$json.collection_run_id" not in correlation_replacement:
+        errors.append("correlation node must bind the ingestion collection_run_id")
+
+    correlation_recorder = nodes.get("Record sanitized correlation failure", {})
+    correlation_failure_query = correlation_recorder.get("parameters", {}).get("query", "")
+    correlation_failure_replacement = correlation_recorder.get("parameters", {}).get(
+        "options", {}
+    ).get("queryReplacement", "")
+    if "record_claim_correlation_failure" not in correlation_failure_query:
+        errors.append("correlation failure recorder must use the sanitized database function")
+    if "Insert observations if new" not in correlation_failure_replacement:
+        errors.append("correlation failure recorder must bind the original collection_run_id")
+    if target_names(connections, "Record sanitized correlation failure", 0) != [
+        "Stop with sanitized correlation failure"
+    ]:
+        errors.append("correlation failure recorder must terminate through its sanitized stop node")
+
+    correlation_stop = nodes.get("Stop with sanitized correlation failure", {})
+    if correlation_stop.get("type") != "n8n-nodes-base.stopAndError":
+        errors.append("correlation failure path must end with a Stop And Error node")
+    if correlation_stop.get("parameters", {}).get("errorMessage") != "={{ $json.error_message }}":
+        errors.append("correlation Stop And Error must use only the sanitized database message")
 
     stop_node = nodes.get("Stop with sanitized failure", {})
     if stop_node.get("type") != "n8n-nodes-base.stopAndError":
