@@ -1,0 +1,196 @@
+{
+  "name": "WF-10 Collect ransomware.live",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e40fbab1-89b9-45a5-9c92-bd044353f60c",
+      "name": "Run collection manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-640, 80]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "b9fe5632-891c-4b02-bda7-76121ff5fa58",
+      "name": "Run from orchestrator",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [-640, -80]
+    },
+    {
+      "parameters": {
+        "url": "https://api.ransomware.live/v2/recentvictims",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "60ab1a08-53d8-40b8-a602-df4e0b414524",
+      "name": "Fetch recent victims",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [-384, 0],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const responses = $input.all().map((item) => item.json);\nif (responses.length !== 1) {\n  throw new Error(`Expected one HTTP response, received ${responses.length}`);\n}\n\nconst response = responses[0];\nif (response.statusCode !== 200) {\n  throw new Error(`Unexpected HTTP status: ${response.statusCode}`);\n}\n\nconst contentType = String(response.headers?.['content-type'] ?? response.headers?.['Content-Type'] ?? '');\nif (!contentType.toLowerCase().includes('application/json')) {\n  throw new Error('Unexpected response content type');\n}\n\nconst records = response.body;\nif (!Array.isArray(records) || records.length < 1 || records.length > 500) {\n  throw new Error('Response must contain between 1 and 500 records');\n}\n\nconst requiredStringFields = ['victim', 'group', 'discovered'];\nconst allowedFields = ['activity', 'attackdate', 'claim_url', 'country', 'description', 'discovered', 'domain', 'group', 'url', 'victim'];\nconst normalized = records.map((record, index) => {\n  if (!record || typeof record !== 'object' || Array.isArray(record)) {\n    throw new Error(`Record ${index + 1} must be an object`);\n  }\n  for (const field of requiredStringFields) {\n    if (typeof record[field] !== 'string' || !record[field].trim()) {\n      throw new Error(`Record ${index + 1} has invalid ${field}`);\n    }\n  }\n  const safe = {};\n  for (const field of allowedFields) {\n    const value = record[field];\n    if (value === undefined || value === null) {\n      safe[field] = '';\n    } else if (typeof value === 'string') {\n      safe[field] = value.trim();\n    } else {\n      throw new Error(`Record ${index + 1} has invalid ${field}`);\n    }\n  }\n  return safe;\n});\n\nreturn [{ json: { records: normalized } }];"
+      },
+      "id": "031eb3cc-cf08-4da5-900d-e0613fa0e626",
+      "name": "Validate and allow-list response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM ingest_ransomware_live_collection($1::jsonb);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ JSON.stringify($json.records) }}"
+        }
+      },
+      "id": "7606931b-0e0b-4871-ba03-915f0f7ca7c3",
+      "name": "Insert observations if new",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [128, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: { failure_code: 'fetch_failed' } }];"
+      },
+      "id": "697d54ad-acde-4a9f-9177-2b24b621c7b7",
+      "name": "Classify fetch failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 256]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: { failure_code: 'response_validation_failed' } }];"
+      },
+      "id": "ba80feeb-25bd-4dd9-8a55-1cc26dd5091d",
+      "name": "Classify validation failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [128, 256]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: { failure_code: 'ingestion_failed' } }];"
+      },
+      "id": "02dd768e-f187-4290-9902-eebd6283932a",
+      "name": "Classify ingestion failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 256]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM record_ransomware_live_failure($1::text);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ $json.failure_code }}"
+        }
+      },
+      "id": "37e58f17-f603-49e0-9bf2-f6499e164f3d",
+      "name": "Record sanitized failure",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [640, 256]
+    },
+    {
+      "parameters": {
+        "errorType": "errorMessage",
+        "errorMessage": "={{ $json.error_message }}"
+      },
+      "id": "a2e818e4-4216-48f3-a9be-8f0c5f707518",
+      "name": "Stop with sanitized failure",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [896, 256]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run collection manually": {
+      "main": [[{"node": "Fetch recent victims", "type": "main", "index": 0}]]
+    },
+    "Run from orchestrator": {
+      "main": [[{"node": "Fetch recent victims", "type": "main", "index": 0}]]
+    },
+    "Fetch recent victims": {
+      "main": [
+        [{"node": "Validate and allow-list response", "type": "main", "index": 0}],
+        [{"node": "Classify fetch failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Validate and allow-list response": {
+      "main": [
+        [{"node": "Insert observations if new", "type": "main", "index": 0}],
+        [{"node": "Classify validation failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Insert observations if new": {
+      "main": [
+        [],
+        [{"node": "Classify ingestion failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Classify fetch failure": {
+      "main": [[{"node": "Record sanitized failure", "type": "main", "index": 0}]]
+    },
+    "Classify validation failure": {
+      "main": [[{"node": "Record sanitized failure", "type": "main", "index": 0}]]
+    },
+    "Classify ingestion failure": {
+      "main": [[{"node": "Record sanitized failure", "type": "main", "index": 0}]]
+    },
+    "Record sanitized failure": {
+      "main": [[{"node": "Stop with sanitized failure", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Paris"
+  },
+  "versionId": "9f6630b1-8fc8-4ac8-a55e-664c43e8c390",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

@@ -19,6 +19,9 @@ fi
 
 docker compose config --quiet
 
+python3 scripts/validate_source_fixtures.py
+python3 scripts/test_ransomware_live_contract.py
+
 for migration in db/migrations/*.sql; do
   filename=$(basename "$migration")
   echo "$filename" | grep -Eq '^[0-9]{3}_[a-z0-9_]+\.sql$' || {
@@ -28,4 +31,3 @@ for migration in db/migrations/*.sql; do
 done
 
 echo 'Repository validation passed.'
-
