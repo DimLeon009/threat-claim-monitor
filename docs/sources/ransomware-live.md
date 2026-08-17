@@ -56,16 +56,22 @@ python3 scripts/validate_source_fixtures.py
 
 ## Workflow deployment
 
-Apply migration `002_ransomware_live_ingestion.sql` to an existing development database before importing the workflow:
+Apply migrations `002_ransomware_live_ingestion.sql` and
+`003_ransomware_live_failure_history.sql` to an existing development database before importing the workflow:
 
 ```sh
 docker compose exec postgres psql \
   --username tcm_admin \
   --dbname threat_claim_monitor \
   --file /migrations/002_ransomware_live_ingestion.sql
+
+docker compose exec postgres psql \
+  --username tcm_admin \
+  --dbname threat_claim_monitor \
+  --file /migrations/003_ransomware_live_failure_history.sql
 ```
 
-Import `n8n/workflows/wf-10-collect-ransomware-live.json` and `n8n/workflows/wf-00-orchestrator.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new`; credentials and environment-specific credential identifiers are intentionally absent from the committed export.
+Import `n8n/workflows/wf-10-collect-ransomware-live.json` and `n8n/workflows/wf-00-orchestrator.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to both `Insert observations if new` and `Record sanitized failure`; credentials and environment-specific credential identifiers are intentionally absent from the committed export.
 
 In `WF-00 Orchestrator`, configure `Collect ransomware.live` to call `WF-10 Collect ransomware.live`. The database workflow identifier is intentionally absent from the committed export because it is local to each n8n instance.
 
@@ -79,4 +85,22 @@ Both workflows remain inactive after import. Run `WF-10` manually to establish a
 4. `ingest_ransomware_live_collection` serializes collections for this source, creates a run, inserts unseen source keys, and completes the baseline atomically.
 5. A duplicate source key is a no-op and increments neither `observations` nor `inserted_count`.
 
-If validation or database ingestion fails, the n8n execution fails closed. Persisting sanitized failed collection runs is deferred to the dedicated M1 error-handling increment.
+## Failure behavior
+
+HTTP exhaustion, response-contract rejection, and database-ingestion errors leave the success path through a dedicated n8n error output. The workflow replaces the raw error item with one allow-listed code before calling `record_ransomware_live_failure`:
+
+| Failure code | Persisted message |
+|---|---|
+| `fetch_failed` | `ransomware.live request failed after bounded retries` |
+| `response_validation_failed` | `ransomware.live response rejected by contract validation` |
+| `ingestion_failed` | `ransomware.live database ingestion failed` |
+
+The failure record contains zero fetched and inserted items, the contract version, and the allow-listed code. It never stores the raw response, exception stack, connection string, or credential. After persistence, `Stop with sanitized failure` fails the n8n execution with only the sanitized message.
+
+Validate the failure-routing contract with:
+
+```sh
+python3 scripts/test_ransomware_live_contract.py
+```
+
+The test covers malformed response fixtures, required-field rejection, timeout and retry settings, error-output routing, allow-listed classification, and sanitized termination.

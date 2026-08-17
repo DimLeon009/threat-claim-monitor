@@ -25,5 +25,8 @@ jobs:
       - name: Validate source fixtures
         run: python scripts/validate_source_fixtures.py
 
+      - name: Validate ransomware.live failure contract
+        run: python scripts/test_ransomware_live_contract.py
+
       - name: Validate repository configuration
         run: sh scripts/validate.sh

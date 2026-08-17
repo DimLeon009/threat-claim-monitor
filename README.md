@@ -108,7 +108,7 @@ Read the complete [architecture documentation](docs/architecture/architecture.md
 
 | Source | Format | V1 role | State |
 |---|---|---|---|
-| ransomware.live | JSON API | Primary claim feed | Seeded; adapter planned in M1 |
+| ransomware.live | JSON API | Primary claim feed | Adapter implemented; M1 hardening in progress |
 | RansomLook | JSON API and RSS | Secondary observation and correlation | Seeded; adapter planned in M5 |
 | FrenchBreaches | RSS advertised | French breach enrichment | Seeded, disabled pending validation |
 | CERT-FR | RSS / CTI publications | Future institutional confirmation | Planned |

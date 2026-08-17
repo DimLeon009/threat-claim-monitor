@@ -90,11 +90,11 @@ Collect recent ransomware.live records safely and insert each source observation
 - [x] Content-type and response-shape validation
 - [x] Common normalized observation contract
 - [x] Stable source-key generation
-- [ ] Collection run history and sanitized failures
+- [x] Collection run history and sanitized failures
 - [x] Silent first-run baseline
 - [x] Redacted source contract fixture
 - [x] Duplicate replay test
-- [ ] Malformed response and timeout tests
+- [x] Malformed response and timeout tests
 - [x] Workflow export documentation
 
 ### Acceptance criteria
