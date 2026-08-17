@@ -22,5 +22,8 @@ jobs:
       - name: Validate documentation
         run: python scripts/validate_docs.py
 
+      - name: Validate source fixtures
+        run: python scripts/validate_source_fixtures.py
+
       - name: Validate repository configuration
         run: sh scripts/validate.sh

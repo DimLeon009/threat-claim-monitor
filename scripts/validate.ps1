@@ -19,6 +19,11 @@ try {
     throw 'Docker Compose validation failed.'
   }
 
+  python scripts/validate_source_fixtures.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Source fixture validation failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'

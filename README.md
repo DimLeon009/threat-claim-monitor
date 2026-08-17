@@ -189,8 +189,8 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 
 | Milestone | Scope | Status |
 |---|---|---|
-| M0 | Repository, Compose, schema, ADR, documentation, CI | ✅ Implemented; runtime smoke test pending Docker |
-| M1 | ransomware.live collection and silent baseline | ⏳ Next |
+| M0 | Repository, Compose, schema, ADR, documentation, CI | ✅ Complete; runtime validated on macOS |
+| M1 | ransomware.live collection and silent baseline | 🚧 In progress |
 | M2 | Matching and cross-source correlation | Planned |
 | M3 | Ollama structured analysis | Planned |
 | M4 | Webhook, email, and Teams notifications | Planned |

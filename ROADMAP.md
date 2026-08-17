@@ -84,18 +84,18 @@ Collect recent ransomware.live records safely and insert each source observation
 
 ### Deliverables
 
-- [ ] `WF-00 Orchestrator`
-- [ ] `WF-10 Collect ransomware.live`
-- [ ] HTTP timeout and bounded retry policy
-- [ ] Content-type and response-shape validation
-- [ ] Common normalized observation contract
-- [ ] Stable source-key generation
+- [x] `WF-00 Orchestrator`
+- [x] `WF-10 Collect ransomware.live`
+- [x] HTTP timeout and bounded retry policy
+- [x] Content-type and response-shape validation
+- [x] Common normalized observation contract
+- [x] Stable source-key generation
 - [ ] Collection run history and sanitized failures
-- [ ] Silent first-run baseline
-- [ ] Redacted source contract fixture
-- [ ] Duplicate replay test
+- [x] Silent first-run baseline
+- [x] Redacted source contract fixture
+- [x] Duplicate replay test
 - [ ] Malformed response and timeout tests
-- [ ] Workflow export documentation
+- [x] Workflow export documentation
 
 ### Acceptance criteria
 
@@ -318,4 +318,3 @@ A roadmap item is done when:
 - documentation is updated;
 - workflow exports are sanitized;
 - acceptance evidence is recorded in the pull request.
-

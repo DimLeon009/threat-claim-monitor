@@ -38,6 +38,12 @@ This directory contains the technical, operational, and security documentation f
 | [macOS](development/macos.md) | Apple Silicon, Docker Desktop, native Ollama, and host networking |
 | [Contributing](../CONTRIBUTING.md) | Branches, commits, migrations, workflows, tests, and review expectations |
 
+### Sources
+
+| Document | Purpose |
+|---|---|
+| [ransomware.live](sources/ransomware-live.md) | Public API contract, stable identity, silent baseline, and fixture policy |
+
 ### Security
 
 | Document | Purpose |
@@ -53,4 +59,3 @@ This directory contains the technical, operational, and security documentation f
 - Planned behavior must be labeled as planned.
 - Links are relative so documentation remains usable from forks.
 - Material behavior changes require documentation in the same pull request.
-
