@@ -1,0 +1,22 @@
+{
+  "profile_version": "ollama-model-v1",
+  "role": "fallback",
+  "model": "qwen3:4b-q4_K_M",
+  "expected_digest_prefix": "2bfd38a7daaf",
+  "installation_required": true,
+  "runtime": {
+    "stream": false,
+    "think": false,
+    "keep_alive": "5m",
+    "options": {
+      "temperature": 0,
+      "num_ctx": 4096,
+      "num_predict": 512
+    }
+  },
+  "input_limits": {
+    "max_observations": 10,
+    "max_description_characters": 1000,
+    "max_total_characters": 12000
+  }
+}
