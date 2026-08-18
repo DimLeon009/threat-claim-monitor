@@ -163,9 +163,9 @@ Produce concise French analyst summaries from normalized evidence through explic
 - [x] Explicit cloud-selection and public-metadata policy
 - [x] Stable OpenAI v1 API contract
 - [x] Provider-aware analysis provenance and uniqueness
-- [ ] Sanitized Foundry runtime configuration
-- [ ] `WF-41 Microsoft Foundry analysis`
-- [ ] Shared validation and deterministic fallback
+- [x] Sanitized Foundry runtime configuration
+- [x] `WF-41 Microsoft Foundry analysis`
+- [x] Shared validation and deterministic fallback
 - [ ] Authentication, rate-limit, content-filter, and timeout tests
 - [ ] Approved Foundry deployment and real inference validation
 - [ ] Ollama/Foundry contract-parity validation
