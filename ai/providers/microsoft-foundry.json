@@ -22,7 +22,8 @@
     "stream": false,
     "temperature": 0,
     "max_completion_tokens": 512,
-    "response_format": "json_schema"
+    "response_format": "json_schema",
+    "schema_transport": "azure_structured_outputs_subset"
   },
   "input_limits": {
     "max_observations": 10,

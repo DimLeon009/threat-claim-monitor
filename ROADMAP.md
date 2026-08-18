@@ -167,7 +167,7 @@ Produce concise French analyst summaries from normalized evidence through explic
 - [x] `WF-41 Microsoft Foundry analysis`
 - [x] Shared validation and deterministic fallback
 - [ ] Authentication, rate-limit, content-filter, and timeout tests
-- [ ] Approved Foundry deployment and real inference validation
+- [x] Approved Foundry deployment and real inference validation
 - [ ] Ollama/Foundry contract-parity validation
 
 ### Acceptance criteria

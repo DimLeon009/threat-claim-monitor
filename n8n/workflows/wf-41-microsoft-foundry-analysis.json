@@ -19,6 +19,18 @@
     },
     {
       "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const unsupported = new Set(['minLength','maxLength','pattern','minItems','maxItems','uniqueItems']);\nconst stripUnsupported = value => {\n  if (Array.isArray(value)) return value.map(stripUnsupported);\n  if (!value || typeof value !== 'object') return value;\n  if (Object.hasOwn(value, 'const')) {\n    const exact = value.const;\n    const converted = {...value,type:typeof exact,enum:[exact]};\n    delete converted.const;\n    return stripUnsupported(converted);\n  }\n  return Object.fromEntries(Object.entries(value).filter(([key,item]) => !unsupported.has(key) && item !== undefined).map(([key,item]) => [key,stripUnsupported(item)]));\n};\nconst request = $json.foundry_request;\nconst schema = stripUnsupported(request.response_format.json_schema.schema);\nreturn {json:{...$json,foundry_request:{...request,response_format:{...request.response_format,json_schema:{...request.response_format.json_schema,schema}}}}};"
+      },
+      "id": "ee653573-c21c-4330-87a0-2eeafbe1f671",
+      "name": "Restrict Foundry JSON Schema",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [16, 0]
+    },
+    {
+      "parameters": {
         "operation": "executeQuery",
         "query": "WITH config AS (SELECT * FROM get_enabled_microsoft_foundry_config()), jobs AS (SELECT job.* FROM config CROSS JOIN LATERAL get_pending_claim_analysis_jobs('claim-analysis-v1', 'microsoft_foundry', config.deployment_name, 10) AS job) SELECT jobs.*, config.endpoint_base_url, config.deployment_name, config.model_name, config.model_version, config.api_family, config.deployment_type, config.data_processing_scope, config.content_filter_name FROM config CROSS JOIN jobs;",
         "options": {"queryBatching": "single"}
@@ -59,7 +71,7 @@
       "name": "Call Microsoft Foundry",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [48, 0],
+      "position": [240, 0],
       "onError": "continueErrorOutput"
     },
     {
@@ -72,7 +84,7 @@
       "name": "Validate Foundry output or fallback",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [304, -80]
+      "position": [496, -80]
     },
     {
       "parameters": {
@@ -84,7 +96,7 @@
       "name": "Build sanitized Foundry fallback",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [304, 80]
+      "position": [496, 80]
     },
     {
       "parameters": {
@@ -96,7 +108,7 @@
       "name": "Persist Foundry analysis",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
-      "position": [560, 0]
+      "position": [752, 0]
     }
   ],
   "pinData": {},
@@ -104,7 +116,8 @@
     "Run Foundry analysis manually": {"main": [[{"node": "Load configured Foundry jobs", "type": "main", "index": 0}]]},
     "Run from orchestrator": {"main": [[{"node": "Load configured Foundry jobs", "type": "main", "index": 0}]]},
     "Load configured Foundry jobs": {"main": [[{"node": "Build Foundry request", "type": "main", "index": 0}]]},
-    "Build Foundry request": {"main": [[{"node": "Call Microsoft Foundry", "type": "main", "index": 0}]]},
+    "Build Foundry request": {"main": [[{"node": "Restrict Foundry JSON Schema", "type": "main", "index": 0}]]},
+    "Restrict Foundry JSON Schema": {"main": [[{"node": "Call Microsoft Foundry", "type": "main", "index": 0}]]},
     "Call Microsoft Foundry": {"main": [[{"node": "Validate Foundry output or fallback", "type": "main", "index": 0}], [{"node": "Build sanitized Foundry fallback", "type": "main", "index": 0}]]},
     "Validate Foundry output or fallback": {"main": [[{"node": "Persist Foundry analysis", "type": "main", "index": 0}]]},
     "Build sanitized Foundry fallback": {"main": [[{"node": "Persist Foundry analysis", "type": "main", "index": 0}]]}

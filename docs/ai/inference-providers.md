@@ -25,6 +25,8 @@ Both providers use:
 
 Provider adapters may translate request and response envelopes, but they must not change the meaning or limits of the shared contract.
 
+Microsoft Foundry structured outputs support only a subset of JSON Schema. Immediately before the HTTPS request, `WF-41` removes unsupported transport keywords such as string-length, pattern, array-length, and uniqueness constraints, and converts exact `const` strings to typed single-value enums. It preserves required fields, types, enums, and `additionalProperties: false`. The full local semantic validator still enforces every original length, uniqueness, forbidden-content, and evidence-reference rule after inference, so this transport adaptation does not relax persisted output.
+
 Migration `011_provider_aware_analysis` extends provenance and idempotency with `provider`, `deployment_name`, and bounded `provider_metadata`. The legacy two-argument analysis queue remains an Ollama-compatible wrapper. A provider-aware queue isolates work by provider and deployment, so storing an Ollama result cannot consume the corresponding Foundry job.
 
 ## Microsoft Foundry configuration

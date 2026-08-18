@@ -35,6 +35,7 @@ def main() -> int:
         "Run from orchestrator",
         "Load configured Foundry jobs",
         "Build Foundry request",
+        "Restrict Foundry JSON Schema",
         "Call Microsoft Foundry",
         "Validate Foundry output or fallback",
         "Build sanitized Foundry fallback",
@@ -82,6 +83,28 @@ def main() -> int:
         errors.append("WF-41 must never provide model tools")
     if "api-key" in build_code.lower() or "authorization" in build_code.lower():
         errors.append("WF-41 request code must not construct authentication headers")
+
+    schema_code = nodes.get("Restrict Foundry JSON Schema", {}).get(
+        "parameters", {}
+    ).get("jsCode", "")
+    for fragment in (
+        "minLength",
+        "maxLength",
+        "pattern",
+        "minItems",
+        "maxItems",
+        "uniqueItems",
+        "stripUnsupported",
+        "Object.hasOwn(value, 'const')",
+        "enum:[exact]",
+        "delete converted.const",
+    ):
+        if fragment not in schema_code:
+            errors.append(f"Foundry schema adapter is missing {fragment}")
+    if targets(connections, "Build Foundry request") != ["Restrict Foundry JSON Schema"]:
+        errors.append("WF-41 must restrict the schema before the cloud request")
+    if targets(connections, "Restrict Foundry JSON Schema") != ["Call Microsoft Foundry"]:
+        errors.append("the restricted Foundry schema must reach the HTTP node")
 
     call = nodes.get("Call Microsoft Foundry", {})
     parameters = call.get("parameters", {})
@@ -146,6 +169,8 @@ def main() -> int:
 
     if profile.get("endpoint_contract", {}).get("chat_completions_path") not in build_code:
         errors.append("WF-41 endpoint path differs from the Foundry provider profile")
+    if profile.get("runtime", {}).get("schema_transport") != "azure_structured_outputs_subset":
+        errors.append("Foundry profile must record the Azure structured-output subset")
 
     for fragment in (
         "CREATE TABLE IF NOT EXISTS analysis_provider_configs",

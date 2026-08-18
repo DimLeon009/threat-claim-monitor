@@ -192,7 +192,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M0 | Repository, Compose, schema, ADR, documentation, CI | ✅ Complete; runtime validated on macOS |
 | M1 | ransomware.live collection and silent baseline | ✅ Complete; runtime validated on Windows |
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
-| M3 | Evidence-grounded hybrid AI analysis | 🚧 Ollama validated; Microsoft Foundry integration in progress |
+| M3 | Evidence-grounded hybrid AI analysis | 🚧 Ollama and Microsoft Foundry runtime validated; failure-path and parity validation in progress |
 | M4 | Auditable webhook, email, and Teams notifications | ⏳ Next; common contract, transactional dispatch, retries, and delivery history |
 | M5 | Additional source adapters | Planned |
 | M6 | Hardening and v1.0.0 | Planned |
