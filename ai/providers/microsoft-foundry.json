@@ -1,0 +1,59 @@
+{
+  "profile_version": "microsoft-foundry-provider-v1",
+  "provider": "microsoft_foundry",
+  "api_family": "openai-v1",
+  "endpoint_contract": {
+    "scheme": "https",
+    "allowed_host_suffixes": [
+      ".openai.azure.com",
+      ".services.ai.azure.com"
+    ],
+    "chat_completions_path": "/openai/v1/chat/completions"
+  },
+  "authentication": {
+    "preferred": "microsoft_entra_id",
+    "allowed": [
+      "microsoft_entra_id",
+      "api_key"
+    ],
+    "secret_location": "n8n_credential_store"
+  },
+  "runtime": {
+    "stream": false,
+    "temperature": 0,
+    "max_completion_tokens": 512,
+    "response_format": "json_schema"
+  },
+  "input_limits": {
+    "max_observations": 10,
+    "max_description_characters": 1000,
+    "max_total_characters": 12000
+  },
+  "data_policy": {
+    "classification": "public_metadata_only",
+    "explicit_cloud_selection_required": true,
+    "automatic_local_to_cloud_failover": false,
+    "leaked_material_allowed": false
+  },
+  "required_runtime_configuration": [
+    "endpoint_base_url",
+    "deployment_name",
+    "model_name",
+    "model_version",
+    "deployment_type",
+    "data_processing_scope",
+    "content_filter_name"
+  ],
+  "required_provenance": [
+    "provider",
+    "deployment_name",
+    "model_name",
+    "model_version",
+    "api_family",
+    "deployment_type",
+    "data_processing_scope",
+    "content_filter_name",
+    "prompt_version",
+    "input_hash"
+  ]
+}

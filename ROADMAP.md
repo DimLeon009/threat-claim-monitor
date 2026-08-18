@@ -33,6 +33,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M1 | First reliable ransomware claim feed | ✅ |
 | M2 | Deterministic watchlist matching and correlation | ✅ |
 | M3 | Evidence-grounded local summaries | ✅ |
+| M3.1 | Explicit Microsoft Foundry provider | 🚧 |
 | M4 | Auditable multi-channel notifications | ⏳ |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
@@ -166,6 +167,37 @@ Produce concise French analyst summaries from normalized evidence without allowi
 - Each stored analysis identifies model, prompt version, and input hash.
 - The same fixture produces structurally stable output.
 - A malicious source instruction cannot trigger tools or external actions.
+
+## 🚧 M3.1 — Microsoft Foundry provider
+
+### Objective
+
+Add an enterprise cloud inference path without removing the sovereign local mode or duplicating the analysis safety contract.
+
+### Deliverables
+
+- [x] Hybrid inference ADR
+- [x] Provider-neutral analysis contract
+- [x] Versioned Microsoft Foundry provider profile
+- [x] Explicit cloud-selection and public-metadata policy
+- [x] Stable OpenAI v1 API contract
+- [ ] Provider-aware analysis provenance and uniqueness
+- [ ] Sanitized Foundry runtime configuration
+- [ ] `WF-41 Microsoft Foundry analysis`
+- [ ] Shared validation and deterministic fallback
+- [ ] Authentication, rate-limit, content-filter, and timeout tests
+- [ ] Approved Foundry deployment and real inference validation
+- [ ] Ollama/Foundry contract-parity validation
+
+### Acceptance criteria
+
+- A local failure never causes an implicit cloud request.
+- Ollama and Foundry receive the same bounded evidence contract.
+- Both providers produce the same validated output shape.
+- Foundry credentials never enter Git, PostgreSQL, or workflow exports.
+- Every cloud result records its deployment and data-processing provenance.
+- Invalid, filtered, rate-limited, or unavailable cloud output uses the deterministic fallback.
+- Cloud activation requires an approved endpoint, deployment, processing scope, and content-filter configuration.
 
 ## ⏳ M4 — Notifications
 
