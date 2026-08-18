@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/threat-claim-monitor/schemas/claim-analysis-v1.schema.json",
+  "title": "Threat Claim Monitor claim analysis v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "language",
+    "summary_fr",
+    "observed_facts",
+    "uncertainties",
+    "disclaimer"
+  ],
+  "properties": {
+    "language": {
+      "const": "fr"
+    },
+    "summary_fr": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    },
+    "observed_facts": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["statement_fr", "evidence_ids"],
+        "properties": {
+          "statement_fr": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          },
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^evidence-[0-9]{1,2}$"
+            }
+          }
+        }
+      }
+    },
+    "uncertainties": {
+      "type": "array",
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "disclaimer": {
+      "const": "Déclaration criminelle non vérifiée ; aucune compromission n’est confirmée."
+    }
+  }
+}

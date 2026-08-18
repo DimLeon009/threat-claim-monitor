@@ -32,7 +32,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M0 | Reproducible professional foundation | ✅ |
 | M1 | First reliable ransomware claim feed | ✅ |
 | M2 | Deterministic watchlist matching and correlation | ✅ |
-| M3 | Evidence-grounded local summaries | ⏳ |
+| M3 | Evidence-grounded local summaries | 🚧 |
 | M4 | Auditable multi-channel notifications | Planned |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
@@ -137,7 +137,7 @@ Identify monitored organizations with explainable rules and correlate source dup
 - One observation links to at most one canonical claim.
 - Correlation decisions remain explainable from stored evidence.
 
-## ⏳ M3 — Local AI analysis
+## 🚧 M3 — Local AI analysis
 
 ### Objective
 
@@ -145,17 +145,17 @@ Produce concise French analyst summaries from normalized evidence without allowi
 
 ### Deliverables
 
-- [ ] Host-native Ollama connectivity check
-- [ ] Pinned `qwen3:8b-q4_K_M` model and recorded digest
-- [ ] Qwen3 4B explicit fallback profile
-- [ ] Versioned system and extraction prompt
-- [ ] Strict JSON Schema
-- [ ] Temperature-zero, non-agent inference
-- [ ] Input truncation and untrusted-content delimiters
-- [ ] Schema and semantic validation
-- [ ] Deterministic non-AI fallback summary
-- [ ] Prompt-injection regression corpus
-- [ ] Unsupported-fact and missing-value tests
+- [x] Host-native Ollama connectivity check
+- [x] Pinned `qwen3:8b-q4_K_M` model and recorded digest
+- [x] Qwen3 4B explicit fallback profile
+- [x] Versioned system and extraction prompt
+- [x] Strict JSON Schema
+- [x] Temperature-zero, non-agent inference
+- [x] Input truncation and untrusted-content delimiters
+- [x] Schema and semantic validation
+- [x] Deterministic non-AI fallback summary
+- [x] Prompt-injection regression corpus
+- [x] Unsupported-fact and missing-value tests
 - [ ] Analysis provenance storage
 
 ### Acceptance criteria

@@ -55,6 +55,12 @@ This directory contains the technical, operational, and security documentation f
 | [Threat-actor aliases](matching/threat-actor-aliases.md) | Approved canonical actor names, exact aliases, disabled mappings, and fail-closed collisions |
 | [Review candidates](matching/review-candidates.md) | Token and fuzzy candidate rules, bounded scores, evidence, and anti-auto-alert invariants |
 
+### Local AI
+
+| Document | Purpose |
+|---|---|
+| [Local analysis contract](ai/local-analysis-contract.md) | Pinned Ollama profiles, untrusted-input boundary, strict JSON output, validation, and fallback |
+
 ### Security
 
 | Document | Purpose |
