@@ -135,15 +135,12 @@ def validate_analysis_output(payload: Any, evidence_ids: set[str]) -> list[str]:
 
 def deterministic_fallback(prepared_evidence: dict[str, Any]) -> dict[str, Any]:
     """Return a safe summary when local inference is unavailable or invalid."""
-    claim = prepared_evidence.get("claim", {})
-    victim = claim.get("victim_name") or "une organisation non renseignée"
-    actor = claim.get("threat_actor") or "un groupe non renseigné"
     return {
         "language": "fr",
         "summary_fr": (
-            f"Une source publique attribue à {actor} une déclaration concernant {victim}. "
-            "Les preuves disponibles ne confirment pas une compromission."
-        )[:600],
+            "Une ou plusieurs sources publiques relaient une déclaration concernant "
+            "l’organisation surveillée. Les preuves disponibles ne confirment pas une compromission."
+        ),
         "observed_facts": [],
         "uncertainties": ["Analyse locale indisponible ou invalide ; consulter les preuves sources."],
         "disclaimer": DISCLAIMER,

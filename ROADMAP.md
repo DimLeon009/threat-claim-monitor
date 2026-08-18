@@ -33,7 +33,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M1 | First reliable ransomware claim feed | ✅ |
 | M2 | Deterministic watchlist matching and correlation | ✅ |
 | M3 | Evidence-grounded local summaries | 🚧 |
-| M4 | Auditable multi-channel notifications | Planned |
+| M4 | Auditable multi-channel notifications | ⏳ |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
 
@@ -156,7 +156,7 @@ Produce concise French analyst summaries from normalized evidence without allowi
 - [x] Deterministic non-AI fallback summary
 - [x] Prompt-injection regression corpus
 - [x] Unsupported-fact and missing-value tests
-- [ ] Analysis provenance storage
+- [x] Analysis provenance storage
 
 ### Acceptance criteria
 
@@ -167,7 +167,7 @@ Produce concise French analyst summaries from normalized evidence without allowi
 - The same fixture produces structurally stable output.
 - A malicious source instruction cannot trigger tools or external actions.
 
-## M4 — Notifications
+## ⏳ M4 — Notifications
 
 ### Objective
 

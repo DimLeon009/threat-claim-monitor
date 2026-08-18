@@ -193,7 +193,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M1 | ransomware.live collection and silent baseline | ✅ Complete; runtime validated on Windows |
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
 | M3 | Ollama structured analysis | 🚧 In progress; local model contract validated on Windows |
-| M4 | Webhook, email, and Teams notifications | Planned |
+| M4 | Webhook, email, and Teams notifications | ⏳ Planned next |
 | M5 | Additional source adapters | Planned |
 | M6 | Hardening and v1.0.0 | Planned |
 

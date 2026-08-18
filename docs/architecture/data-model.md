@@ -141,12 +141,16 @@ Reproducibility fields include:
 
 - model name and optional digest;
 - prompt version;
+- claim evidence version;
 - input hash;
+- the bounded, allow-listed input payload;
 - structured output;
 - validation status;
-- sanitized error.
+- sanitized error;
+- bounded inference metadata: completion reason, token counts, and duration.
 
 The uniqueness constraint prevents repeated analysis of the same claim, prompt version, and input.
+Only claims with an accepted organization match and current non-historical evidence enter the analysis queue. The database revalidates the output shape and every referenced evidence identifier before persistence. A model error stores only an allow-listed failure code translated to a fixed sanitized message; raw model or transport errors are never persisted.
 
 ## Delivery entities
 
