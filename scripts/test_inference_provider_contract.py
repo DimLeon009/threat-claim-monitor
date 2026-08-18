@@ -12,6 +12,8 @@ PROFILE_FILE = ROOT / "ai/providers/microsoft-foundry.json"
 ADR_FILE = ROOT / "docs/architecture/adr/0002-hybrid-local-foundry-inference.md"
 CONTRACT_FILE = ROOT / "docs/ai/inference-providers.md"
 SCHEMA_FILE = ROOT / "ai/schemas/claim-analysis-v1.schema.json"
+MIGRATION_FILE = ROOT / "db/migrations/011_provider_aware_analysis.sql"
+RUNTIME_TEST_FILE = ROOT / "scripts/test_provider_aware_analysis.sql"
 
 
 def main() -> int:
@@ -20,6 +22,8 @@ def main() -> int:
     schema = json.loads(SCHEMA_FILE.read_text(encoding="utf-8"))
     adr = ADR_FILE.read_text(encoding="utf-8")
     contract = CONTRACT_FILE.read_text(encoding="utf-8")
+    migration = MIGRATION_FILE.read_text(encoding="utf-8")
+    runtime_test = RUNTIME_TEST_FILE.read_text(encoding="utf-8")
 
     if profile.get("provider") != "microsoft_foundry":
         errors.append("Foundry profile provider is not microsoft_foundry")
@@ -90,6 +94,30 @@ def main() -> int:
         ):
             if fragment not in text:
                 errors.append(f"{label} is missing {fragment}")
+
+    for fragment in (
+        "ADD COLUMN IF NOT EXISTS provider",
+        "ADD COLUMN IF NOT EXISTS deployment_name",
+        "provider_metadata",
+        "UNIQUE (claim_id, prompt_version, input_hash, provider, deployment_name)",
+        "requested_provider",
+        "microsoft_foundry",
+        "invalid Microsoft Foundry deployment provenance",
+        "cloud analysis rate limited; deterministic fallback stored",
+    ):
+        if fragment not in migration:
+            errors.append(f"provider-aware migration is missing {fragment}")
+
+    for fragment in (
+        "provider queues must expose the same bounded input independently",
+        "Ollama persistence incorrectly consumed the Foundry queue",
+        "Foundry persistence must be idempotent per deployment",
+        "incomplete Foundry provenance was accepted",
+        "stored multi-provider provenance is incomplete or unsafe",
+        "ROLLBACK;",
+    ):
+        if fragment not in runtime_test:
+            errors.append(f"provider-aware runtime test is missing {fragment}")
 
     if errors:
         print("Inference-provider contract validation failed:", file=sys.stderr)

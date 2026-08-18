@@ -2,8 +2,8 @@
 
 > Self-hosted monitoring of public ransomware and data-leak claims, with deterministic organization matching, local AI summaries, and auditable notifications.
 
-![Project status](https://img.shields.io/badge/status-M3%20complete-success)
-![Current increment](https://img.shields.io/badge/current-M3.1%20Foundry-orange)
+![Project status](https://img.shields.io/badge/status-M3%20hybrid%20AI%20in%20progress-orange)
+![Next milestone](https://img.shields.io/badge/next-M4%20notifications-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Docker Compose](https://img.shields.io/badge/runtime-Docker%20Compose-2496ED?logo=docker&logoColor=white)
 ![n8n](https://img.shields.io/badge/orchestration-n8n-EA4B71?logo=n8n&logoColor=white)
@@ -192,8 +192,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M0 | Repository, Compose, schema, ADR, documentation, CI | ✅ Complete; runtime validated on macOS |
 | M1 | ransomware.live collection and silent baseline | ✅ Complete; runtime validated on Windows |
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
-| M3 | Evidence-grounded Ollama structured analysis | ✅ Complete; fallback and valid inference paths runtime-validated on Windows |
-| M3.1 | Hybrid Ollama and Microsoft Foundry inference | 🚧 In progress; architecture and provider contract defined |
+| M3 | Evidence-grounded hybrid AI analysis | 🚧 Ollama validated; Microsoft Foundry integration in progress |
 | M4 | Auditable webhook, email, and Teams notifications | ⏳ Next; common contract, transactional dispatch, retries, and delivery history |
 | M5 | Additional source adapters | Planned |
 | M6 | Hardening and v1.0.0 | Planned |

@@ -32,8 +32,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M0 | Reproducible professional foundation | ✅ |
 | M1 | First reliable ransomware claim feed | ✅ |
 | M2 | Deterministic watchlist matching and correlation | ✅ |
-| M3 | Evidence-grounded local summaries | ✅ |
-| M3.1 | Explicit Microsoft Foundry provider | 🚧 |
+| M3 | Evidence-grounded hybrid AI summaries | 🚧 |
 | M4 | Auditable multi-channel notifications | ⏳ |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
@@ -138,11 +137,11 @@ Identify monitored organizations with explainable rules and correlate source dup
 - One observation links to at most one canonical claim.
 - Correlation decisions remain explainable from stored evidence.
 
-## ✅ M3 — Local AI analysis
+## 🚧 M3 — Hybrid AI analysis
 
 ### Objective
 
-Produce concise French analyst summaries from normalized evidence without allowing the model to invent control-plane decisions.
+Produce concise French analyst summaries from normalized evidence through explicitly selected local or enterprise-cloud inference, without allowing either provider to invent control-plane decisions.
 
 ### Deliverables
 
@@ -158,30 +157,12 @@ Produce concise French analyst summaries from normalized evidence without allowi
 - [x] Prompt-injection regression corpus
 - [x] Unsupported-fact and missing-value tests
 - [x] Analysis provenance storage
-
-### Acceptance criteria
-
-- Invalid model output never blocks claim processing.
-- Unknown source facts remain unknown.
-- Model output cannot set match confidence or verification state.
-- Each stored analysis identifies model, prompt version, and input hash.
-- The same fixture produces structurally stable output.
-- A malicious source instruction cannot trigger tools or external actions.
-
-## 🚧 M3.1 — Microsoft Foundry provider
-
-### Objective
-
-Add an enterprise cloud inference path without removing the sovereign local mode or duplicating the analysis safety contract.
-
-### Deliverables
-
 - [x] Hybrid inference ADR
 - [x] Provider-neutral analysis contract
 - [x] Versioned Microsoft Foundry provider profile
 - [x] Explicit cloud-selection and public-metadata policy
 - [x] Stable OpenAI v1 API contract
-- [ ] Provider-aware analysis provenance and uniqueness
+- [x] Provider-aware analysis provenance and uniqueness
 - [ ] Sanitized Foundry runtime configuration
 - [ ] `WF-41 Microsoft Foundry analysis`
 - [ ] Shared validation and deterministic fallback
@@ -191,6 +172,12 @@ Add an enterprise cloud inference path without removing the sovereign local mode
 
 ### Acceptance criteria
 
+- Invalid model output never blocks claim processing.
+- Unknown source facts remain unknown.
+- Model output cannot set match confidence or verification state.
+- Each stored analysis identifies model, prompt version, and input hash.
+- The same fixture produces structurally stable output.
+- A malicious source instruction cannot trigger tools or external actions.
 - A local failure never causes an implicit cloud request.
 - Ollama and Foundry receive the same bounded evidence contract.
 - Both providers produce the same validated output shape.

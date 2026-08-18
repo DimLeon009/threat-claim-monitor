@@ -139,6 +139,7 @@ Stores a local-model result or deterministic fallback.
 
 Reproducibility fields include:
 
+- provider and deployment name;
 - model name and optional digest;
 - prompt version;
 - claim evidence version;
@@ -149,8 +150,10 @@ Reproducibility fields include:
 - sanitized error;
 - bounded inference metadata: completion reason, token counts, and duration.
 
-The uniqueness constraint prevents repeated analysis of the same claim, prompt version, and input.
+The uniqueness constraint prevents repeated analysis of the same claim, prompt version, input, provider, and deployment. Ollama and Microsoft Foundry may therefore evaluate the same bounded input independently without weakening per-deployment idempotency.
 Only claims with an accepted organization match and current non-historical evidence enter the analysis queue. The database revalidates the output shape and every referenced evidence identifier before persistence. A model error stores only an allow-listed failure code translated to a fixed sanitized message; raw model or transport errors are never persisted.
+
+Foundry records additionally require an allow-listed provider metadata object containing the model version, API family, deployment type, data-processing scope, and content-filter name. Provider metadata rejects endpoint, token, key, authorization, and secret fields. Existing analysis envelopes without a provider remain compatible and are recorded as Ollama with the model tag as deployment name.
 
 ## Delivery entities
 

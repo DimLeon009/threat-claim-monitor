@@ -25,6 +25,8 @@ Both providers use:
 
 Provider adapters may translate request and response envelopes, but they must not change the meaning or limits of the shared contract.
 
+Migration `011_provider_aware_analysis` extends provenance and idempotency with `provider`, `deployment_name`, and bounded `provider_metadata`. The legacy two-argument analysis queue remains an Ollama-compatible wrapper. A provider-aware queue isolates work by provider and deployment, so storing an Ollama result cannot consume the corresponding Foundry job.
+
 ## Microsoft Foundry configuration
 
 The repository profile is `ai/providers/microsoft-foundry.json`. It contains no tenant, subscription, resource, endpoint, deployment, or credential value.
