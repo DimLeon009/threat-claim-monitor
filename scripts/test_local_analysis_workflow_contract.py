@@ -72,8 +72,10 @@ def main() -> int:
     parameters = call.get("parameters", {})
     if parameters.get("method") != "POST" or "/api/chat" not in parameters.get("url", ""):
         errors.append("WF-40 must call the Ollama chat endpoint with POST")
-    if "$env.OLLAMA_BASE_URL" not in parameters.get("url", ""):
-        errors.append("WF-40 must use the configured host-native Ollama URL")
+    if parameters.get("url") != "http://host.docker.internal:11434/api/chat":
+        errors.append("WF-40 must use the fixed host-native Ollama chat URL")
+    if "$env" in parameters.get("url", ""):
+        errors.append("WF-40 must not require n8n node access to environment variables")
     if parameters.get("options", {}).get("timeout") != 180000:
         errors.append("WF-40 Ollama timeout must remain 180 seconds")
     if call.get("onError") != "continueErrorOutput":

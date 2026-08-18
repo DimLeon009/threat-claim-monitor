@@ -44,7 +44,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.OLLAMA_BASE_URL + '/api/chat' }}",
+        "url": "http://host.docker.internal:11434/api/chat",
         "sendHeaders": true,
         "headerParameters": {"parameters": [{"name": "Content-Type", "value": "application/json"}]},
         "sendBody": true,

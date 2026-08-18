@@ -32,7 +32,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M0 | Reproducible professional foundation | ✅ |
 | M1 | First reliable ransomware claim feed | ✅ |
 | M2 | Deterministic watchlist matching and correlation | ✅ |
-| M3 | Evidence-grounded local summaries | 🚧 |
+| M3 | Evidence-grounded local summaries | ✅ |
 | M4 | Auditable multi-channel notifications | ⏳ |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
@@ -137,7 +137,7 @@ Identify monitored organizations with explainable rules and correlate source dup
 - One observation links to at most one canonical claim.
 - Correlation decisions remain explainable from stored evidence.
 
-## 🚧 M3 — Local AI analysis
+## ✅ M3 — Local AI analysis
 
 ### Objective
 

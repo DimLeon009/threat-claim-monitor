@@ -51,7 +51,7 @@ Ollama documents JSON Schema objects in `format`, temperature zero for more dete
 
 Migration `010_local_analysis_provenance` stores the claim evidence version, pinned model name and digest, prompt version, exact bounded input payload and SHA-256 hash, validated output, validation status, sanitized failure, and bounded inference metrics. The database independently verifies the input hash, output shape, evidence references, claim version, and allow-listed fallback reason. Replaying the same claim, prompt, and input is idempotent.
 
-The workflow contains no credential identifier. After import into n8n, assign `PostgreSQL - Threat Claim Monitor` to both PostgreSQL nodes. `OLLAMA_BASE_URL` must point to the host service from the n8n container, normally `http://host.docker.internal:11434`. Publish the workflow only after the credential is assigned.
+The workflow contains no credential identifier. After import into n8n, assign `PostgreSQL - Threat Claim Monitor` to both PostgreSQL nodes. The HTTP node uses the non-secret local endpoint `http://host.docker.internal:11434/api/chat` directly. This preserves n8n's environment-variable access restriction instead of weakening it for one workflow. Publish the workflow only after the credential is assigned.
 
 ## Validation
 
