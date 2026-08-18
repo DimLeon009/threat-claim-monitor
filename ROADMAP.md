@@ -30,9 +30,9 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | Milestone | Outcome | Status |
 |---|---|:---:|
 | M0 | Reproducible professional foundation | ✅ |
-| M1 | First reliable ransomware claim feed | 🚧 |
-| M2 | Deterministic watchlist matching and correlation | ⏳ |
-| M3 | Evidence-grounded local summaries | Planned |
+| M1 | First reliable ransomware claim feed | ✅ |
+| M2 | Deterministic watchlist matching and correlation | ✅ |
+| M3 | Evidence-grounded local summaries | ⏳ |
 | M4 | Auditable multi-channel notifications | Planned |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
@@ -76,7 +76,7 @@ Provide a clean repository and reproducible runtime on which every later workflo
 
 A new contributor can clone, configure, start, inspect, stop, and restart the foundation using documented commands.
 
-## 🚧 M1 — ransomware.live collection
+## ✅ M1 — ransomware.live collection
 
 ### Objective
 
@@ -106,7 +106,7 @@ Collect recent ransomware.live records safely and insert each source observation
 - A source failure does not corrupt partial state.
 - Logs and persisted errors contain no credentials or excessive payloads.
 
-## ⏳ M2 — Matching and claim correlation
+## ✅ M2 — Matching and claim correlation
 
 ### Objective
 
@@ -114,17 +114,18 @@ Identify monitored organizations with explainable rules and correlate source dup
 
 ### Deliverables
 
-- [ ] Unicode and punctuation normalization contract
-- [ ] Registered-domain extraction and normalization
-- [ ] Threat-actor alias normalization
-- [ ] Canonical claim creation
-- [ ] 45-day correlation window
-- [ ] Exact domain, official-name, and alias matching
-- [ ] Review path for token and fuzzy candidates
-- [ ] Match evidence payload
-- [ ] Evidence-version updates
-- [ ] Positive, negative, ambiguous, and collision corpus
-- [ ] Concurrency and replay tests
+- [x] Unicode and punctuation normalization contract
+- [x] Registered-domain extraction and normalization
+- [x] Threat-actor alias normalization
+- [x] Canonical claim creation
+- [x] 45-day correlation window
+- [x] Exact domain, official-name, and alias matching
+- [x] Review path for token and fuzzy candidates
+- [x] Match evidence payload
+- [x] Evidence-version updates
+- [x] Positive, negative, ambiguous, and collision corpus
+- [x] Concurrency and replay tests
+- [x] Collection-workflow correlation integration
 
 ### Acceptance criteria
 
@@ -136,7 +137,7 @@ Identify monitored organizations with explainable rules and correlate source dup
 - One observation links to at most one canonical claim.
 - Correlation decisions remain explainable from stored evidence.
 
-## M3 — Local AI analysis
+## ⏳ M3 — Local AI analysis
 
 ### Objective
 

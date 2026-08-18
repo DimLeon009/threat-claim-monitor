@@ -16,6 +16,7 @@ erDiagram
     CLAIMS ||--o{ CLAIM_OBSERVATIONS : groups
     OBSERVATIONS ||--|| CLAIM_OBSERVATIONS : linked_once
     ORGANIZATIONS ||--o{ ORGANIZATION_ALIASES : defines
+    THREAT_ACTORS ||--o{ THREAT_ACTOR_ALIASES : defines
     CLAIMS ||--o{ ORGANIZATION_MATCHES : evaluated_against
     ORGANIZATIONS ||--o{ ORGANIZATION_MATCHES : matched_by
     CLAIMS ||--o{ ANALYSES : summarized_by
@@ -54,6 +55,10 @@ Defines a monitored legal entity or brand.
 Contains explicitly approved alternative names or domains. Each alias defines its matching mode and deterministic confidence score.
 
 Aliases should be narrow. Generic terms, product names, and ambiguous abbreviations must not be auto-alert aliases.
+
+### `threat_actors` and `threat_actor_aliases`
+
+These tables define administrator-approved canonical threat-group names and exact aliases used only for correlation identity. Normalized names are unique within each table, disabled mappings do not resolve, and a name that points to multiple enabled actors fails closed. Unknown actors remain usable under ordinary text normalization; the system never invents an alias through fuzzy similarity.
 
 ## Evidence entities
 
@@ -112,6 +117,21 @@ The record includes:
 - review timestamp when applicable.
 
 Model-generated text must never populate the matching method or confidence score.
+
+### M2 normalization and exact-candidate functions
+
+Migrations `004_matching_normalization`, `005_exact_organization_matching`, and `008_threat_actor_aliases` add deterministic database functions without changing stored source evidence:
+
+- `normalize_match_text` creates accent-insensitive, punctuation-separated comparison keys;
+- `normalize_threat_actor` applies the text contract and then resolves explicit enabled actor aliases;
+- `normalize_domain` parses and validates an ASCII hostname while failing closed on malformed values;
+- `domain_matches_registered` accepts only an approved registered-domain boundary or its true subdomains;
+- `extract_approved_registered_domain` returns the longest configured boundary match;
+- `find_exact_organization_matches` evaluates domain, official-name, and approved exact-alias rules.
+
+An exact candidate is `auto_accepted` only when exactly one enabled organization matches. Configuration collisions return every candidate as `pending`, even when a domain rule has nominal confidence 100. The function stores the rule version, normalized comparison evidence, candidate count, collision flag, and automatic-alert eligibility in its result.
+
+Candidate evaluation remains read-only when called alone. Migration `006_transactional_claim_correlation` adds the transactional persistence boundary: it serializes the V1 correlation worker with a transaction-scoped advisory lock, reuses at most one exact victim/actor or domain/actor claim within 45 days, links each observation once, advances evidence versions only for new evidence, and persists exact organization matches. Migration `009_review_match_candidates` extends this boundary with pending-only token and fuzzy candidates while preserving exact and human decisions. Ambiguous existing claim candidates abort without partial writes.
 
 ### `analyses`
 
@@ -185,4 +205,3 @@ Retention will become configurable before v1.0.0. Deletion must preserve referen
 ## Future extensions
 
 Possible additions include analyst comments, official confirmation evidence, source health snapshots, notification subscriptions, and retention jobs. IOC storage and vector embeddings are deliberately not part of this schema until their use cases are implemented.
-

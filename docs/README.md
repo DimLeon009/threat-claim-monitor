@@ -8,8 +8,9 @@ This directory contains the technical, operational, and security documentation f
 2. [ADR-0001: Minimal V1 architecture](architecture/adr/0001-minimal-v1-architecture.md)
 3. [Data model](architecture/data-model.md)
 4. [Threat model](security/threat-model.md)
-5. [Getting started](operations/getting-started.md)
-6. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
+5. [Matching normalization](matching/normalization.md)
+6. [Getting started](operations/getting-started.md)
+7. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
 
 ## Documentation map
 
@@ -43,6 +44,16 @@ This directory contains the technical, operational, and security documentation f
 | Document | Purpose |
 |---|---|
 | [ransomware.live](sources/ransomware-live.md) | Public API contract, stable identity, silent baseline, and fixture policy |
+
+### Matching
+
+| Document | Purpose |
+|---|---|
+| [Normalization](matching/normalization.md) | Deterministic text, threat-actor, and approved-domain normalization contract |
+| [Exact matching](matching/exact-matching.md) | Domain, official-name, approved-alias, confidence, and collision rules |
+| [Claim correlation](matching/claim-correlation.md) | Transactional 45-day correlation, replay, concurrency, evidence versions, and match persistence |
+| [Threat-actor aliases](matching/threat-actor-aliases.md) | Approved canonical actor names, exact aliases, disabled mappings, and fail-closed collisions |
+| [Review candidates](matching/review-candidates.md) | Token and fuzzy candidate rules, bounded scores, evidence, and anti-auto-alert invariants |
 
 ### Security
 

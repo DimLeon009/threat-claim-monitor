@@ -1,0 +1,39 @@
+{
+  "token_cases": [
+    {
+      "candidate": "Example Holdings Europe",
+      "approved_alias": "Example Holdings",
+      "expected": true
+    },
+    {
+      "candidate": "Example Europe",
+      "approved_alias": "Example Holdings",
+      "expected": false
+    },
+    {
+      "candidate": "Example Holdings",
+      "approved_alias": "Holdings",
+      "expected": false
+    }
+  ],
+  "fuzzy_cases": [
+    {
+      "candidate": "Northwind Proprty",
+      "official_name": "Northwind Property",
+      "expected_candidate": true
+    },
+    {
+      "candidate": "Unrelated Company",
+      "official_name": "Northwind Property",
+      "expected_candidate": false
+    }
+  ],
+  "invariants": {
+    "review_status": "pending",
+    "auto_alert_eligible": false,
+    "token_min_score": 70,
+    "token_max_score": 84,
+    "fuzzy_max_score": 69,
+    "fuzzy_min_similarity": 0.6
+  }
+}

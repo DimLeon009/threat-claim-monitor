@@ -1,0 +1,37 @@
+{
+  "text_cases": [
+    {"input": "  Digit Ré Group  ", "expected": "digit re group"},
+    {"input": "DIGIT-RE__Group", "expected": "digit re group"},
+    {"input": "Capifrance", "expected": "capifrance"},
+    {"input": "Cap France", "expected": "cap france"},
+    {"input": "L’Agence Exemple", "expected": "l agence exemple"}
+  ],
+  "actor_cases": [
+    {"input": "  Lock-Bit  ", "expected": "lock bit"},
+    {"input": "ALPHA_team", "expected": "alpha team"}
+  ],
+  "domain_cases": [
+    {"input": "https://WWW.Capifrance.FR/path?q=1", "expected": "www.capifrance.fr"},
+    {"input": "*.portal.digitregroup.com.", "expected": "portal.digitregroup.com"},
+    {"input": "optimhome.com:443", "expected": "optimhome.com"},
+    {"input": "user@capifrance.fr", "expected": null},
+    {"input": "127.0.0.1", "expected": null},
+    {"input": "single-label", "expected": null},
+    {"input": "bad_label.example", "expected": null}
+  ],
+  "registered_domain_cases": [
+    {"candidate": "capifrance.fr", "approved": "capifrance.fr", "expected": true},
+    {"candidate": "portal.capifrance.fr", "approved": "capifrance.fr", "expected": true},
+    {"candidate": "notcapifrance.fr", "approved": "capifrance.fr", "expected": false},
+    {"candidate": "capifrance.fr.evil.invalid", "approved": "capifrance.fr", "expected": false},
+    {"candidate": "digitregroup.com", "approved": "digitregroup.com", "expected": true},
+    {"candidate": "digitregroup.example", "approved": "digitregroup.com", "expected": false}
+  ],
+  "exact_match_cases": [
+    {"victim": "CAPIFRANCE", "domain": "", "method": "name_exact", "score": 95},
+    {"victim": "Unrelated label", "domain": "portal.capifrance.fr", "method": "domain_exact", "score": 100},
+    {"victim": "DigitRE Group", "domain": "", "method": "alias_exact", "score": 90},
+    {"victim": "Cap France", "domain": "notcapifrance.fr", "method": null, "score": null},
+    {"victim": "Optim home", "domain": "optimhome.com.evil.invalid", "method": null, "score": null}
+  ]
+}

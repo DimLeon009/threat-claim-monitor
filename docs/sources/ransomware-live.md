@@ -56,8 +56,8 @@ python3 scripts/validate_source_fixtures.py
 
 ## Workflow deployment
 
-Apply migrations `002_ransomware_live_ingestion.sql` and
-`003_ransomware_live_failure_history.sql` to an existing development database before importing the workflow:
+Apply migrations `002_ransomware_live_ingestion.sql` through
+`007_collection_run_correlation.sql` to an existing development database before importing the workflow:
 
 ```sh
 docker compose exec postgres psql \
@@ -69,9 +69,14 @@ docker compose exec postgres psql \
   --username tcm_admin \
   --dbname threat_claim_monitor \
   --file /migrations/003_ransomware_live_failure_history.sql
+
+docker compose exec postgres psql \
+  --username tcm_admin \
+  --dbname threat_claim_monitor \
+  --file /migrations/007_collection_run_correlation.sql
 ```
 
-Import `n8n/workflows/wf-10-collect-ransomware-live.json` and `n8n/workflows/wf-00-orchestrator.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to both `Insert observations if new` and `Record sanitized failure`; credentials and environment-specific credential identifiers are intentionally absent from the committed export.
+Import `n8n/workflows/wf-10-collect-ransomware-live.json` and `n8n/workflows/wf-00-orchestrator.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new`, `Correlate collection observations`, `Record sanitized failure`, and `Record sanitized correlation failure`; credentials and environment-specific credential identifiers are intentionally absent from the committed export.
 
 In `WF-00 Orchestrator`, configure `Collect ransomware.live` to call `WF-10 Collect ransomware.live`. The database workflow identifier is intentionally absent from the committed export because it is local to each n8n instance.
 
@@ -84,6 +89,7 @@ Both workflows remain inactive after import. Run `WF-10` manually to establish a
 3. Only allow-listed public metadata reaches PostgreSQL.
 4. `ingest_ransomware_live_collection` serializes collections for this source, creates a run, inserts unseen source keys, and completes the baseline atomically.
 5. A duplicate source key is a no-op and increments neither `observations` nor `inserted_count`.
+6. `correlate_collection_run_exact` processes the observations inserted by that collection run and persists its sanitized summary.
 
 ## Failure behavior
 
@@ -96,6 +102,8 @@ HTTP exhaustion, response-contract rejection, and database-ingestion errors leav
 | `ingestion_failed` | `ransomware.live database ingestion failed` |
 
 The failure record contains zero fetched and inserted items, the contract version, and the allow-listed code. It never stores the raw response, exception stack, connection string, or credential. After persistence, `Stop with sanitized failure` fails the n8n execution with only the sanitized message.
+
+Correlation errors use a separate guarded output. `record_claim_correlation_failure` changes the already successful ingestion run to `partial`, stores only `correlation_failed` and the bounded message `claim correlation failed; retry the collection run correlation`, then stops the workflow. The original database error is not persisted or forwarded by the sanitized stop node.
 
 Validate the failure-routing contract with:
 

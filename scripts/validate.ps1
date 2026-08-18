@@ -29,6 +29,11 @@ try {
     throw 'Ransomware.live workflow contract validation failed.'
   }
 
+  python scripts/test_matching_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Matching contract validation failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'
