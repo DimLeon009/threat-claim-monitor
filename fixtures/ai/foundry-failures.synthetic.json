@@ -1,0 +1,41 @@
+{
+  "contract_version": "foundry-failure-v1",
+  "cases": [
+    {
+      "name": "authentication-401",
+      "status": 401,
+      "detail": "synthetic unauthorized response",
+      "expected_failure_code": "provider_authentication_failed"
+    },
+    {
+      "name": "authentication-403",
+      "status": 403,
+      "detail": "synthetic forbidden response",
+      "expected_failure_code": "provider_authentication_failed"
+    },
+    {
+      "name": "rate-limit-429",
+      "status": 429,
+      "detail": "synthetic request rate limited",
+      "expected_failure_code": "provider_rate_limited"
+    },
+    {
+      "name": "content-filter-400",
+      "status": 400,
+      "detail": "synthetic content_filter rejection",
+      "expected_failure_code": "provider_content_filtered"
+    },
+    {
+      "name": "timeout",
+      "status": 0,
+      "detail": "synthetic request timed out",
+      "expected_failure_code": "foundry_unavailable"
+    },
+    {
+      "name": "provider-unavailable-503",
+      "status": 503,
+      "detail": "synthetic provider unavailable",
+      "expected_failure_code": "foundry_unavailable"
+    }
+  ]
+}

@@ -77,7 +77,7 @@ Global, data-zone, and regional deployments have different processing-location p
 
 ## Failure behavior
 
-Authentication failure, quota exhaustion, rate limiting, content filtering, timeout, invalid output, or provider unavailability produces a sanitized allow-listed failure and the same deterministic fallback. Raw provider responses and authentication details are not persisted.
+Authentication failure, quota exhaustion, rate limiting, content filtering, timeout, invalid output, or provider unavailability produces a sanitized allow-listed failure and the same deterministic fallback. WF-41 recognizes both direct HTTP status fields and n8n's nested `error.status` shape. Repository-safe synthetic cases cover 401, 403, 429, content-filter rejection, timeout, and provider unavailability. Raw provider responses and authentication details are not persisted.
 
 The local provider remains independently runnable. Cloud use is never an implicit recovery action.
 

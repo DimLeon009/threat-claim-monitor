@@ -12,6 +12,19 @@ WORKFLOW_FILE = ROOT / "n8n/workflows/wf-41-microsoft-foundry-analysis.json"
 PROFILE_FILE = ROOT / "ai/providers/microsoft-foundry.json"
 CONFIG_MIGRATION_FILE = ROOT / "db/migrations/012_foundry_provider_configuration.sql"
 CONFIG_TEST_FILE = ROOT / "scripts/test_foundry_provider_configuration.sql"
+FAILURE_FIXTURE_FILE = ROOT / "fixtures/ai/foundry-failures.synthetic.json"
+
+
+def classify_failure(status: int, detail: str) -> str:
+    """Mirror the allow-listed WF-41 failure classification contract."""
+    normalized_detail = detail.lower()
+    if status in (401, 403):
+        return "provider_authentication_failed"
+    if status == 429:
+        return "provider_rate_limited"
+    if "content_filter" in normalized_detail or "responsibleai" in normalized_detail:
+        return "provider_content_filtered"
+    return "foundry_unavailable"
 
 
 def targets(connections: dict, node_name: str, output: int = 0) -> list[str]:
@@ -27,6 +40,7 @@ def main() -> int:
     profile = json.loads(PROFILE_FILE.read_text(encoding="utf-8"))
     migration = CONFIG_MIGRATION_FILE.read_text(encoding="utf-8")
     runtime_test = CONFIG_TEST_FILE.read_text(encoding="utf-8")
+    failure_fixture = json.loads(FAILURE_FIXTURE_FILE.read_text(encoding="utf-8"))
     nodes = {node.get("name"): node for node in workflow.get("nodes", [])}
     connections = workflow.get("connections", {})
 
@@ -148,6 +162,7 @@ def main() -> int:
         "parameters", {}
     ).get("jsCode", "")
     for fragment in (
+        "error?.status",
         "provider_authentication_failed",
         "provider_rate_limited",
         "provider_content_filtered",
@@ -158,6 +173,35 @@ def main() -> int:
             errors.append(f"Foundry failure path is missing {fragment}")
     if "persistence:{...$json" in fallback_code or "error:source" in fallback_code:
         errors.append("Foundry failure path must not persist raw provider errors")
+
+    expected_failure_cases = {
+        "authentication-401",
+        "authentication-403",
+        "rate-limit-429",
+        "content-filter-400",
+        "timeout",
+        "provider-unavailable-503",
+    }
+    fixture_cases = failure_fixture.get("cases", [])
+    fixture_names = {case.get("name") for case in fixture_cases}
+    missing_failure_cases = sorted(expected_failure_cases - fixture_names)
+    if missing_failure_cases:
+        errors.append(
+            "Foundry failure fixture is missing cases: "
+            + ", ".join(missing_failure_cases)
+        )
+    for case in fixture_cases:
+        actual = classify_failure(int(case.get("status", 0)), str(case.get("detail", "")))
+        expected = case.get("expected_failure_code")
+        if actual != expected:
+            errors.append(
+                f"Foundry failure fixture {case.get('name')} classified as {actual}, "
+                f"expected {expected}"
+            )
+    serialized_failure_fixture = json.dumps(failure_fixture).lower()
+    for forbidden in ("api-key", "authorization", "bearer ", "secret"):
+        if forbidden in serialized_failure_fixture:
+            errors.append(f"Foundry failure fixture contains forbidden token {forbidden}")
 
     persist = nodes.get("Persist Foundry analysis", {}).get("parameters", {})
     if "persist_claim_analysis_result" not in persist.get("query", ""):
