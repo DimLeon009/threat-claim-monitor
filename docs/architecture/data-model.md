@@ -157,9 +157,15 @@ Foundry records additionally require an allow-listed provider metadata object co
 
 ## Delivery entities
 
+### `notification_channel_configs`
+
+Stores only the allow-listed channel name and its enabled state. Endpoint URLs and credentials remain in the execution platform credential store and are never persisted in PostgreSQL.
+
 ### `notification_outbox`
 
 Implements the transactional outbox pattern. A notification becomes eligible for external delivery only after its durable job exists.
+
+Migration 013 adds the strict `notification-v1` payload constraint and the concurrent-safe producer. It locks the claim, revalidates current evidence, analysis, and accepted organization match, then inserts one durable job per enabled channel. Replays return the existing job through the unique deduplication key.
 
 The deduplication key combines the claim, organization, channel, notification type, and evidence version. Status values are:
 

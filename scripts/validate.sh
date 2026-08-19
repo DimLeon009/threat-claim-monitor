@@ -27,6 +27,7 @@ python3 scripts/test_local_analysis_workflow_contract.py
 python3 scripts/test_inference_provider_contract.py
 python3 scripts/test_foundry_workflow_contract.py
 python3 scripts/test_inference_parity.py
+python3 scripts/test_notification_outbox_contract.py
 
 for migration in db/migrations/*.sql; do
   filename=$(basename "$migration")
