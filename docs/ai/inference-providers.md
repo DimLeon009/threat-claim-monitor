@@ -87,7 +87,10 @@ Run the offline workflow contract without a Foundry subscription or credential:
 
 ```sh
 python3 scripts/test_foundry_workflow_contract.py
+python3 scripts/test_inference_parity.py
 ```
+
+The parity validation fails if the providers drift in bounded input handling, prompt safety rules, embedded output schema, semantic limits, evidence-reference checks, forbidden control-plane fields, or provider-aware persistence. Provider-specific HTTP envelopes and provenance remain intentionally distinct.
 
 With PostgreSQL running, validate the disabled-by-default configuration, endpoint allow-list, lookalike rejection, and absence of secret-bearing columns:
 
