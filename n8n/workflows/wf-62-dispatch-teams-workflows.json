@@ -1,0 +1,117 @@
+{
+  "name": "WF-62 Dispatch Teams Workflows",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "0becc768-242f-459f-a25e-c50d91803ed0",
+      "name": "Run Teams dispatch manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-640, 80]
+    },
+    {
+      "parameters": {"rule": {"interval": [{"field": "minutes", "minutesInterval": 1}]}},
+      "id": "c00a06bc-3901-4f3f-a318-38ec65b775af",
+      "name": "Run Teams dispatch every minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-640, -80]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM claim_notification_jobs('teams', 10, 120);",
+        "options": {"queryBatching": "single"}
+      },
+      "id": "7dd04ab4-973a-4ce4-9f52-12ae6646bc22",
+      "name": "Claim Teams jobs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-384, 0]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "if (!$json.notification_id || !$json.lease_token || !$json.payload) throw new Error('Invalid claimed Teams job');\nif ($json.channel !== 'teams') throw new Error('Unexpected notification channel');\nconst p = $json.payload;\nif (p.contract_version !== 'notification-v1') throw new Error('Unsupported notification contract');\nconst safeText = (value,max=300) => String(value ?? 'Non renseigné').replace(/[\\u0000-\\u001f\\u007f]+/g,' ').replace(/\\s+/g,' ').trim().slice(0,max).replace(/\\\\/g,'\\\\\\\\').replace(/([*_{}\\[\\]()#+\\-.!|~])/g,'\\\\$1').replace(/</g,'‹').replace(/>/g,'›') || 'Non renseigné';\nconst factLines = (p.analysis.observed_facts ?? []).slice(0,5).map(item => `• ${safeText(item.statement_fr,240)}`).join('\\n');\nconst uncertaintyLines = (p.analysis.uncertainties ?? []).slice(0,5).map(item => `• ${safeText(item,200)}`).join('\\n');\nconst sourceLines = (p.sources ?? []).slice(0,10).map(item => `• ${safeText(item.name,120)} — ${safeText(item.discovered_at,80)}`).join('\\n');\nconst card = {$schema:'http://adaptivecards.io/schemas/adaptive-card.json',type:'AdaptiveCard',version:'1.2',body:[{type:'TextBlock',size:'Large',weight:'Bolder',color:'Attention',wrap:true,text:`Threat Claim Monitor — ${safeText(p.organization.name,160)}`},{type:'TextBlock',wrap:true,text:`${safeText(p.disclaimer,300)}`},{type:'FactSet',facts:[{title:'Alert ID',value:safeText(p.alert_id,80)},{title:'Organisation',value:safeText(p.organization.name,160)},{title:'Victime déclarée',value:safeText(p.claim.victim_name,180)},{title:'Acteur',value:safeText(p.claim.threat_actor,160)},{title:'Vérification',value:safeText(p.claim.verification_status,80)},{title:'Correspondance',value:`${safeText(p.match.method,100)} — ${Number(p.match.confidence_score)} / 100`},{title:'Première observation',value:safeText(p.claim.first_seen_at,80)},{title:'Dernière observation',value:safeText(p.claim.last_seen_at,80)}]},{type:'TextBlock',weight:'Bolder',spacing:'Medium',text:'Analyse'},{type:'TextBlock',wrap:true,text:safeText(p.analysis.summary_fr,600)},{type:'TextBlock',weight:'Bolder',spacing:'Medium',text:'Faits observés'},{type:'TextBlock',wrap:true,text:factLines||'Aucun fait structuré'},{type:'TextBlock',weight:'Bolder',spacing:'Medium',text:'Incertitudes'},{type:'TextBlock',wrap:true,text:uncertaintyLines||'Aucune incertitude structurée'},{type:'TextBlock',weight:'Bolder',spacing:'Medium',text:'Sources'},{type:'TextBlock',wrap:true,text:sourceLines||'Aucune source structurée'}]};\nconst teams_body = {type:'message',attachments:[{contentType:'application/vnd.microsoft.card.adaptive',contentUrl:null,content:card}]};\nreturn {json:{dispatch_context:{notification_id:$json.notification_id,lease_token:$json.lease_token},teams_body}};"
+      },
+      "id": "ee901dcc-2ae4-45f8-930b-88a8a484d50b",
+      "name": "Build safe Adaptive Card",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://teams-workflow.example.invalid/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [{"name": "Content-Type", "value": "application/json"}]},
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.teams_body) }}",
+        "options": {"response": {"response": {"fullResponse": true}}, "timeout": 10000}
+      },
+      "id": "59666052-1e1d-4887-a3fd-d21093085c16",
+      "name": "Send Teams Adaptive Card",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [128, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Build safe Adaptive Card').item.json.dispatch_context;\nconst status = Number($json.statusCode ?? 200);\nreturn {json:{delivery_result:{notification_id:source.notification_id,lease_token:source.lease_token,succeeded:true,response_status:status,response_excerpt:'teams workflow accepted',error_code:null}}};"
+      },
+      "id": "46b80ad1-6772-46f6-bd67-21844c5c2be5",
+      "name": "Build Teams success result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, -80]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Build safe Adaptive Card').item.json.dispatch_context;\nconst status = Number($json.statusCode ?? $json.httpCode ?? $json.error?.statusCode ?? $json.error?.httpCode ?? $json.error?.status ?? 0);\nconst detail = JSON.stringify($json.error ?? {}).toLowerCase();\nlet error_code = 'connection_failed';\nif (status === 401 || status === 403) error_code = 'delivery_rejected';\nelse if (status === 429) error_code = 'rate_limited';\nelse if (status >= 400 && status < 500) error_code = 'http_4xx';\nelse if (status >= 500) error_code = 'http_5xx';\nelse if (detail.includes('timeout') || detail.includes('timed out')) error_code = 'timeout';\nelse if (detail.includes('credential')) error_code = 'credential_unavailable';\nreturn {json:{delivery_result:{notification_id:source.notification_id,lease_token:source.lease_token,succeeded:false,response_status:status||null,response_excerpt:null,error_code}}};"
+      },
+      "id": "c93637a5-b29a-4b18-b505-191511481479",
+      "name": "Build sanitized Teams failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 80]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM record_notification_delivery_result_envelope($1::jsonb);",
+        "options": {"queryBatching": "single", "queryReplacement": "={{ JSON.stringify($json.delivery_result) }}"}
+      },
+      "id": "28ae87d6-a5db-4998-a7ad-1d69dc6ff94e",
+      "name": "Persist Teams delivery result",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [640, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run Teams dispatch manually": {"main": [[{"node": "Claim Teams jobs", "type": "main", "index": 0}]]},
+    "Run Teams dispatch every minute": {"main": [[{"node": "Claim Teams jobs", "type": "main", "index": 0}]]},
+    "Claim Teams jobs": {"main": [[{"node": "Build safe Adaptive Card", "type": "main", "index": 0}]]},
+    "Build safe Adaptive Card": {"main": [[{"node": "Send Teams Adaptive Card", "type": "main", "index": 0}]]},
+    "Send Teams Adaptive Card": {"main": [[{"node": "Build Teams success result", "type": "main", "index": 0}], [{"node": "Build sanitized Teams failure", "type": "main", "index": 0}]]},
+    "Build Teams success result": {"main": [[{"node": "Persist Teams delivery result", "type": "main", "index": 0}]]},
+    "Build sanitized Teams failure": {"main": [[{"node": "Persist Teams delivery result", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "timezone": "Europe/Paris"},
+  "versionId": "666bddae-e176-4f18-bd0c-4ddbd5dad2ed",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}

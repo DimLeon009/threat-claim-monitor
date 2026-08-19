@@ -59,6 +59,31 @@ try {
     throw 'Inference parity validation failed.'
   }
 
+  python scripts/test_notification_outbox_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Notification outbox contract validation failed.'
+  }
+
+  python scripts/test_webhook_workflow_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Generic webhook workflow contract validation failed.'
+  }
+
+  python scripts/test_notification_producer_workflow_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Notification producer workflow contract validation failed.'
+  }
+
+  python scripts/test_email_workflow_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'SMTP email workflow contract validation failed.'
+  }
+
+  python scripts/test_teams_workflow_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Teams Workflows contract validation failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'

@@ -10,8 +10,9 @@ This directory contains the technical, operational, and security documentation f
 4. [Data model](architecture/data-model.md)
 5. [Threat model](security/threat-model.md)
 6. [Matching normalization](matching/normalization.md)
-7. [Getting started](operations/getting-started.md)
-8. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
+7. [Notification contract](notifications/notification-contract.md)
+8. [Getting started](operations/getting-started.md)
+9. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
 
 ## Documentation map
 
@@ -63,6 +64,15 @@ This directory contains the technical, operational, and security documentation f
 |---|---|
 | [Local analysis contract](ai/local-analysis-contract.md) | Pinned Ollama profiles, untrusted-input boundary, strict JSON output, validation, and fallback |
 | [Inference provider contract](ai/inference-providers.md) | Shared Ollama/Foundry contract, cloud selection, authentication, provenance, and data boundary |
+
+### Notifications
+
+| Document | Purpose |
+|---|---|
+| [Notification contract](notifications/notification-contract.md) | Common payload, eligibility, transactional outbox, idempotency, concurrency, and credential boundary |
+| [Generic webhook](notifications/generic-webhook.md) | WF-60 import, credential boundary, delivery behavior, failure handling, and runtime validation |
+| [SMTP email](notifications/smtp-email.md) | WF-61 safe rendering, SMTP credential boundary, import, delivery behavior, and validation |
+| [Teams Workflows](notifications/teams-workflows.md) | WF-62 Adaptive Card, webhook ownership, signature credential, safe rendering, and smoke test |
 
 ### Security
 

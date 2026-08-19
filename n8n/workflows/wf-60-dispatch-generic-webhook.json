@@ -1,0 +1,125 @@
+{
+  "name": "WF-60 Dispatch generic webhook",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c9b8cb95-ecbb-4efb-ada1-9631ab58e067",
+      "name": "Run webhook dispatch manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-640, 80]
+    },
+    {
+      "parameters": {
+        "rule": {"interval": [{"field": "minutes", "minutesInterval": 1}]}
+      },
+      "id": "2ce64549-ea96-4846-abfd-eed519f95b93",
+      "name": "Run webhook dispatch every minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-640, -80]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM claim_notification_jobs('webhook', 10, 120);",
+        "options": {"queryBatching": "single"}
+      },
+      "id": "71584cb8-0dc4-4e65-a547-a074316c9abc",
+      "name": "Claim webhook jobs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-384, 0]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "if (!$json.notification_id || !$json.lease_token || !$json.payload) throw new Error('Invalid claimed webhook job');\nif ($json.channel !== 'webhook') throw new Error('Unexpected notification channel');\nif ($json.payload.contract_version !== 'notification-v1') throw new Error('Unsupported notification contract');\nreturn {json:{dispatch_context:{notification_id:$json.notification_id,lease_token:$json.lease_token},webhook_body:$json.payload}};"
+      },
+      "id": "bc3f669c-1824-4609-8450-12d372d86468",
+      "name": "Build webhook request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.example.invalid/threat-claim-monitor",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {"parameters": [{"name": "Content-Type", "value": "application/json"}]},
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.webhook_body) }}",
+        "options": {
+          "response": {"response": {"fullResponse": true}},
+          "timeout": 10000
+        }
+      },
+      "id": "26016a48-ac66-4a47-94f9-3cb04bd43676",
+      "name": "Send generic webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [128, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Build webhook request').item.json.dispatch_context;\nconst forbidden = /https?:\\/\\/|api[_-]?key|authorization|bearer\\s|secret|token|password|credential/i;\nconst raw = typeof $json.body === 'string' ? $json.body : JSON.stringify($json.body ?? '');\nconst cleaned = raw.replace(/[\\u0000-\\u001f\\u007f]+/g,' ').slice(0,500);\nconst response_excerpt = !cleaned ? null : forbidden.test(cleaned) ? '[redacted unsafe response]' : cleaned;\nconst status = Number($json.statusCode ?? 200);\nreturn {json:{delivery_result:{notification_id:source.notification_id,lease_token:source.lease_token,succeeded:true,response_status:status,response_excerpt,error_code:null}}};"
+      },
+      "id": "bc1e7755-e0de-4de7-af88-11cb53605926",
+      "name": "Build webhook success result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, -80]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Build webhook request').item.json.dispatch_context;\nconst status = Number($json.statusCode ?? $json.httpCode ?? $json.error?.statusCode ?? $json.error?.httpCode ?? $json.error?.status ?? 0);\nconst detail = JSON.stringify($json.error ?? {}).toLowerCase();\nlet error_code = 'connection_failed';\nif (status === 401 || status === 403) error_code = 'delivery_rejected';\nelse if (status === 429) error_code = 'rate_limited';\nelse if (status >= 400 && status < 500) error_code = 'http_4xx';\nelse if (status >= 500) error_code = 'http_5xx';\nelse if (detail.includes('timeout') || detail.includes('timed out')) error_code = 'timeout';\nelse if (detail.includes('credential')) error_code = 'credential_unavailable';\nreturn {json:{delivery_result:{notification_id:source.notification_id,lease_token:source.lease_token,succeeded:false,response_status:status || null,response_excerpt:null,error_code}}};"
+      },
+      "id": "fdd0e84e-ed0c-437a-94a9-60433871308d",
+      "name": "Build sanitized webhook failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 80]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM record_notification_delivery_result_envelope($1::jsonb);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ JSON.stringify($json.delivery_result) }}"
+        }
+      },
+      "id": "3528f87f-6bcc-45e7-af69-0386cb8ad308",
+      "name": "Persist webhook delivery result",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [640, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run webhook dispatch manually": {"main": [[{"node": "Claim webhook jobs", "type": "main", "index": 0}]]},
+    "Run webhook dispatch every minute": {"main": [[{"node": "Claim webhook jobs", "type": "main", "index": 0}]]},
+    "Claim webhook jobs": {"main": [[{"node": "Build webhook request", "type": "main", "index": 0}]]},
+    "Build webhook request": {"main": [[{"node": "Send generic webhook", "type": "main", "index": 0}]]},
+    "Send generic webhook": {"main": [[{"node": "Build webhook success result", "type": "main", "index": 0}], [{"node": "Build sanitized webhook failure", "type": "main", "index": 0}]]},
+    "Build webhook success result": {"main": [[{"node": "Persist webhook delivery result", "type": "main", "index": 0}]]},
+    "Build sanitized webhook failure": {"main": [[{"node": "Persist webhook delivery result", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "timezone": "Europe/Paris"},
+  "versionId": "a693210b-7384-4572-8752-ec771133086f",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}

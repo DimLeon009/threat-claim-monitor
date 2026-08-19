@@ -33,7 +33,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M1 | First reliable ransomware claim feed | ✅ |
 | M2 | Deterministic watchlist matching and correlation | ✅ |
 | M3 | Evidence-grounded hybrid AI summaries | ✅ |
-| M4 | Auditable multi-channel notifications | ⏳ |
+| M4 | Auditable multi-channel notifications | ✅ |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
 
@@ -186,7 +186,7 @@ Produce concise French analyst summaries from normalized evidence through explic
 - Invalid, filtered, rate-limited, or unavailable cloud output uses the deterministic fallback.
 - Cloud activation requires an approved endpoint, deployment, processing scope, and content-filter configuration.
 
-## ⏳ M4 — Notifications
+## ✅ M4 — Notifications
 
 ### Objective
 
@@ -194,18 +194,18 @@ Deliver one useful alert per material evidence version and retain complete deliv
 
 ### Deliverables
 
-- [ ] Common notification contract
-- [ ] Required uncertainty disclaimer
-- [ ] Transactional outbox producer
-- [ ] Concurrent-safe outbox claim operation
-- [ ] Generic webhook adapter
-- [ ] SMTP email adapter
-- [ ] Microsoft Teams Workflows Adaptive Card adapter
-- [ ] Bounded exponential retry
-- [ ] Dead-letter state and manual requeue procedure
-- [ ] Attempt history and response sanitization
-- [ ] Channel-specific escaping tests
-- [ ] Duplicate prevention tests
+- [x] Common notification contract
+- [x] Required uncertainty disclaimer
+- [x] Transactional outbox producer
+- [x] Concurrent-safe outbox claim operation
+- [x] Generic webhook adapter
+- [x] SMTP email adapter
+- [x] Microsoft Teams Workflows Adaptive Card adapter
+- [x] Bounded exponential retry
+- [x] Dead-letter state and manual requeue procedure
+- [x] Attempt history and response sanitization
+- [x] Channel-specific escaping tests
+- [x] Duplicate prevention tests
 
 ### Acceptance criteria
 

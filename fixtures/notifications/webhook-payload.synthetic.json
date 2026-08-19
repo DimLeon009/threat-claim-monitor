@@ -1,0 +1,41 @@
+{
+  "contract_version": "notification-v1",
+  "alert_id": "76000000-0000-4000-8000-000000000001",
+  "notification_type": "new_claim",
+  "created_at": "2026-08-19T10:00:00Z",
+  "organization": {
+    "id": "20000000-0000-4000-8000-000000000001",
+    "name": "Example & Sons <France>"
+  },
+  "claim": {
+    "id": "74000000-0000-4000-8000-000000000001",
+    "evidence_version": 1,
+    "victim_name": "Example \"Victim\" & Co.",
+    "threat_actor": "Synthetic 'Actor'",
+    "claimed_at": null,
+    "first_seen_at": "2026-08-19T08:00:00Z",
+    "last_seen_at": "2026-08-19T08:00:00Z",
+    "verification_status": "claimed"
+  },
+  "match": {
+    "method": "name_exact",
+    "confidence_score": 95,
+    "review_status": "auto_accepted"
+  },
+  "analysis": {
+    "id": "74000000-0000-4000-8000-000000000021",
+    "provider": "ollama",
+    "deployment_name": "synthetic-model",
+    "model_name": "synthetic-model",
+    "validation_status": "valid",
+    "summary_fr": "Une source publique mentionne Example & Sons <France>.",
+    "observed_facts": [
+      {"statement_fr": "La valeur contient des caractères JSON : \" & < > ' .", "evidence_ids": ["evidence-1"]}
+    ],
+    "uncertainties": ["Aucune compromission n’est confirmée."]
+  },
+  "sources": [
+    {"name": "Synthetic Source", "discovered_at": "2026-08-19T08:00:00Z", "published_at": null}
+  ],
+  "disclaimer": "Déclaration criminelle non vérifiée ; aucune compromission n’est confirmée."
+}

@@ -157,9 +157,19 @@ Foundry records additionally require an allow-listed provider metadata object co
 
 ## Delivery entities
 
+### `notification_channel_configs`
+
+Stores only the allow-listed channel name and its enabled state. Endpoint URLs and credentials remain in the execution platform credential store and are never persisted in PostgreSQL.
+
 ### `notification_outbox`
 
 Implements the transactional outbox pattern. A notification becomes eligible for external delivery only after its durable job exists.
+
+Migration 013 adds the strict `notification-v1` payload constraint and the concurrent-safe producer. It locks the claim, revalidates current evidence, analysis, and accepted organization match, then inserts one durable job per enabled channel. Replays return the existing job through the unique deduplication key.
+
+Migration 017 adds the bounded WF-50 queue wrapper. It skips fully enqueued evidence versions and deterministically selects one current validated analysis without invoking either inference provider.
+
+Migration 014 adds a short-lived lease token and expiry. Channel workers reserve eligible rows with `FOR UPDATE SKIP LOCKED`; active leases are exclusive and expired leases can be reclaimed with a new token.
 
 The deduplication key combines the claim, organization, channel, notification type, and evidence version. Status values are:
 
@@ -173,7 +183,7 @@ The deduplication key combines the claim, organization, channel, notification ty
 
 Records every channel attempt, including timestamp, success, response status, bounded response excerpt, and sanitized error.
 
-Response bodies must be truncated and must not persist authentication material.
+Migration 015 makes result persistence atomic with the outbox state transition. Response excerpts are truncated and secret-like content is replaced rather than persisted. Five consecutive failures move a job to `dead_letter`; manual requeue preserves these attempt rows.
 
 ## State invariants
 
