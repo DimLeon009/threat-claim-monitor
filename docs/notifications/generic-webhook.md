@@ -40,3 +40,5 @@ External delivery is at-least-once. If n8n stops after the receiver accepts the 
 ## Validation
 
 `scripts/test_webhook_workflow_contract.py` checks the inactive sanitized export, fixed method and timeout, credential requirement, dedicated error branch, database-owned retry, JSON serialization, result persistence, and an escaping-oriented synthetic payload.
+
+The Windows runtime smoke test validated one synthetic WF-50 job through WF-60 and a local authenticated receiver. PostgreSQL recorded `sent` with exactly one successful attempt, the receiver obtained the complete `notification-v1` payload, and the synthetic database records were removed after verification. No endpoint, authentication header, or credential value is retained in repository evidence.
