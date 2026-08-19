@@ -146,6 +146,7 @@ def main() -> None:
             "invalid delivery result envelope was accepted",
             "WF-50 producer did not create the expected channel jobs",
             "WF-50 producer replay returned a fully enqueued claim",
+            "cross-source evidence created a duplicate new-claim notification",
             "ROLLBACK;",
         ),
         "notification runtime test",

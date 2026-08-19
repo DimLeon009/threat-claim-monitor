@@ -34,6 +34,11 @@ try {
     throw 'RansomLook workflow contract validation failed.'
   }
 
+  python scripts/test_cross_source_correlation_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Cross-source correlation contract validation failed.'
+  }
+
   python scripts/test_matching_contract.py
   if ($LASTEXITCODE -ne 0) {
     throw 'Matching contract validation failed.'

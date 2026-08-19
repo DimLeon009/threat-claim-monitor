@@ -38,7 +38,7 @@ All additional response fields are discarded before database ingestion. A value 
 
 The source key is derived from the normalized victim name, normalized threat actor, and parsed discovery timestamp. PostgreSQL enforces uniqueness on `(source_id, source_key)`, so replaying a response cannot insert the same RansomLook observation twice.
 
-The first successful collection establishes a silent RansomLook baseline. Its observations are stored with `is_historical = true`; later unseen source keys are non-historical. This increment stores observations only. Cross-source claim correlation and the `multi_source_observed` transition are implemented separately so the state change can be tested independently.
+The first successful collection establishes a silent RansomLook baseline. Its observations are stored with `is_historical = true`; later unseen source keys are non-historical. Migration `020_cross_source_correlation.sql` adds source-independent collection correlation and the guarded `multi_source_observed` transition.
 
 ## Failure behavior
 
@@ -54,7 +54,7 @@ An incompatible root wrapper, invalid content type, oversized array, or missing 
 
 ## Deployment
 
-Apply migration `018_ransomlook_ingestion.sql`, then import `n8n/workflows/wf-11-collect-ransomlook.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new` and `Record sanitized failure`.
+Apply migrations `018_ransomlook_ingestion.sql` through `020_cross_source_correlation.sql`, then import `n8n/workflows/wf-11-collect-ransomlook.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new`, `Correlate collection observations`, `Record sanitized failure`, and `Record sanitized correlation failure`.
 
 WF-11 is inactive and has no environment-specific workflow or credential identifier in the committed export. Run it manually before connecting it to WF-00. The first successful run should report `is_baseline = true`; replaying the same response should report `inserted_count = 0`.
 
@@ -69,5 +69,7 @@ The official endpoint and response example are documented by [RansomLook](https:
 ## Windows runtime validation
 
 The first Windows smoke-test collection fetched 264 records, rejected two fully masked titles, inserted 262 historical observations, and established the silent baseline. An immediate second collection fetched 266 records and inserted only the two newly published usable observations with `is_baseline = false`. The 262 previously stored observations were not duplicated.
+
+After cross-source correlation was enabled, the updated WF-11 processed 17 newly inserted observations and persisted 17 claim links successfully. The controlled backfill processed the earlier 262-observation baseline and two subsequent observations. No monitored-organization match was produced, and historical observations remained excluded from new-claim notification eligibility.
 
 No live victim value, response body, external URL, or credential is retained as repository evidence. Only aggregate collection counts and generated collection-run identifiers were inspected during validation.

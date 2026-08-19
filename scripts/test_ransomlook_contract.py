@@ -65,6 +65,9 @@ def main() -> int:
         "Classify ingestion failure",
         "Record sanitized failure",
         "Stop with sanitized failure",
+        "Correlate collection observations",
+        "Record sanitized correlation failure",
+        "Stop with sanitized correlation failure",
     }
     missing_nodes = sorted(expected_nodes - nodes.keys())
     if missing_nodes:
@@ -136,6 +139,10 @@ def main() -> int:
     insertion_query = nodes.get("Insert observations if new", {}).get("parameters", {}).get("query", "")
     if "ingest_ransomlook_collection" not in insertion_query:
         errors.append("ingestion node must call ingest_ransomlook_collection")
+    if target_names(connections, "Insert observations if new", 0) != [
+        "Correlate collection observations"
+    ]:
+        errors.append("successful RansomLook ingestion must target collection correlation")
 
     for required_sql in (
         "CREATE OR REPLACE FUNCTION ingest_ransomlook_collection",

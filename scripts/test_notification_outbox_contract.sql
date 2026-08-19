@@ -66,7 +66,7 @@ VALUES (
       'evidence_ids', jsonb_build_array('evidence-1')
     )),
     'uncertainties', jsonb_build_array('La compromission n’est pas confirmée.'),
-    'disclaimer', 'Déclaration criminelle non vérifiée ; aucune compromission n’est confirmée.'
+    'disclaimer', U&'D\00E9claration criminelle non v\00E9rifi\00E9e ; aucune compromission n\2019est confirm\00E9e.'
   ),
   'valid', 1,
   '{"observations":[{"evidence_id":"evidence-1"}]}'::jsonb,
@@ -131,7 +131,7 @@ BEGIN
         OR payload->'analysis'->>'summary_fr'
           <> 'Une source publique relaie une déclaration synthétique non vérifiée.'
         OR payload->>'disclaimer'
-          <> 'Déclaration criminelle non vérifiée ; aucune compromission n’est confirmée.'
+          <> U&'D\00E9claration criminelle non v\00E9rifi\00E9e ; aucune compromission n\2019est confirm\00E9e.'
         OR jsonb_array_length(payload->'sources') <> 1
         OR payload::text ~* 'https?://|api[_-]?key|authorization|bearer\s|secret|token'
       )
@@ -585,6 +585,46 @@ BEGIN
     WHERE claim_id = '74000000-0000-4000-8000-000000000003'
   ) THEN
     RAISE EXCEPTION 'WF-50 producer replay returned a fully enqueued claim';
+  END IF;
+END;
+$$;
+
+UPDATE claims
+SET evidence_version = 2,
+    verification_status = 'multi_source_observed',
+    updated_at = now()
+WHERE id = '74000000-0000-4000-8000-000000000003';
+
+INSERT INTO analyses (
+  id, claim_id, model_name, model_digest, prompt_version, input_hash,
+  output_payload, validation_status, evidence_version, input_payload,
+  inference_metadata, provider, deployment_name, provider_metadata
+)
+SELECT
+  '74000000-0000-4000-8000-000000000024',
+  '74000000-0000-4000-8000-000000000003',
+  model_name, model_digest, prompt_version, repeat('8', 64), output_payload,
+  validation_status, 2, input_payload, inference_metadata,
+  provider, deployment_name, provider_metadata
+FROM analyses
+WHERE id = '74000000-0000-4000-8000-000000000023';
+
+CREATE TEMP TABLE producer_cross_source_replay AS
+SELECT * FROM enqueue_ready_claim_notifications(100);
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM producer_cross_source_replay
+    WHERE claim_id = '74000000-0000-4000-8000-000000000003'
+  ) OR (
+    SELECT count(*)
+    FROM notification_outbox
+    WHERE claim_id = '74000000-0000-4000-8000-000000000003'
+      AND notification_type = 'new_claim'
+  ) <> 2 THEN
+    RAISE EXCEPTION 'cross-source evidence created a duplicate new-claim notification';
   END IF;
 END;
 $$;

@@ -226,8 +226,8 @@ Increase coverage and source resilience while preserving a single internal obser
 
 - [x] RansomLook adapter and contract fixture
 - [x] Response-wrapper compatibility test
-- [ ] Cross-source claim correlation
-- [ ] `multi_source_observed` transition
+- [x] Cross-source claim correlation
+- [x] `multi_source_observed` transition
 - [ ] FrenchBreaches RSS endpoint and automation validation
 - [ ] FrenchBreaches adapter only if structured access is reliable and permitted
 - [ ] Per-source health indicators
