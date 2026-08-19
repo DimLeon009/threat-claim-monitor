@@ -64,6 +64,16 @@ try {
     throw 'Notification outbox contract validation failed.'
   }
 
+  python scripts/test_webhook_workflow_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Generic webhook workflow contract validation failed.'
+  }
+
+  python scripts/test_notification_producer_workflow_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Notification producer workflow contract validation failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'

@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MIGRATION_FILE = ROOT / "db" / "migrations" / "013_notification_outbox_contract.sql"
 LEASE_MIGRATION_FILE = ROOT / "db" / "migrations" / "014_notification_job_leases.sql"
 DELIVERY_MIGRATION_FILE = ROOT / "db" / "migrations" / "015_notification_delivery_results.sql"
+WEBHOOK_MIGRATION_FILE = ROOT / "db" / "migrations" / "016_webhook_delivery_envelope.sql"
 RUNTIME_TEST_FILE = ROOT / "scripts" / "test_notification_outbox_contract.sql"
 
 
@@ -20,6 +21,7 @@ def main() -> None:
     migration = MIGRATION_FILE.read_text(encoding="utf-8")
     lease_migration = LEASE_MIGRATION_FILE.read_text(encoding="utf-8")
     delivery_migration = DELIVERY_MIGRATION_FILE.read_text(encoding="utf-8")
+    webhook_migration = WEBHOOK_MIGRATION_FILE.read_text(encoding="utf-8")
     runtime_test = RUNTIME_TEST_FILE.read_text(encoding="utf-8")
 
     require_fragments(
@@ -111,6 +113,18 @@ def main() -> None:
     )
 
     require_fragments(
+        webhook_migration,
+        (
+            "FUNCTION record_notification_delivery_result_envelope",
+            "jsonb_typeof(candidate) <> 'object'",
+            "invalid notification delivery result envelope",
+            "record_notification_delivery_result(",
+            "016_webhook_delivery_envelope",
+        ),
+        "webhook delivery envelope migration",
+    )
+
+    require_fragments(
         runtime_test,
         (
             "first enqueue did not create one job per enabled channel",
@@ -129,6 +143,9 @@ def main() -> None:
             "dead-letter notification was not safely requeued",
             "notification success was not finalized atomically",
             "stale notification lease was accepted",
+            "invalid delivery result envelope was accepted",
+            "WF-50 producer did not create the expected channel jobs",
+            "WF-50 producer replay returned a fully enqueued claim",
             "ROLLBACK;",
         ),
         "notification runtime test",

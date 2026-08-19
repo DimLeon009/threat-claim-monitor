@@ -206,13 +206,15 @@ $$;
 CREATE TEMP TABLE first_delivery_failure AS
 SELECT result.*
 FROM reclaimed_webhook_job AS claimed
-CROSS JOIN LATERAL record_notification_delivery_result(
-  claimed.notification_id,
-  claimed.lease_token,
-  false,
-  503,
-  'Authorization: Bearer secret-token',
-  'http_5xx'
+CROSS JOIN LATERAL record_notification_delivery_result_envelope(
+  jsonb_build_object(
+    'notification_id', claimed.notification_id,
+    'lease_token', claimed.lease_token,
+    'succeeded', false,
+    'response_status', 503,
+    'response_excerpt', 'Authorization: Bearer secret-token',
+    'error_code', 'http_5xx'
+  )
 ) AS result;
 
 DO $$
@@ -495,8 +497,109 @@ BEGIN
 END;
 $$;
 
+INSERT INTO claims (
+  id, canonical_key, victim_name, normalized_victim_name, threat_actor,
+  normalized_threat_actor, first_seen_at, last_seen_at, evidence_version
+)
+VALUES (
+  '74000000-0000-4000-8000-000000000003',
+  'synthetic-notification-producer-claim',
+  'Example Producer Victim', 'example producer victim',
+  'Example Producer Actor', 'example producer actor',
+  '2026-08-19T09:00:00Z', '2026-08-19T09:00:00Z', 1
+);
+
+INSERT INTO observations (
+  id, source_id, source_key, discovered_at, published_at,
+  victim_name, normalized_victim_name, threat_actor, normalized_threat_actor,
+  description, payload_hash, raw_payload, is_historical
+)
+VALUES (
+  '74000000-0000-4000-8000-000000000013',
+  '10000000-0000-4000-8000-000000000001',
+  'synthetic-notification-producer-observation',
+  '2026-08-19T09:00:00Z', '2026-08-19T08:55:00Z',
+  'Example Producer Victim', 'example producer victim',
+  'Example Producer Actor', 'example producer actor',
+  'Synthetic producer evidence.', repeat('6', 64),
+  '{"fixture":"notification-producer"}'::jsonb, false
+);
+
+INSERT INTO claim_observations (claim_id, observation_id)
+VALUES (
+  '74000000-0000-4000-8000-000000000003',
+  '74000000-0000-4000-8000-000000000013'
+);
+
+INSERT INTO organization_matches (
+  claim_id, organization_id, matching_method, confidence_score, review_status, evidence
+)
+VALUES (
+  '74000000-0000-4000-8000-000000000003',
+  '20000000-0000-4000-8000-000000000001',
+  'name_exact', 95, 'auto_accepted',
+  '{"rule_version":"notification-producer-test","auto_alert_eligible":true}'::jsonb
+);
+
+INSERT INTO analyses (
+  id, claim_id, model_name, model_digest, prompt_version, input_hash,
+  output_payload, validation_status, evidence_version, input_payload,
+  inference_metadata, provider, deployment_name, provider_metadata
+)
+SELECT
+  '74000000-0000-4000-8000-000000000023',
+  '74000000-0000-4000-8000-000000000003',
+  model_name, model_digest, prompt_version, repeat('7', 64), output_payload,
+  validation_status, 1, input_payload, inference_metadata,
+  provider, deployment_name, provider_metadata
+FROM analyses
+WHERE id = '74000000-0000-4000-8000-000000000021';
+
+CREATE TEMP TABLE producer_enqueue AS
+SELECT * FROM enqueue_ready_claim_notifications(100);
+
+CREATE TEMP TABLE producer_replay AS
+SELECT * FROM enqueue_ready_claim_notifications(100);
+
 DO $$
 BEGIN
+  IF (SELECT count(*) FROM producer_enqueue
+      WHERE claim_id = '74000000-0000-4000-8000-000000000003') <> 2
+    OR EXISTS (
+      SELECT 1
+      FROM producer_enqueue
+      WHERE claim_id = '74000000-0000-4000-8000-000000000003'
+        AND (
+          analysis_id <> '74000000-0000-4000-8000-000000000023'
+          OR created = false
+          OR channel NOT IN ('webhook', 'teams')
+        )
+    )
+  THEN
+    RAISE EXCEPTION 'WF-50 producer did not create the expected channel jobs';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM producer_replay
+    WHERE claim_id = '74000000-0000-4000-8000-000000000003'
+  ) THEN
+    RAISE EXCEPTION 'WF-50 producer replay returned a fully enqueued claim';
+  END IF;
+END;
+$$;
+
+DO $$
+BEGIN
+  BEGIN
+    PERFORM * FROM record_notification_delivery_result_envelope('{}'::jsonb);
+    RAISE EXCEPTION 'invalid delivery result envelope was accepted';
+  EXCEPTION WHEN raise_exception THEN
+    IF SQLERRM <> 'invalid notification delivery result envelope' THEN
+      RAISE;
+    END IF;
+  END;
+
   BEGIN
     INSERT INTO notification_outbox (
       claim_id, organization_id, channel, notification_type,

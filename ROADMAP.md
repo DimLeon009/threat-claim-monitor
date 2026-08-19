@@ -198,7 +198,7 @@ Deliver one useful alert per material evidence version and retain complete deliv
 - [x] Required uncertainty disclaimer
 - [x] Transactional outbox producer
 - [x] Concurrent-safe outbox claim operation
-- [ ] Generic webhook adapter
+- [x] Generic webhook adapter
 - [ ] SMTP email adapter
 - [ ] Microsoft Teams Workflows Adaptive Card adapter
 - [x] Bounded exponential retry

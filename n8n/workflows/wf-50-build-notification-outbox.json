@@ -1,0 +1,45 @@
+{
+  "name": "WF-50 Build notification outbox",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ad2e7928-8cd7-4a03-83e5-b1293823f3bb",
+      "name": "Build outbox manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-256, 80]
+    },
+    {
+      "parameters": {
+        "rule": {"interval": [{"field": "minutes", "minutesInterval": 1}]}
+      },
+      "id": "d1be2b35-ceae-456e-b75f-d8340ea40210",
+      "name": "Build outbox every minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-256, -80]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM enqueue_ready_claim_notifications(50);",
+        "options": {"queryBatching": "single"}
+      },
+      "id": "8900cf0e-c1cb-46d0-933f-dfbb6334f0b6",
+      "name": "Create durable notification jobs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [0, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Build outbox manually": {"main": [[{"node": "Create durable notification jobs", "type": "main", "index": 0}]]},
+    "Build outbox every minute": {"main": [[{"node": "Create durable notification jobs", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "timezone": "Europe/Paris"},
+  "versionId": "1e5dc475-ee8f-4f8c-8fc8-516400204e83",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}

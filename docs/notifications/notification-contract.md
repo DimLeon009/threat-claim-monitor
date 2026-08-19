@@ -35,11 +35,13 @@ The claim row is selected `FOR UPDATE`, serializing concurrent producers for tha
 
 New evidence may increment `evidence_version`, allowing a new status-change or correction notification while preserving prior delivery history.
 
+WF-50 calls `enqueue_ready_claim_notifications` once per minute. The database selects only current eligible analyses and deterministically prefers a valid result over a fallback. An enabled Microsoft Foundry configuration gives its stored result precedence; otherwise the local Ollama result is preferred. Selection never invokes an inference provider. Claims whose enabled-channel jobs already exist are skipped, while the underlying unique keys remain the final concurrency guard.
+
 ## Channel configuration boundary
 
 The database stores only the channel name and whether it is enabled. Webhook endpoints, SMTP passwords, Teams URLs, and other credentials belong in the execution platform credential store and must never be written to PostgreSQL, workflow exports, logs, or Git.
 
-Webhook, email, and Teams network dispatch remain later M4 increments.
+The generic webhook network adapter is implemented by WF-60. Email and Teams network dispatch remain later M4 increments.
 
 ## Concurrent job reservation
 
@@ -56,6 +58,12 @@ Migration 015 atomically verifies the active lease, appends one `notification_at
 A successful attempt moves the job to `sent` and records `sent_at`. A failure accepts only an allow-listed error code translated to a fixed message. Response excerpts are limited to 500 characters, control characters are removed, and content resembling a URL, credential, authorization value, password, secret, or token is replaced with `[redacted unsafe response]`.
 
 Failures retry after an exponential delay starting at 60 seconds and capped at one hour. The fifth failed attempt moves the same durable job to `dead_letter`; it never creates another outbox row. An operator can call `requeue_dead_letter_notification` after correcting the cause. Requeue resets the delivery counter but preserves the complete attempt history.
+
+## Generic webhook adapter
+
+WF-60 claims only the `webhook` channel, serializes the common payload with `JSON.stringify`, and sends it through a ten-second HTTPS request with n8n HTTP Header Auth. The node performs no direct retry. Both success and the dedicated sanitized failure output bind one strict JSON result envelope to PostgreSQL.
+
+See the [generic webhook runbook](generic-webhook.md) for safe import, configuration, testing, and publication.
 
 ## Validation
 

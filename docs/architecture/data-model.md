@@ -167,6 +167,8 @@ Implements the transactional outbox pattern. A notification becomes eligible for
 
 Migration 013 adds the strict `notification-v1` payload constraint and the concurrent-safe producer. It locks the claim, revalidates current evidence, analysis, and accepted organization match, then inserts one durable job per enabled channel. Replays return the existing job through the unique deduplication key.
 
+Migration 017 adds the bounded WF-50 queue wrapper. It skips fully enqueued evidence versions and deterministically selects one current validated analysis without invoking either inference provider.
+
 Migration 014 adds a short-lived lease token and expiry. Channel workers reserve eligible rows with `FOR UPDATE SKIP LOCKED`; active leases are exclusive and expired leases can be reclaimed with a new token.
 
 The deduplication key combines the claim, organization, channel, notification type, and evidence version. Status values are:
