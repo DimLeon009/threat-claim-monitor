@@ -2,8 +2,8 @@
 
 > Self-hosted monitoring of public ransomware and data-leak claims, with deterministic organization matching, local AI summaries, and auditable notifications.
 
-![Project status](https://img.shields.io/badge/status-M4%20notifications%20complete-brightgreen)
-![Next milestone](https://img.shields.io/badge/next-M5%20multi--source-blue)
+![Project status](https://img.shields.io/badge/status-M5%20multi--source%20in%20progress-yellow)
+![Next milestone](https://img.shields.io/badge/next-M6%20hardening-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Docker Compose](https://img.shields.io/badge/runtime-Docker%20Compose-2496ED?logo=docker&logoColor=white)
 ![n8n](https://img.shields.io/badge/orchestration-n8n-EA4B71?logo=n8n&logoColor=white)
@@ -113,8 +113,8 @@ Read the complete [architecture documentation](docs/architecture/architecture.md
 
 | Source | Format | V1 role | State |
 |---|---|---|---|
-| ransomware.live | JSON API | Primary claim feed | Adapter implemented; M1 hardening in progress |
-| RansomLook | JSON API and RSS | Secondary observation and correlation | Seeded; adapter planned in M5 |
+| ransomware.live | JSON API | Primary claim feed | Adapter implemented and runtime validated |
+| RansomLook | JSON API | Secondary observation and correlation | Adapter, response-wrapper contract, and Windows runtime validated |
 | FrenchBreaches | RSS advertised | French breach enrichment | Seeded, disabled pending validation |
 | CERT-FR | RSS / CTI publications | Future institutional confirmation | Planned |
 | Have I Been Pwned | RSS / API | Future verified breach enrichment | Planned |
@@ -200,7 +200,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
 | M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
 | M4 | Auditable webhook, email, and Teams notifications | ✅ Complete; webhook, SMTP, and Teams runtime validated on Windows |
-| M5 | Additional source adapters | Planned |
+| M5 | Additional source adapters | 🚧 RansomLook adapter runtime validated; cross-source correlation pending |
 | M6 | Hardening and v1.0.0 | Planned |
 
 The detailed acceptance criteria are tracked in the [roadmap](ROADMAP.md).

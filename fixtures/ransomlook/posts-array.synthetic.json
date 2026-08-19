@@ -1,0 +1,17 @@
+[
+  {
+    "group_name": "example-group",
+    "post_title": "Acme Example",
+    "discovered": "2026-08-18T08:30:00Z"
+  },
+  {
+    "group_name": "example-group-2",
+    "post_title": "beta-example.invalid",
+    "discovered": "2026-08-18T09:45:00Z"
+  },
+  {
+    "group_name": "example-group-3",
+    "post_title": "*********",
+    "discovered": "2026-08-18T10:00:00Z"
+  }
+]

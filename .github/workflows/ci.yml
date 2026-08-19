@@ -28,6 +28,9 @@ jobs:
       - name: Validate ransomware.live failure contract
         run: python scripts/test_ransomware_live_contract.py
 
+      - name: Validate RansomLook adapter contract
+        run: python scripts/test_ransomlook_contract.py
+
       - name: Validate deterministic matching contract
         run: python scripts/test_matching_contract.py
 

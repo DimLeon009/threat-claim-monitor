@@ -34,7 +34,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M2 | Deterministic watchlist matching and correlation | ✅ |
 | M3 | Evidence-grounded hybrid AI summaries | ✅ |
 | M4 | Auditable multi-channel notifications | ✅ |
-| M5 | Resilient multi-source coverage | Planned |
+| M5 | Resilient multi-source coverage | 🚧 |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
 
 ## ✅ M0 — Foundation
@@ -216,7 +216,7 @@ Deliver one useful alert per material evidence version and retain complete deliv
 - Notification content includes alert ID, organization, actor, dates, match method, confidence, verification state, sources, summary, and disclaimer.
 - No raw payload, secret, or criminal download link is forwarded.
 
-## M5 — Multi-source coverage
+## 🚧 M5 — Multi-source coverage
 
 ### Objective
 
@@ -224,8 +224,8 @@ Increase coverage and source resilience while preserving a single internal obser
 
 ### Deliverables
 
-- [ ] RansomLook adapter and contract fixture
-- [ ] Response-wrapper compatibility test
+- [x] RansomLook adapter and contract fixture
+- [x] Response-wrapper compatibility test
 - [ ] Cross-source claim correlation
 - [ ] `multi_source_observed` transition
 - [ ] FrenchBreaches RSS endpoint and automation validation
