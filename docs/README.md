@@ -71,6 +71,7 @@ This directory contains the technical, operational, and security documentation f
 |---|---|
 | [Notification contract](notifications/notification-contract.md) | Common payload, eligibility, transactional outbox, idempotency, concurrency, and credential boundary |
 | [Generic webhook](notifications/generic-webhook.md) | WF-60 import, credential boundary, delivery behavior, failure handling, and runtime validation |
+| [SMTP email](notifications/smtp-email.md) | WF-61 safe rendering, SMTP credential boundary, import, delivery behavior, and validation |
 
 ### Security
 

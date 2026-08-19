@@ -41,7 +41,7 @@ WF-50 calls `enqueue_ready_claim_notifications` once per minute. The database se
 
 The database stores only the channel name and whether it is enabled. Webhook endpoints, SMTP passwords, Teams URLs, and other credentials belong in the execution platform credential store and must never be written to PostgreSQL, workflow exports, logs, or Git.
 
-The generic webhook network adapter is implemented by WF-60. Email and Teams network dispatch remain later M4 increments.
+The generic webhook adapter is implemented by WF-60 and the SMTP email adapter by WF-61. Teams network dispatch remains a later M4 increment.
 
 ## Concurrent job reservation
 
@@ -64,6 +64,12 @@ Failures retry after an exponential delay starting at 60 seconds and capped at o
 WF-60 claims only the `webhook` channel, serializes the common payload with `JSON.stringify`, and sends it through a ten-second HTTPS request with n8n HTTP Header Auth. The node performs no direct retry. Both success and the dedicated sanitized failure output bind one strict JSON result envelope to PostgreSQL.
 
 See the [generic webhook runbook](generic-webhook.md) for safe import, configuration, testing, and publication.
+
+## SMTP email adapter
+
+WF-61 renders bounded plain-text and HTML alternatives without links or attachments. It removes header control characters and escapes every dynamic HTML value before using n8n's SMTP credential. The SMTP node performs no direct retry, and both outcomes use the common delivery-result envelope.
+
+See the [SMTP email runbook](smtp-email.md) for credential, sender, recipient, smoke-test, and publication requirements.
 
 ## Validation
 

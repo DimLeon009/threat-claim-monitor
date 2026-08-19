@@ -1,0 +1,117 @@
+{
+  "name": "WF-61 Dispatch SMTP email",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f569523b-b9f6-45b5-8656-0c26cc75a647",
+      "name": "Run email dispatch manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-640, 80]
+    },
+    {
+      "parameters": {
+        "rule": {"interval": [{"field": "minutes", "minutesInterval": 1}]}
+      },
+      "id": "095a2a9c-fafa-4fe1-8dc2-78109e88dc44",
+      "name": "Run email dispatch every minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-640, -80]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM claim_notification_jobs('email', 10, 120);",
+        "options": {"queryBatching": "single"}
+      },
+      "id": "814b8929-c8b5-431a-aa6c-7a95450814f2",
+      "name": "Claim email jobs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-384, 0]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "if (!$json.notification_id || !$json.lease_token || !$json.payload) throw new Error('Invalid claimed email job');\nif ($json.channel !== 'email') throw new Error('Unexpected notification channel');\nconst p = $json.payload;\nif (p.contract_version !== 'notification-v1') throw new Error('Unsupported notification contract');\nconst scalar = (value,max=240) => String(value ?? 'Non renseigné').replace(/[\\u0000-\\u001f\\u007f]+/g,' ').replace(/\\s+/g,' ').trim().slice(0,max) || 'Non renseigné';\nconst escapeHtml = value => scalar(value,1000).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');\nconst facts = (p.analysis.observed_facts ?? []).slice(0,5).map(item => `- ${scalar(item.statement_fr)}`);\nconst uncertainties = (p.analysis.uncertainties ?? []).slice(0,5).map(item => `- ${scalar(item,200)}`);\nconst sources = (p.sources ?? []).slice(0,10).map(item => `- ${scalar(item.name)} — découverte : ${scalar(item.discovered_at)}`);\nconst email_subject = scalar(`[TCM][${p.claim.verification_status}] ${p.organization.name} — ${p.claim.threat_actor ?? 'acteur inconnu'}`,160);\nconst email_text = [`Alerte Threat Claim Monitor`, ``, `Identifiant : ${scalar(p.alert_id)}`, `Organisation : ${scalar(p.organization.name)}`, `Victime déclarée : ${scalar(p.claim.victim_name)}`, `Acteur : ${scalar(p.claim.threat_actor)}`, `Première observation : ${scalar(p.claim.first_seen_at)}`, `Dernière observation : ${scalar(p.claim.last_seen_at)}`, `Vérification : ${scalar(p.claim.verification_status)}`, `Correspondance : ${scalar(p.match.method)} (${Number(p.match.confidence_score)} / 100)`, `Analyse : ${scalar(p.analysis.summary_fr,600)}`, ``, `Faits observés :`, ...(facts.length?facts:['- Aucun fait structuré']), ``, `Incertitudes :`, ...(uncertainties.length?uncertainties:['- Aucune incertitude structurée']), ``, `Sources :`, ...sources, ``, scalar(p.disclaimer,300), ``, `Alert ID : ${scalar(p.alert_id)}`].join('\\n').slice(0,6000);\nconst list = values => values.length ? `<ul>${values.map(value => `<li>${escapeHtml(value.replace(/^- /,''))}</li>`).join('')}</ul>` : '<p>Aucune valeur structurée</p>';\nconst email_html = `<h1>Alerte Threat Claim Monitor</h1><dl><dt>Identifiant</dt><dd>${escapeHtml(p.alert_id)}</dd><dt>Organisation</dt><dd>${escapeHtml(p.organization.name)}</dd><dt>Victime déclarée</dt><dd>${escapeHtml(p.claim.victim_name)}</dd><dt>Acteur</dt><dd>${escapeHtml(p.claim.threat_actor)}</dd><dt>Première observation</dt><dd>${escapeHtml(p.claim.first_seen_at)}</dd><dt>Dernière observation</dt><dd>${escapeHtml(p.claim.last_seen_at)}</dd><dt>Vérification</dt><dd>${escapeHtml(p.claim.verification_status)}</dd><dt>Correspondance</dt><dd>${escapeHtml(p.match.method)} (${Number(p.match.confidence_score)} / 100)</dd></dl><h2>Analyse</h2><p>${escapeHtml(scalar(p.analysis.summary_fr,600))}</p><h2>Faits observés</h2>${list(facts)}<h2>Incertitudes</h2>${list(uncertainties)}<h2>Sources</h2>${list(sources)}<hr><p><strong>${escapeHtml(scalar(p.disclaimer,300))}</strong></p><p>Alert ID : ${escapeHtml(p.alert_id)}</p>`.slice(0,10000);\nreturn {json:{dispatch_context:{notification_id:$json.notification_id,lease_token:$json.lease_token},email_subject,email_text,email_html}};"
+      },
+      "id": "7ae4bf2a-64e2-4fb5-8f91-cf0fbc400bb2",
+      "name": "Render safe email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 0]
+    },
+    {
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "fromEmail": "Threat Claim Monitor <alerts@example.invalid>",
+        "toEmail": "security@example.invalid",
+        "subject": "={{ $json.email_subject }}",
+        "emailFormat": "both",
+        "text": "={{ $json.email_text }}",
+        "html": "={{ $json.email_html }}",
+        "options": {"appendAttribution": false, "allowUnauthorizedCerts": false}
+      },
+      "id": "25e4e469-088d-4837-82d0-e0648f11c51f",
+      "name": "Send SMTP email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [128, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Render safe email').item.json.dispatch_context;\nreturn {json:{delivery_result:{notification_id:source.notification_id,lease_token:source.lease_token,succeeded:true,response_status:null,response_excerpt:'smtp accepted',error_code:null}}};"
+      },
+      "id": "3f885895-2b1e-4f85-8159-f006584a3dfb",
+      "name": "Build email success result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, -80]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const source = $('Render safe email').item.json.dispatch_context;\nconst detail = JSON.stringify($json.error ?? $json).toLowerCase();\nlet error_code = 'connection_failed';\nif (detail.includes('credential') || detail.includes('authentication') || detail.includes('auth')) error_code = 'credential_unavailable';\nelse if (detail.includes('timeout') || detail.includes('timed out')) error_code = 'timeout';\nelse if (detail.includes('recipient') || detail.includes('envelope') || detail.includes('rejected')) error_code = 'delivery_rejected';\nreturn {json:{delivery_result:{notification_id:source.notification_id,lease_token:source.lease_token,succeeded:false,response_status:null,response_excerpt:null,error_code}}};"
+      },
+      "id": "0f1e7ad9-8767-4a2a-813d-d7f660527c16",
+      "name": "Build sanitized email failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 80]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM record_notification_delivery_result_envelope($1::jsonb);",
+        "options": {"queryBatching": "single", "queryReplacement": "={{ JSON.stringify($json.delivery_result) }}"}
+      },
+      "id": "2fda7bb7-5b19-4ab0-96fd-6a307a7146f3",
+      "name": "Persist email delivery result",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [640, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run email dispatch manually": {"main": [[{"node": "Claim email jobs", "type": "main", "index": 0}]]},
+    "Run email dispatch every minute": {"main": [[{"node": "Claim email jobs", "type": "main", "index": 0}]]},
+    "Claim email jobs": {"main": [[{"node": "Render safe email", "type": "main", "index": 0}]]},
+    "Render safe email": {"main": [[{"node": "Send SMTP email", "type": "main", "index": 0}]]},
+    "Send SMTP email": {"main": [[{"node": "Build email success result", "type": "main", "index": 0}], [{"node": "Build sanitized email failure", "type": "main", "index": 0}]]},
+    "Build email success result": {"main": [[{"node": "Persist email delivery result", "type": "main", "index": 0}]]},
+    "Build sanitized email failure": {"main": [[{"node": "Persist email delivery result", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "timezone": "Europe/Paris"},
+  "versionId": "6abddf04-213a-45c4-a922-d5151774e37d",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}

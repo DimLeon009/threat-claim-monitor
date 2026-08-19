@@ -199,7 +199,7 @@ Deliver one useful alert per material evidence version and retain complete deliv
 - [x] Transactional outbox producer
 - [x] Concurrent-safe outbox claim operation
 - [x] Generic webhook adapter
-- [ ] SMTP email adapter
+- [x] SMTP email adapter
 - [ ] Microsoft Teams Workflows Adaptive Card adapter
 - [x] Bounded exponential retry
 - [x] Dead-letter state and manual requeue procedure
