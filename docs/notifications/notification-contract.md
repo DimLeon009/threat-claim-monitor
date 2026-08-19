@@ -1,6 +1,8 @@
 # Notification contract and transactional outbox
 
-Milestone 4 starts with a channel-independent `notification-v1` contract. PostgreSQL creates the durable outbox job in the same database transaction that selects the current claim, accepted organization match, eligible analysis, and non-historical evidence. This increment does not contact an external service.
+Milestone 4 uses a channel-independent `notification-v1` contract. PostgreSQL creates the durable outbox job in the same database transaction that selects the current claim, accepted organization match, eligible analysis, and non-historical evidence. The producer itself never contacts an external service; separate leased adapters perform delivery.
+
+Milestone 4 is complete: the common producer, leases, bounded retry, dead-letter handling, attempt audit, generic webhook, SMTP email, and Teams Workflows adapters have all been validated, including Windows runtime smoke tests for every channel.
 
 ## Eligibility
 

@@ -33,7 +33,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M1 | First reliable ransomware claim feed | ✅ |
 | M2 | Deterministic watchlist matching and correlation | ✅ |
 | M3 | Evidence-grounded hybrid AI summaries | ✅ |
-| M4 | Auditable multi-channel notifications | 🚧 |
+| M4 | Auditable multi-channel notifications | ✅ |
 | M5 | Resilient multi-source coverage | Planned |
 | M6 | Hardened v1.0.0 portfolio release | Planned |
 
@@ -186,7 +186,7 @@ Produce concise French analyst summaries from normalized evidence through explic
 - Invalid, filtered, rate-limited, or unavailable cloud output uses the deterministic fallback.
 - Cloud activation requires an approved endpoint, deployment, processing scope, and content-filter configuration.
 
-## 🚧 M4 — Notifications
+## ✅ M4 — Notifications
 
 ### Objective
 

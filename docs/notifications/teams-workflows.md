@@ -70,3 +70,5 @@ Delivery remains at-least-once. The stable alert identifier appears prominently 
 ## Validation
 
 `scripts/test_teams_workflow_contract.py` verifies the inactive sanitized export, official Adaptive Card envelope, v1.2 schema, absence of actions and external content, Markdown and mention neutralization corpus, credential split, dedicated error branch, database-owned retry, and transactional result persistence.
+
+The Windows Teams sandbox smoke test produced exactly one card and PostgreSQL recorded `sent` with one successful attempt. Markdown link, emphasis, heading, and mention-shaped synthetic strings remained literal; angle brackets were visibly neutralized. The synthetic database records and enabled channel state were removed after verification. No Workflow URL, signature, tenant identifier, team name, channel name, or credential value is retained in repository evidence.
