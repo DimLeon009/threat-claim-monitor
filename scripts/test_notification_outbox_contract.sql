@@ -203,6 +203,195 @@ BEGIN
 END;
 $$;
 
+CREATE TEMP TABLE first_delivery_failure AS
+SELECT result.*
+FROM reclaimed_webhook_job AS claimed
+CROSS JOIN LATERAL record_notification_delivery_result(
+  claimed.notification_id,
+  claimed.lease_token,
+  false,
+  503,
+  'Authorization: Bearer secret-token',
+  'http_5xx'
+) AS result;
+
+DO $$
+DECLARE
+  stale_notification_id uuid;
+  stale_lease_token uuid;
+BEGIN
+  IF (SELECT count(*) FROM first_delivery_failure) <> 1
+    OR EXISTS (
+      SELECT 1
+      FROM first_delivery_failure
+      WHERE result_status <> 'retry'
+        OR attempt_count <> 1
+        OR next_available_at < clock_timestamp() + interval '55 seconds'
+        OR next_available_at > clock_timestamp() + interval '65 seconds'
+        OR delivered_at IS NOT NULL
+    )
+  THEN
+    RAISE EXCEPTION 'notification failure did not schedule the expected retry';
+  END IF;
+
+  SELECT notification_id, lease_token
+  INTO stale_notification_id, stale_lease_token
+  FROM reclaimed_webhook_job;
+
+  BEGIN
+    PERFORM * FROM record_notification_delivery_result(
+      stale_notification_id, stale_lease_token, true, 204, 'accepted', null
+    );
+    RAISE EXCEPTION 'stale notification lease was accepted';
+  EXCEPTION WHEN raise_exception THEN
+    IF SQLERRM <> 'notification lease is not active' THEN
+      RAISE;
+    END IF;
+  END;
+END;
+$$;
+
+DO $$
+DECLARE
+  webhook_notification_id uuid;
+  current_lease_token uuid;
+  delivery_result record;
+  failure_number integer;
+BEGIN
+  SELECT notification_id
+  INTO webhook_notification_id
+  FROM reclaimed_webhook_job;
+
+  FOR failure_number IN 2..5 LOOP
+    UPDATE notification_outbox
+    SET available_at = clock_timestamp() - interval '1 second'
+    WHERE id = webhook_notification_id;
+
+    SELECT claimed.lease_token
+    INTO current_lease_token
+    FROM claim_notification_jobs('webhook', 1, 300) AS claimed;
+
+    IF current_lease_token IS NULL THEN
+      RAISE EXCEPTION 'retry notification could not be leased';
+    END IF;
+
+    SELECT result.*
+    INTO delivery_result
+    FROM record_notification_delivery_result(
+      webhook_notification_id,
+      current_lease_token,
+      false,
+      503,
+      E'upstream\nserver error',
+      'http_5xx'
+    ) AS result;
+
+    IF failure_number < 5 AND delivery_result.result_status <> 'retry' THEN
+      RAISE EXCEPTION 'notification entered dead-letter too early';
+    END IF;
+    IF failure_number = 5 AND delivery_result.result_status <> 'dead_letter' THEN
+      RAISE EXCEPTION 'notification did not reach dead-letter after five failures';
+    END IF;
+  END LOOP;
+END;
+$$;
+
+DO $$
+DECLARE
+  webhook_notification_id uuid;
+  post_requeue_lease uuid;
+  success_result record;
+BEGIN
+  SELECT notification_id
+  INTO webhook_notification_id
+  FROM reclaimed_webhook_job;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM notification_outbox
+    WHERE id = webhook_notification_id
+      AND status = 'dead_letter'
+      AND attempts = 5
+      AND lease_token IS NULL
+      AND lease_expires_at IS NULL
+      AND last_error = 'notification endpoint returned a server error'
+  ) THEN
+    RAISE EXCEPTION 'notification did not reach dead-letter after five failures';
+  END IF;
+
+  IF (SELECT count(*) FROM notification_attempts
+      WHERE notification_id = webhook_notification_id) <> 5
+    OR NOT EXISTS (
+      SELECT 1
+      FROM notification_attempts
+      WHERE notification_id = webhook_notification_id
+        AND response_excerpt = '[redacted unsafe response]'
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM notification_attempts
+      WHERE notification_id = webhook_notification_id
+        AND (
+          length(response_excerpt) > 500
+          OR response_excerpt ~* 'authorization|bearer|secret|token'
+          OR error_message <> 'notification endpoint returned a server error'
+        )
+    )
+  THEN
+    RAISE EXCEPTION 'notification attempt history was not sanitized';
+  END IF;
+
+  PERFORM requeue_dead_letter_notification(webhook_notification_id);
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM notification_outbox
+    WHERE id = webhook_notification_id
+      AND status = 'retry'
+      AND attempts = 0
+      AND last_error IS NULL
+  ) OR (SELECT count(*) FROM notification_attempts
+        WHERE notification_id = webhook_notification_id) <> 5
+  THEN
+    RAISE EXCEPTION 'dead-letter notification was not safely requeued';
+  END IF;
+
+  SELECT claimed.lease_token
+  INTO post_requeue_lease
+  FROM claim_notification_jobs('webhook', 1, 300) AS claimed;
+
+  SELECT result.*
+  INTO success_result
+  FROM record_notification_delivery_result(
+    webhook_notification_id,
+    post_requeue_lease,
+    true,
+    204,
+    'accepted',
+    null
+  ) AS result;
+
+  IF success_result.result_status <> 'sent'
+    OR success_result.attempt_count <> 1
+    OR success_result.delivered_at IS NULL
+    OR NOT EXISTS (
+      SELECT 1
+      FROM notification_outbox
+      WHERE id = webhook_notification_id
+        AND status = 'sent'
+        AND attempts = 1
+        AND sent_at IS NOT NULL
+        AND last_error IS NULL
+        AND lease_token IS NULL
+    )
+    OR (SELECT count(*) FROM notification_attempts
+        WHERE notification_id = webhook_notification_id) <> 6
+  THEN
+    RAISE EXCEPTION 'notification success was not finalized atomically';
+  END IF;
+END;
+$$;
+
 UPDATE notification_outbox
 SET status = 'retry',
     available_at = clock_timestamp() + interval '1 hour',

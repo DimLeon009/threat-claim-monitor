@@ -201,9 +201,9 @@ Deliver one useful alert per material evidence version and retain complete deliv
 - [ ] Generic webhook adapter
 - [ ] SMTP email adapter
 - [ ] Microsoft Teams Workflows Adaptive Card adapter
-- [ ] Bounded exponential retry
-- [ ] Dead-letter state and manual requeue procedure
-- [ ] Attempt history and response sanitization
+- [x] Bounded exponential retry
+- [x] Dead-letter state and manual requeue procedure
+- [x] Attempt history and response sanitization
 - [ ] Channel-specific escaping tests
 - [ ] Duplicate prevention tests
 

@@ -39,7 +39,7 @@ New evidence may increment `evidence_version`, allowing a new status-change or c
 
 The database stores only the channel name and whether it is enabled. Webhook endpoints, SMTP passwords, Teams URLs, and other credentials belong in the execution platform credential store and must never be written to PostgreSQL, workflow exports, logs, or Git.
 
-Webhook, email, and Teams dispatch, retry scheduling, dead-letter handling, and per-attempt response sanitization are later M4 increments.
+Webhook, email, and Teams network dispatch remain later M4 increments.
 
 ## Concurrent job reservation
 
@@ -49,6 +49,14 @@ Pending and retry jobs become eligible only when `available_at` is reached. A pr
 
 The migration safely returns any pre-existing unleased `processing` row to `retry`. External delivery is still absent from this increment.
 
+## Delivery results, retry, and dead-letter
+
+Migration 015 atomically verifies the active lease, appends one `notification_attempts` row, and moves the outbox job to its next state. An expired, stale, or incorrect lease token cannot record a result.
+
+A successful attempt moves the job to `sent` and records `sent_at`. A failure accepts only an allow-listed error code translated to a fixed message. Response excerpts are limited to 500 characters, control characters are removed, and content resembling a URL, credential, authorization value, password, secret, or token is replaced with `[redacted unsafe response]`.
+
+Failures retry after an exponential delay starting at 60 seconds and capped at one hour. The fifth failed attempt moves the same durable job to `dead_letter`; it never creates another outbox row. An operator can call `requeue_dead_letter_notification` after correcting the cause. Requeue resets the delivery counter but preserves the complete attempt history.
+
 ## Validation
 
-Static repository validation checks the contract, eligibility gates, idempotency mechanism, concurrent lease operation, and absence of delivery calls. The PostgreSQL runtime test creates synthetic data inside a transaction, verifies one job per enabled channel, replay idempotency, lease exclusivity, expired-lease recovery, future-retry suppression, historical-evidence suppression, and invalid-payload rejection, then rolls everything back.
+Static repository validation checks the contract, eligibility gates, idempotency mechanism, concurrent lease operation, result finalization, and absence of delivery calls. The PostgreSQL runtime test creates synthetic data inside a transaction and verifies job production, replay idempotency, lease exclusivity and recovery, bounded retry, dead-letter, manual requeue, sanitized attempt history, successful finalization, historical-evidence suppression, and invalid-payload rejection before rolling everything back.

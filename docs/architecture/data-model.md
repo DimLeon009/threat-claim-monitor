@@ -181,7 +181,7 @@ The deduplication key combines the claim, organization, channel, notification ty
 
 Records every channel attempt, including timestamp, success, response status, bounded response excerpt, and sanitized error.
 
-Response bodies must be truncated and must not persist authentication material.
+Migration 015 makes result persistence atomic with the outbox state transition. Response excerpts are truncated and secret-like content is replaced rather than persisted. Five consecutive failures move a job to `dead_letter`; manual requeue preserves these attempt rows.
 
 ## State invariants
 

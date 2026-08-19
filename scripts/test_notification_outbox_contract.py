@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION_FILE = ROOT / "db" / "migrations" / "013_notification_outbox_contract.sql"
 LEASE_MIGRATION_FILE = ROOT / "db" / "migrations" / "014_notification_job_leases.sql"
+DELIVERY_MIGRATION_FILE = ROOT / "db" / "migrations" / "015_notification_delivery_results.sql"
 RUNTIME_TEST_FILE = ROOT / "scripts" / "test_notification_outbox_contract.sql"
 
 
@@ -18,6 +19,7 @@ def require_fragments(content: str, fragments: tuple[str, ...], label: str) -> N
 def main() -> None:
     migration = MIGRATION_FILE.read_text(encoding="utf-8")
     lease_migration = LEASE_MIGRATION_FILE.read_text(encoding="utf-8")
+    delivery_migration = DELIVERY_MIGRATION_FILE.read_text(encoding="utf-8")
     runtime_test = RUNTIME_TEST_FILE.read_text(encoding="utf-8")
 
     require_fragments(
@@ -86,6 +88,29 @@ def main() -> None:
     )
 
     require_fragments(
+        delivery_migration,
+        (
+            "FUNCTION sanitize_notification_response_excerpt",
+            "[redacted unsafe response]",
+            "left(regexp_replace(candidate, '[[:cntrl:]]+', ' ', 'g'), 500)",
+            "FUNCTION notification_delivery_error_message",
+            "FUNCTION record_notification_delivery_result",
+            "FOR UPDATE",
+            "notification lease is not active",
+            "notification lease expired",
+            "max_attempts constant integer := 5",
+            "least(",
+            "3600",
+            "status = resolved_status",
+            "INSERT INTO notification_attempts",
+            "FUNCTION requeue_dead_letter_notification",
+            "status = 'retry'",
+            "015_notification_delivery_results",
+        ),
+        "notification delivery-result migration",
+    )
+
+    require_fragments(
         runtime_test,
         (
             "first enqueue did not create one job per enabled channel",
@@ -98,6 +123,12 @@ def main() -> None:
             "active notification lease was claimed twice",
             "expired notification lease was not safely reclaimed",
             "future retry job was claimed before available_at",
+            "notification failure did not schedule the expected retry",
+            "notification did not reach dead-letter after five failures",
+            "notification attempt history was not sanitized",
+            "dead-letter notification was not safely requeued",
+            "notification success was not finalized atomically",
+            "stale notification lease was accepted",
             "ROLLBACK;",
         ),
         "notification runtime test",

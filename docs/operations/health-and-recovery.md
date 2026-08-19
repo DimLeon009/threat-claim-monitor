@@ -56,6 +56,16 @@ Do not add `--volumes`. Named volumes hold the n8n credential store and both Pos
 | Notifications remain pending | Channel credentials and endpoint response | Correct channel, then retry outbox jobs |
 | Notifications reach dead-letter | Attempt history and sanitized errors | Resolve cause and explicitly requeue selected jobs |
 
+### Requeue one dead-letter notification
+
+Inspect the job and its attempt history first, correct the channel credential or endpoint outside PostgreSQL, then requeue only the selected identifier:
+
+```sql
+SELECT requeue_dead_letter_notification('00000000-0000-4000-8000-000000000000');
+```
+
+The function refuses non-dead-letter jobs, reuses the existing outbox row, resets its delivery counter, and preserves all earlier attempt records. Replace the example UUID with the reviewed job identifier; never requeue an unbounded set of rows.
+
 ## Source health model
 
 An unavailable source does not mean the full platform is unhealthy. Health should be reported per source using:
@@ -100,4 +110,3 @@ When reporting an issue, include:
 - steps already attempted.
 
 Never include `.env`, authorization headers, webhook URLs, raw stolen data, or unredacted personal information.
-
