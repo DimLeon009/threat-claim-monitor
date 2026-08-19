@@ -52,3 +52,5 @@ External delivery remains at-least-once. The subject and body include the stable
 ## Validation
 
 `scripts/test_email_workflow_contract.py` checks the inactive sanitized export, installed Send Email node version, credential boundary, TLS settings, absence of attachments and links, bounded text and HTML rendering, HTML escaping fixture, dedicated error branch, and transactional result persistence.
+
+The Windows runtime smoke test used a temporary local Mailpit instance with no relay. WF-50 created exactly one synthetic email job, WF-61 stored `sent` with one successful attempt, and Mailpit displayed readable plain-text and HTML alternatives. The synthetic database records, captured message, temporary container, and enabled channel state were removed after verification. No SMTP endpoint, mailbox, or credential value is retained in repository evidence.

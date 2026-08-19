@@ -199,7 +199,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M1 | ransomware.live collection and silent baseline | ✅ Complete; runtime validated on Windows |
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
 | M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
-| M4 | Auditable webhook, email, and Teams notifications | 🚧 Webhook runtime validated and SMTP adapter implemented; Teams remains |
+| M4 | Auditable webhook, email, and Teams notifications | 🚧 Webhook and SMTP runtime validated on Windows; Teams remains |
 | M5 | Additional source adapters | Planned |
 | M6 | Hardening and v1.0.0 | Planned |
 
