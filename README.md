@@ -2,8 +2,8 @@
 
 > Self-hosted monitoring of public ransomware and data-leak claims, with deterministic organization matching, local AI summaries, and auditable notifications.
 
-![Project status](https://img.shields.io/badge/status-M3%20complete-success)
-![Next milestone](https://img.shields.io/badge/next-M4%20notifications-orange)
+![Project status](https://img.shields.io/badge/status-M3%20hybrid%20AI%20complete-brightgreen)
+![Next milestone](https://img.shields.io/badge/next-M4%20notifications-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Docker Compose](https://img.shields.io/badge/runtime-Docker%20Compose-2496ED?logo=docker&logoColor=white)
 ![n8n](https://img.shields.io/badge/orchestration-n8n-EA4B71?logo=n8n&logoColor=white)
@@ -14,7 +14,7 @@
 
 Threat Claim Monitor is an open-source defensive Cyber Threat Intelligence project designed to detect when a monitored organization appears in a public ransomware or data-leak claim.
 
-The platform collects structured OSINT feeds, preserves the original observation, correlates duplicates, applies deterministic matching rules, and produces a concise notification for security teams. A local language model can summarize the available evidence, but it never decides whether an organization matches and never promotes a criminal claim to a confirmed incident.
+The platform collects structured OSINT feeds, preserves the original observation, correlates duplicates, applies deterministic matching rules, and produces a concise notification for security teams. An explicitly selected local or enterprise-cloud language model can summarize the available evidence, but it never decides whether an organization matches and never promotes a criminal claim to a confirmed incident.
 
 The initial monitored organizations are:
 
@@ -48,7 +48,7 @@ Threat Claim Monitor turns that fragmented stream into a controlled detection pi
 | Deduplication | PostgreSQL uniqueness constraints plus deterministic correlation rules |
 | Organization matching | Exact domains, official names, and explicitly approved aliases |
 | Confidence | Rule-based match score, separate from incident verification status |
-| Local AI | Schema-constrained Ollama summary with deterministic fallback |
+| Hybrid AI | Schema-constrained Ollama or Microsoft Foundry summary with deterministic fallback |
 | Notification | Transactional outbox for webhook, email, and Teams delivery |
 | Auditability | Source observations, analyses, evidence versions, and attempts retained |
 | Extensibility | Source and channel adapters remain independent of the core data model |
@@ -83,6 +83,10 @@ flowchart LR
         OLLAMA["Ollama + Qwen"]
     end
 
+    subgraph Cloud["Approved enterprise cloud"]
+        FOUNDRY["Microsoft Foundry"]
+    end
+
     subgraph Channels["Notification channels"]
         WEBHOOK["Generic webhook"]
         EMAIL["SMTP email"]
@@ -94,6 +98,7 @@ flowchart LR
     FB -. "disabled until validated" .-> N8N
     N8N <--> PG
     N8N -->|"bounded evidence"| OLLAMA
+    N8N -->|"explicitly selected bounded public metadata"| FOUNDRY
     PG -->|"outbox"| N8N
     N8N --> WEBHOOK
     N8N --> EMAIL
@@ -124,6 +129,7 @@ HTML scraping is excluded whenever a structured public feed is available. Direct
 | Relational storage | PostgreSQL 17.10 | Evidence, configuration, correlation and notification state |
 | Local inference | Ollama | Host-native model serving |
 | Reference model | Qwen3 8B Q4_K_M | French-language structured summarization |
+| Cloud inference | Microsoft Foundry | Explicitly selected enterprise inference over the shared analysis contract |
 | Runtime | Docker Compose | Reproducible Windows and macOS services |
 | CI | GitHub Actions | Configuration and repository validation |
 | Documentation | Markdown and Mermaid | Architecture, operations and decisions |
@@ -192,7 +198,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M0 | Repository, Compose, schema, ADR, documentation, CI | ✅ Complete; runtime validated on macOS |
 | M1 | ransomware.live collection and silent baseline | ✅ Complete; runtime validated on Windows |
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
-| M3 | Evidence-grounded Ollama structured analysis | ✅ Complete; fallback and valid inference paths runtime-validated on Windows |
+| M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
 | M4 | Auditable webhook, email, and Teams notifications | ⏳ Next; common contract, transactional dispatch, retries, and delivery history |
 | M5 | Additional source adapters | Planned |
 | M6 | Hardening and v1.0.0 | Planned |

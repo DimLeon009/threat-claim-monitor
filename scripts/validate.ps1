@@ -44,6 +44,21 @@ try {
     throw 'Local-analysis workflow contract validation failed.'
   }
 
+  python scripts/test_inference_provider_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Inference-provider contract validation failed.'
+  }
+
+  python scripts/test_foundry_workflow_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Foundry workflow contract validation failed.'
+  }
+
+  python scripts/test_inference_parity.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Inference parity validation failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'

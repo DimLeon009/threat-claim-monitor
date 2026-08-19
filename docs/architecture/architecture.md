@@ -10,7 +10,7 @@ The architecture is intentionally small enough for one engineer to operate while
 - idempotent ingestion;
 - source isolation;
 - deterministic alert decisions;
-- local inference;
+- replaceable local or explicitly selected cloud inference;
 - auditable delivery;
 - cross-platform deployment;
 - documented evolution.
@@ -20,7 +20,7 @@ The architecture is intentionally small enough for one engineer to operate while
 | Driver | Architectural response |
 |---|---|
 | One developer | Two containerized services and no custom microservice in V1 |
-| Windows and Apple Silicon | Multi-architecture images and host-native Ollama |
+| Windows and Apple Silicon | Multi-architecture images, host-native Ollama, and optional HTTPS Foundry inference |
 | Unreliable external feeds | Independent adapters, retries, health state, and raw evidence retention |
 | Duplicate reporting | Source uniqueness constraints and canonical claim correlation |
 | High false-positive cost | Exact matching for automatic alerts; ambiguity goes to review |
@@ -62,7 +62,7 @@ flowchart TB
     L2["Orchestration layer<br/>n8n workflows, scheduling, retries"]
     L3["Domain layer<br/>normalization, correlation, matching, confidence"]
     L4["Persistence layer<br/>PostgreSQL evidence, state, outbox, audit"]
-    L5["Inference boundary<br/>Ollama structured summarization"]
+    L5["Inference boundary<br/>Ollama or explicitly selected Microsoft Foundry"]
 
     L1 --> L2
     L2 --> L3
@@ -83,6 +83,7 @@ flowchart LR
         API2["RansomLook API"]
         RSS["Optional RSS feeds"]
         DEST["Notification endpoints"]
+        FOUNDRY["Microsoft Foundry"]
     end
 
     subgraph HOST["Windows or macOS host"]
@@ -100,6 +101,7 @@ flowchart LR
     N8N -.->|"HTTPS GET"| RSS
     N8N -->|"SQL internal network"| PG
     N8N -->|"HTTP host bridge"| OLLAMA
+    N8N -->|"HTTPS bounded public metadata<br/>only when explicitly selected"| FOUNDRY
     N8N -->|"HTTPS / SMTP"| DEST
 ```
 
@@ -149,6 +151,14 @@ Its responsibility is intentionally narrow: convert bounded normalized evidence 
 
 If Ollama is unavailable or its response is invalid, the claim remains processable and a deterministic summary template is used.
 
+### Microsoft Foundry
+
+Microsoft Foundry is an optional enterprise inference provider behind the same analysis contract. It receives only bounded public metadata over HTTPS and has no tools, retrieval, memory, or control-plane authority.
+
+Cloud selection is explicit. Ollama failure never triggers an automatic Foundry request. The endpoint and deployment metadata are reviewed runtime configuration; authentication stays in the n8n credential store. Every stored cloud result identifies the provider, deployment, model version, API family, processing scope, and content-filter configuration.
+
+See [ADR-0002](adr/0002-hybrid-local-foundry-inference.md) and the [inference provider contract](../ai/inference-providers.md).
+
 ### Source adapters
 
 Each source adapter owns:
@@ -184,6 +194,7 @@ flowchart TB
     W20["WF-20 Normalize and correlate"]
     W30["WF-30 Match organizations"]
     W40["WF-40 Local analysis"]
+    W41["WF-41 Microsoft Foundry analysis"]
     W50["WF-50 Build outbox"]
     W60["WF-60 Dispatch notifications"]
     W90["WF-90 Health and errors"]
@@ -195,8 +206,10 @@ flowchart TB
     W11 --> W20
     W12 --> W20
     W20 --> W30
-    W30 -->|"accepted match"| W40
+    W30 -->|"accepted match + local selected"| W40
+    W30 -->|"accepted match + cloud selected"| W41
     W40 --> W50
+    W41 --> W50
     W50 --> W60
     W00 --> W90
     W60 --> W90
@@ -212,7 +225,7 @@ sequenceDiagram
     participant A as Source adapter
     participant P as PostgreSQL
     participant M as Matcher
-    participant O as Ollama
+    participant I as Selected inference provider
     participant D as Dispatcher
 
     S->>A: Poll enabled source
@@ -224,8 +237,8 @@ sequenceDiagram
         P-->>M: Observation available
         M->>P: Correlate claim and evaluate watchlist
         alt accepted match
-            M->>O: Send bounded evidence and JSON Schema
-            O-->>M: Structured summary
+            M->>I: Send bounded evidence and JSON Schema
+            I-->>M: Structured summary
             M->>P: Store analysis and outbox job
             D->>P: Claim pending outbox job
             D->>D: Send channel payload
@@ -350,4 +363,3 @@ flowchart LR
 ```
 
 Future features must preserve the distinction between source observation, derived analysis, and verified fact.
-

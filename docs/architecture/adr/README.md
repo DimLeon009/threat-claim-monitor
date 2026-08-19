@@ -15,6 +15,7 @@ Architecture Decision Records capture decisions that materially constrain implem
 | ADR | Title | Status | Date |
 |---|---|---|---|
 | [ADR-0001](0001-minimal-v1-architecture.md) | Minimal V1 architecture | Accepted | 2026-08-14 |
+| [ADR-0002](0002-hybrid-local-foundry-inference.md) | Hybrid local and Microsoft Foundry inference | Accepted | 2026-08-18 |
 
 ## When to write an ADR
 
@@ -28,4 +29,3 @@ Create an ADR when a change:
 - creates a difficult-to-reverse compatibility commitment.
 
 Routine implementation details do not require an ADR.
-

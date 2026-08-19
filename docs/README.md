@@ -6,11 +6,12 @@ This directory contains the technical, operational, and security documentation f
 
 1. [System architecture](architecture/architecture.md)
 2. [ADR-0001: Minimal V1 architecture](architecture/adr/0001-minimal-v1-architecture.md)
-3. [Data model](architecture/data-model.md)
-4. [Threat model](security/threat-model.md)
-5. [Matching normalization](matching/normalization.md)
-6. [Getting started](operations/getting-started.md)
-7. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
+3. [ADR-0002: Hybrid local and Microsoft Foundry inference](architecture/adr/0002-hybrid-local-foundry-inference.md)
+4. [Data model](architecture/data-model.md)
+5. [Threat model](security/threat-model.md)
+6. [Matching normalization](matching/normalization.md)
+7. [Getting started](operations/getting-started.md)
+8. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
 
 ## Documentation map
 
@@ -22,6 +23,7 @@ This directory contains the technical, operational, and security documentation f
 | [Data model](architecture/data-model.md) | Entities, relationships, invariants, retention, and migration rules |
 | [ADR index](architecture/adr/README.md) | Accepted and proposed architecture decisions |
 | [ADR-0001](architecture/adr/0001-minimal-v1-architecture.md) | Choice of n8n, PostgreSQL, host-native Ollama, and Compose |
+| [ADR-0002](architecture/adr/0002-hybrid-local-foundry-inference.md) | Explicit provider routing, Foundry trust boundary, data policy, and shared analysis contract |
 
 ### Operations
 
@@ -60,6 +62,7 @@ This directory contains the technical, operational, and security documentation f
 | Document | Purpose |
 |---|---|
 | [Local analysis contract](ai/local-analysis-contract.md) | Pinned Ollama profiles, untrusted-input boundary, strict JSON output, validation, and fallback |
+| [Inference provider contract](ai/inference-providers.md) | Shared Ollama/Foundry contract, cloud selection, authentication, provenance, and data boundary |
 
 ### Security
 
