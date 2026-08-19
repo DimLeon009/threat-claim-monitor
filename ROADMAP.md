@@ -197,7 +197,7 @@ Deliver one useful alert per material evidence version and retain complete deliv
 - [x] Common notification contract
 - [x] Required uncertainty disclaimer
 - [x] Transactional outbox producer
-- [ ] Concurrent-safe outbox claim operation
+- [x] Concurrent-safe outbox claim operation
 - [ ] Generic webhook adapter
 - [ ] SMTP email adapter
 - [ ] Microsoft Teams Workflows Adaptive Card adapter

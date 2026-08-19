@@ -141,6 +141,102 @@ BEGIN
 END;
 $$;
 
+CREATE TEMP TABLE first_webhook_claim AS
+SELECT * FROM claim_notification_jobs('webhook', 10, 300);
+
+CREATE TEMP TABLE blocked_webhook_claim AS
+SELECT * FROM claim_notification_jobs('webhook', 10, 300);
+
+DO $$
+BEGIN
+  IF (SELECT count(*) FROM first_webhook_claim) <> 1
+    OR EXISTS (
+      SELECT 1
+      FROM first_webhook_claim
+      WHERE lease_token IS NULL
+        OR lease_expires_at <= clock_timestamp()
+        OR channel <> 'webhook'
+        OR attempts <> 0
+        OR NOT validate_notification_payload(payload)
+    )
+  THEN
+    RAISE EXCEPTION 'eligible webhook job was not leased correctly';
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM blocked_webhook_claim) THEN
+    RAISE EXCEPTION 'active notification lease was claimed twice';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM notification_outbox AS outbox
+    JOIN first_webhook_claim AS claimed ON claimed.notification_id = outbox.id
+    WHERE outbox.status <> 'processing'
+      OR outbox.lease_token IS DISTINCT FROM claimed.lease_token
+  ) THEN
+    RAISE EXCEPTION 'claimed notification state is inconsistent';
+  END IF;
+END;
+$$;
+
+UPDATE notification_outbox AS outbox
+SET lease_expires_at = clock_timestamp() - interval '1 second'
+FROM first_webhook_claim AS claimed
+WHERE outbox.id = claimed.notification_id;
+
+CREATE TEMP TABLE reclaimed_webhook_job AS
+SELECT * FROM claim_notification_jobs('webhook', 10, 300);
+
+DO $$
+BEGIN
+  IF (SELECT count(*) FROM reclaimed_webhook_job) <> 1
+    OR EXISTS (
+      SELECT 1
+      FROM reclaimed_webhook_job AS reclaimed
+      JOIN first_webhook_claim AS original
+        ON original.notification_id = reclaimed.notification_id
+      WHERE original.lease_token = reclaimed.lease_token
+    )
+  THEN
+    RAISE EXCEPTION 'expired notification lease was not safely reclaimed';
+  END IF;
+END;
+$$;
+
+UPDATE notification_outbox
+SET status = 'retry',
+    available_at = clock_timestamp() + interval '1 hour',
+    lease_token = null,
+    lease_expires_at = null
+WHERE claim_id = '74000000-0000-4000-8000-000000000001'
+  AND channel = 'teams';
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM claim_notification_jobs('teams', 10, 300)) THEN
+    RAISE EXCEPTION 'future retry job was claimed before available_at';
+  END IF;
+
+  BEGIN
+    PERFORM * FROM claim_notification_jobs('unsupported', 10, 300);
+    RAISE EXCEPTION 'unsupported notification channel was accepted';
+  EXCEPTION WHEN raise_exception THEN
+    IF SQLERRM <> 'unsupported notification channel' THEN
+      RAISE;
+    END IF;
+  END;
+
+  BEGIN
+    PERFORM * FROM claim_notification_jobs('webhook', 0, 300);
+    RAISE EXCEPTION 'invalid notification claim limit was accepted';
+  EXCEPTION WHEN raise_exception THEN
+    IF SQLERRM <> 'notification claim limit must be between 1 and 100' THEN
+      RAISE;
+    END IF;
+  END;
+END;
+$$;
+
 INSERT INTO claims (
   id, canonical_key, victim_name, normalized_victim_name,
   first_seen_at, last_seen_at, evidence_version

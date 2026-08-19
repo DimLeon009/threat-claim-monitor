@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION_FILE = ROOT / "db" / "migrations" / "013_notification_outbox_contract.sql"
+LEASE_MIGRATION_FILE = ROOT / "db" / "migrations" / "014_notification_job_leases.sql"
 RUNTIME_TEST_FILE = ROOT / "scripts" / "test_notification_outbox_contract.sql"
 
 
@@ -16,6 +17,7 @@ def require_fragments(content: str, fragments: tuple[str, ...], label: str) -> N
 
 def main() -> None:
     migration = MIGRATION_FILE.read_text(encoding="utf-8")
+    lease_migration = LEASE_MIGRATION_FILE.read_text(encoding="utf-8")
     runtime_test = RUNTIME_TEST_FILE.read_text(encoding="utf-8")
 
     require_fragments(
@@ -64,6 +66,26 @@ def main() -> None:
         )
 
     require_fragments(
+        lease_migration,
+        (
+            "ADD COLUMN IF NOT EXISTS lease_token uuid",
+            "ADD COLUMN IF NOT EXISTS lease_expires_at timestamptz",
+            "notification_outbox_processing_lease_check",
+            "FUNCTION claim_notification_jobs",
+            "requested_limit NOT BETWEEN 1 AND 100",
+            "requested_lease_seconds NOT BETWEEN 30 AND 900",
+            "status IN ('pending', 'retry')",
+            "status = 'processing'",
+            "lease_expires_at <= clock_timestamp()",
+            "FOR UPDATE SKIP LOCKED",
+            "SET status = 'processing'",
+            "lease_token = gen_random_uuid()",
+            "014_notification_job_leases",
+        ),
+        "notification lease migration",
+    )
+
+    require_fragments(
         runtime_test,
         (
             "first enqueue did not create one job per enabled channel",
@@ -72,6 +94,10 @@ def main() -> None:
             "historical evidence created a notification job",
             "invalid notification payload was accepted",
             "notification channel configuration contains a secret-bearing column",
+            "eligible webhook job was not leased correctly",
+            "active notification lease was claimed twice",
+            "expired notification lease was not safely reclaimed",
+            "future retry job was claimed before available_at",
             "ROLLBACK;",
         ),
         "notification runtime test",
