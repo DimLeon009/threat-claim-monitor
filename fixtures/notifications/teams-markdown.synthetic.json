@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "name": "markdown-link-shape",
+      "input": "[Critical](destination)",
+      "expected": "\\[Critical\\]\\(destination\\)"
+    },
+    {
+      "name": "formatting-markers",
+      "input": "*bold* _italic_ # heading",
+      "expected": "\\*bold\\* \\_italic\\_ \\# heading"
+    },
+    {
+      "name": "mention-shape",
+      "input": "<at>Administrator</at>",
+      "expected": "‹at›Administrator‹/at›"
+    },
+    {
+      "name": "control-characters",
+      "input": "first\r\nsecond",
+      "expected": "first second"
+    }
+  ]
+}

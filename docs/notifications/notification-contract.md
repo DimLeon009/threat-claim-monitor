@@ -41,7 +41,7 @@ WF-50 calls `enqueue_ready_claim_notifications` once per minute. The database se
 
 The database stores only the channel name and whether it is enabled. Webhook endpoints, SMTP passwords, Teams URLs, and other credentials belong in the execution platform credential store and must never be written to PostgreSQL, workflow exports, logs, or Git.
 
-The generic webhook adapter is implemented by WF-60 and the SMTP email adapter by WF-61. Teams network dispatch remains a later M4 increment.
+The generic webhook adapter is implemented by WF-60, SMTP email by WF-61, and Microsoft Teams Workflows Adaptive Cards by WF-62.
 
 ## Concurrent job reservation
 
@@ -70,6 +70,12 @@ See the [generic webhook runbook](generic-webhook.md) for safe import, configura
 WF-61 renders bounded plain-text and HTML alternatives without links or attachments. It removes header control characters and escapes every dynamic HTML value before using n8n's SMTP credential. The SMTP node performs no direct retry, and both outcomes use the common delivery-result envelope.
 
 See the [SMTP email runbook](smtp-email.md) for credential, sender, recipient, smoke-test, and publication requirements.
+
+## Microsoft Teams Workflows adapter
+
+WF-62 wraps one version 1.2 Adaptive Card in the Microsoft incoming-webhook message envelope. It contains no actions, images, links, HTML, or mention entities. Dynamic strings are bounded and neutralized for Markdown and `<at>` syntax. The webhook signature is separated into n8n HTTP Query Auth when the generated URL exposes a single `sig` parameter.
+
+See the [Teams Workflows runbook](teams-workflows.md) for trigger authentication, co-ownership, signature handling, test-channel setup, and runtime validation.
 
 ## Validation
 

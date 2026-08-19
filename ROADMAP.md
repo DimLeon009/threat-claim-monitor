@@ -200,12 +200,12 @@ Deliver one useful alert per material evidence version and retain complete deliv
 - [x] Concurrent-safe outbox claim operation
 - [x] Generic webhook adapter
 - [x] SMTP email adapter
-- [ ] Microsoft Teams Workflows Adaptive Card adapter
+- [x] Microsoft Teams Workflows Adaptive Card adapter
 - [x] Bounded exponential retry
 - [x] Dead-letter state and manual requeue procedure
 - [x] Attempt history and response sanitization
-- [ ] Channel-specific escaping tests
-- [ ] Duplicate prevention tests
+- [x] Channel-specific escaping tests
+- [x] Duplicate prevention tests
 
 ### Acceptance criteria
 
