@@ -52,6 +52,18 @@
     },
     {
       "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT source.slug FROM sources AS source WHERE source.slug = 'frenchbreaches' AND source.enabled = true AND NOT EXISTS (SELECT 1 FROM collection_runs AS run WHERE run.source_id = source.id AND run.started_at >= clock_timestamp() - make_interval(mins => source.poll_interval_minutes));",
+        "options": {}
+      },
+      "id": "9da51d52-fbb1-47ab-963c-49c0044b5a01",
+      "name": "Check FrenchBreaches due",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-320, 336]
+    },
+    {
+      "parameters": {
         "source": "database",
         "workflowId": "",
         "mode": "once",
@@ -81,6 +93,22 @@
       "typeVersion": 1.3,
       "position": [-64, 112],
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": "",
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "9da51d52-fbb1-47ab-963c-49c0044b5a02",
+      "name": "Collect FrenchBreaches",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [-64, 336],
+      "onError": "continueRegularOutput"
     }
   ],
   "pinData": {},
@@ -88,13 +116,15 @@
     "Run orchestration manually": {
       "main": [[
         {"node": "Check ransomware.live enabled", "type": "main", "index": 0},
-        {"node": "Check RansomLook enabled", "type": "main", "index": 0}
+        {"node": "Check RansomLook enabled", "type": "main", "index": 0},
+        {"node": "Check FrenchBreaches due", "type": "main", "index": 0}
       ]]
     },
     "Run every 15 minutes": {
       "main": [[
         {"node": "Check ransomware.live enabled", "type": "main", "index": 0},
-        {"node": "Check RansomLook enabled", "type": "main", "index": 0}
+        {"node": "Check RansomLook enabled", "type": "main", "index": 0},
+        {"node": "Check FrenchBreaches due", "type": "main", "index": 0}
       ]]
     },
     "Check ransomware.live enabled": {
@@ -102,6 +132,9 @@
     },
     "Check RansomLook enabled": {
       "main": [[{"node": "Collect RansomLook", "type": "main", "index": 0}]]
+    },
+    "Check FrenchBreaches due": {
+      "main": [[{"node": "Collect FrenchBreaches", "type": "main", "index": 0}]]
     }
   },
   "active": false,

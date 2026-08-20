@@ -63,14 +63,20 @@ def main() -> int:
     expected_nodes = {
         "Check ransomware.live enabled",
         "Check RansomLook enabled",
+        "Check FrenchBreaches due",
         "Collect ransomware.live",
         "Collect RansomLook",
+        "Collect FrenchBreaches",
     }
     missing_nodes = sorted(expected_nodes - nodes.keys())
     if missing_nodes:
         errors.append(f"WF-00 is missing nodes: {', '.join(missing_nodes)}")
 
-    expected_fanout = {"Check ransomware.live enabled", "Check RansomLook enabled"}
+    expected_fanout = {
+        "Check ransomware.live enabled",
+        "Check RansomLook enabled",
+        "Check FrenchBreaches due",
+    }
     for trigger in ("Run orchestration manually", "Run every 15 minutes"):
         if set(targets(connections, trigger)) != expected_fanout:
             errors.append(f"{trigger} must fan out to both independent source gates")
@@ -78,6 +84,7 @@ def main() -> int:
     gate_targets = {
         "Check ransomware.live enabled": "Collect ransomware.live",
         "Check RansomLook enabled": "Collect RansomLook",
+        "Check FrenchBreaches due": "Collect FrenchBreaches",
     }
     for gate, collector in gate_targets.items():
         query = nodes.get(gate, {}).get("parameters", {}).get("query", "")
@@ -86,7 +93,23 @@ def main() -> int:
         if targets(connections, gate) != [collector]:
             errors.append(f"{gate} must target only {collector}")
 
-    for collector in ("Collect ransomware.live", "Collect RansomLook"):
+    frenchbreaches_query = nodes.get("Check FrenchBreaches due", {}).get(
+        "parameters", {}
+    ).get("query", "")
+    for fragment in (
+        "source.slug = 'frenchbreaches'",
+        "source.poll_interval_minutes",
+        "make_interval",
+        "NOT EXISTS",
+    ):
+        if fragment not in frenchbreaches_query:
+            errors.append(f"FrenchBreaches due gate is missing: {fragment}")
+
+    for collector in (
+        "Collect ransomware.live",
+        "Collect RansomLook",
+        "Collect FrenchBreaches",
+    ):
         node = nodes.get(collector, {})
         if node.get("onError") != "continueRegularOutput":
             errors.append(f"{collector} must isolate sub-workflow failure")

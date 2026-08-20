@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Malformed synthetic feed</title>
+    <link>https://frenchbreaches.invalid/</link>
+    <description>The item deliberately omits its GUID.</description>
+    <item>
+      <title>Malformed Example</title>
+      <link>https://frenchbreaches.invalid/incidents/malformed-example</link>
+      <pubDate>Wed, 19 Aug 2026 11:30:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

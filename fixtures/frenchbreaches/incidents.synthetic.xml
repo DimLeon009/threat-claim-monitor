@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Synthetic French breach incidents</title>
+    <link>https://frenchbreaches.invalid/</link>
+    <description>Repository-safe synthetic RSS contract fixture.</description>
+    <item>
+      <title>Example Holding</title>
+      <link>https://frenchbreaches.invalid/incidents/example-holding</link>
+      <guid isPermaLink="true">https://frenchbreaches.invalid/incidents/example-holding</guid>
+      <pubDate>Wed, 19 Aug 2026 08:30:00 GMT</pubDate>
+      <description>Synthetic incident summary that must not be persisted.</description>
+      <category>synthetic-category</category>
+    </item>
+    <item>
+      <title>Example Services</title>
+      <link>https://frenchbreaches.invalid/incidents/example-services</link>
+      <guid isPermaLink="true">https://frenchbreaches.invalid/incidents/example-services</guid>
+      <pubDate>Wed, 19 Aug 2026 09:30:00 GMT</pubDate>
+      <description>Second synthetic incident summary that must be discarded.</description>
+    </item>
+    <item>
+      <title>*********</title>
+      <link>https://frenchbreaches.invalid/incidents/masked-example</link>
+      <guid isPermaLink="true">https://frenchbreaches.invalid/incidents/masked-example</guid>
+      <pubDate>Wed, 19 Aug 2026 10:30:00 GMT</pubDate>
+      <description>Synthetic masked-title case.</description>
+    </item>
+  </channel>
+</rss>

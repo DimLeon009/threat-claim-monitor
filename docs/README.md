@@ -48,6 +48,7 @@ This directory contains the technical, operational, and security documentation f
 |---|---|
 | [ransomware.live](sources/ransomware-live.md) | Public API contract, stable identity, silent baseline, and fixture policy |
 | [RansomLook](sources/ransomlook.md) | Secondary API contract, response-wrapper compatibility, and silent baseline |
+| [FrenchBreaches](sources/frenchbreaches.md) | Minimal RSS allow-list, permission boundary, cache-aware polling, and silent baseline |
 
 ### Matching
 

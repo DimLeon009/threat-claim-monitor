@@ -132,6 +132,10 @@ The function rejects URLs and secret-like words in the reason. Do not place cred
 
 WF-00 reads each source switch before invoking its collector. The ransomware.live and RansomLook branches are independent and use continue-on-error behavior at the sub-workflow boundary. A disabled source produces no collector execution, and a failed source does not prevent the other enabled branch from running.
 
+FrenchBreaches adds a due-time check based on its configured 240-minute polling interval. This respects the official feed's observed four-hour cache while allowing WF-00 to keep its shared 15-minute schedule. A healthy but not-yet-due FrenchBreaches source produces no collector execution and is not a failure.
+
+Windows runtime validation confirmed both due and not-due paths. The due branch invoked WF-12 without creating replay duplicates; after restoring the 240-minute interval, the next scheduled orchestration skipped FrenchBreaches while both JSON collectors completed. A prior RSS contract rejection remained isolated and sanitized, and the subsequent successful collection reset the source's consecutive-failure state.
+
 ### Windows runtime validation
 
 The source-health contract was exercised transactionally against PostgreSQL, including degraded, disabled, recovered, and unsafe-reason rejection paths. The real health view distinguished an intentionally disabled experimental source, a stale source, and a source degraded by a partial correlation run.
