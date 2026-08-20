@@ -1,0 +1,228 @@
+{
+  "name": "WF-12 Collect FrenchBreaches RSS",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424401",
+      "name": "Run collection manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-640, 80]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424402",
+      "name": "Run from orchestrator",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [-640, -80]
+    },
+    {
+      "parameters": {
+        "url": "https://frenchbreaches.com/feed.xml"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424403",
+      "name": "Fetch FrenchBreaches incidents",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [-384, 0],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const items = $input.all().map((item) => item.json);\nif (items.length < 1 || items.length > 200) {\n  throw new Error('RSS feed must contain between 1 and 200 items');\n}\n\nconst seenGuids = new Set();\nconst permalinkPattern = /^https:\\/\\/(?:www\\.)?frenchbreaches\\.com\\/[^\\s\\\\\\u0000-\\u001f\\u007f]*$/i;\nconst normalized = items.map((item, index) => {\n  if (!item || typeof item !== 'object' || Array.isArray(item)) {\n    throw new Error(`Item ${index + 1} must be an object`);\n  }\n\n  for (const field of ['title', 'guid', 'link', 'pubDate']) {\n    if (typeof item[field] !== 'string' || !item[field].trim()) {\n      throw new Error(`Item ${index + 1} has invalid ${field}`);\n    }\n  }\n\n  const title = item.title.trim();\n  const guid = item.guid.trim();\n  const link = item.link.trim();\n  if (title.length > 200 || guid.length > 1000 || link.length > 1000) {\n    throw new Error(`Item ${index + 1} exceeds a field limit`);\n  }\n  if (/[\\u0000-\\u001f\\u007f]/.test(title)) {\n    throw new Error(`Item ${index + 1} title contains a control character`);\n  }\n  if (guid !== link) {\n    throw new Error(`Item ${index + 1} GUID must equal its permalink`);\n  }\n  if (!permalinkPattern.test(link)) {\n    throw new Error(`Item ${index + 1} has an invalid permalink`);\n  }\n\n  const parsedDate = new Date(item.pubDate);\n  const earliest = Date.UTC(2000, 0, 1);\n  const latest = Date.now() + 86400000;\n  if (!Number.isFinite(parsedDate.getTime()) || parsedDate.getTime() < earliest || parsedDate.getTime() > latest) {\n    throw new Error(`Item ${index + 1} has an invalid publication date`);\n  }\n  if (seenGuids.has(guid)) {\n    throw new Error(`Item ${index + 1} duplicates a GUID`);\n  }\n  seenGuids.add(guid);\n\n  return { title, guid, link, published_at: parsedDate.toISOString() };\n});\n\nreturn [{ json: { records: normalized } }];"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424404",
+      "name": "Validate and allow-list RSS items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM ingest_frenchbreaches_collection($1::jsonb);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ JSON.stringify($json.records) }}"
+        }
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424405",
+      "name": "Insert observations if new",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [128, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM correlate_collection_run_exact($1::uuid);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ $json.collection_run_id }}"
+        }
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424406",
+      "name": "Correlate collection observations",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [384, 0],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM record_claim_correlation_failure($1::uuid);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ $('Insert observations if new').first().json.collection_run_id }}"
+        }
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424407",
+      "name": "Record sanitized correlation failure",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [640, 80]
+    },
+    {
+      "parameters": {
+        "errorType": "errorMessage",
+        "errorMessage": "={{ $json.error_message }}"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424408",
+      "name": "Stop with sanitized correlation failure",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [896, 80]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: { failure_code: 'fetch_failed' } }];"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424409",
+      "name": "Classify fetch failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 256]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: { failure_code: 'response_validation_failed' } }];"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424410",
+      "name": "Classify validation failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [128, 256]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "return [{ json: { failure_code: 'ingestion_failed' } }];"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424411",
+      "name": "Classify ingestion failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [384, 256]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM record_frenchbreaches_failure($1::text);",
+        "options": {
+          "queryBatching": "single",
+          "queryReplacement": "={{ $json.failure_code }}"
+        }
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424412",
+      "name": "Record sanitized failure",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [640, 256]
+    },
+    {
+      "parameters": {
+        "errorType": "errorMessage",
+        "errorMessage": "={{ $json.error_message }}"
+      },
+      "id": "1a7b0b17-4d77-49ee-842a-b71b00424413",
+      "name": "Stop with sanitized failure",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [896, 256]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run collection manually": {
+      "main": [[{"node": "Fetch FrenchBreaches incidents", "type": "main", "index": 0}]]
+    },
+    "Run from orchestrator": {
+      "main": [[{"node": "Fetch FrenchBreaches incidents", "type": "main", "index": 0}]]
+    },
+    "Fetch FrenchBreaches incidents": {
+      "main": [
+        [{"node": "Validate and allow-list RSS items", "type": "main", "index": 0}],
+        [{"node": "Classify fetch failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Validate and allow-list RSS items": {
+      "main": [
+        [{"node": "Insert observations if new", "type": "main", "index": 0}],
+        [{"node": "Classify validation failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Insert observations if new": {
+      "main": [
+        [{"node": "Correlate collection observations", "type": "main", "index": 0}],
+        [{"node": "Classify ingestion failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Correlate collection observations": {
+      "main": [
+        [],
+        [{"node": "Record sanitized correlation failure", "type": "main", "index": 0}]
+      ]
+    },
+    "Record sanitized correlation failure": {
+      "main": [[{"node": "Stop with sanitized correlation failure", "type": "main", "index": 0}]]
+    },
+    "Classify fetch failure": {
+      "main": [[{"node": "Record sanitized failure", "type": "main", "index": 0}]]
+    },
+    "Classify validation failure": {
+      "main": [[{"node": "Record sanitized failure", "type": "main", "index": 0}]]
+    },
+    "Classify ingestion failure": {
+      "main": [[{"node": "Record sanitized failure", "type": "main", "index": 0}]]
+    },
+    "Record sanitized failure": {
+      "main": [[{"node": "Stop with sanitized failure", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Paris"
+  },
+  "versionId": "1a7b0b17-4d77-49ee-842a-b71b00424414",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

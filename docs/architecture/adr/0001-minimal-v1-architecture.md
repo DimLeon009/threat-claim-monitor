@@ -11,7 +11,7 @@ Threat Claim Monitor must be self-hosted, work on Windows and Apple Silicon, rem
 
 Use n8n as the workflow orchestrator, PostgreSQL as both the n8n backend and application datastore, and Ollama as a host-native local inference service. Run n8n and PostgreSQL with Docker Compose. Keep the n8n and application data in separate PostgreSQL databases on one server.
 
-The initial structured sources are ransomware.live and RansomLook. FrenchBreaches remains disabled until its RSS endpoint is operationally validated.
+The initial structured sources are ransomware.live and RansomLook. FrenchBreaches uses a minimal RSS metadata adapter, remains disabled by default on clean installations, and can be enabled after its local runtime contract is reviewed.
 
 Ollama will summarize normalized evidence with a JSON Schema. Matching, confidence, correlation, verification status, and notification routing remain deterministic.
 
@@ -39,4 +39,3 @@ Ollama will summarize normalized evidence with a JSON Schema. Matching, confiden
 - **Kubernetes:** disproportionate operational cost for a single-host V1.
 - **Qdrant/RAG:** no current retrieval problem justifies a vector database.
 - **LLM-based matching:** difficult to reproduce and unsafe for alert routing.
-

@@ -216,7 +216,7 @@ Deliver one useful alert per material evidence version and retain complete deliv
 - Notification content includes alert ID, organization, actor, dates, match method, confidence, verification state, sources, summary, and disclaimer.
 - No raw payload, secret, or criminal download link is forwarded.
 
-## 🚧 M5 — Multi-source coverage
+## ✅ M5 — Multi-source coverage
 
 ### Objective
 
@@ -228,8 +228,8 @@ Increase coverage and source resilience while preserving a single internal obser
 - [x] Response-wrapper compatibility test
 - [x] Cross-source claim correlation
 - [x] `multi_source_observed` transition
-- [ ] FrenchBreaches RSS endpoint and automation validation
-- [ ] FrenchBreaches adapter only if structured access is reliable and permitted
+- [x] FrenchBreaches RSS endpoint and automation validation
+- [x] Minimal FrenchBreaches adapter after structured access and integration use were validated
 - [x] Per-source health indicators
 - [x] Source enable/disable runbook
 - [x] Schema-change failure tests

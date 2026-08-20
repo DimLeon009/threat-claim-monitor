@@ -95,7 +95,7 @@ flowchart LR
 
     RL --> N8N
     RLOOK --> N8N
-    FB -. "disabled until validated" .-> N8N
+    FB -. "optional, enabled after runtime validation" .-> N8N
     N8N <--> PG
     N8N -->|"bounded evidence"| OLLAMA
     N8N -->|"explicitly selected bounded public metadata"| FOUNDRY
@@ -115,7 +115,7 @@ Read the complete [architecture documentation](docs/architecture/architecture.md
 |---|---|---|---|
 | ransomware.live | JSON API | Primary claim feed | Adapter implemented and runtime validated |
 | RansomLook | JSON API | Secondary observation and correlation | Adapter, response-wrapper contract, and Windows runtime validated |
-| FrenchBreaches | RSS advertised | French breach enrichment | Seeded, disabled pending validation |
+| FrenchBreaches | RSS 2.0 | Minimal French breach metadata | Adapter, baseline, cache-aware orchestration, and Windows runtime validated; disabled by default on clean installs |
 | CERT-FR | RSS / CTI publications | Future institutional confirmation | Planned |
 | Have I Been Pwned | RSS / API | Future verified breach enrichment | Planned |
 
@@ -200,7 +200,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
 | M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
 | M4 | Auditable webhook, email, and Teams notifications | ✅ Complete; webhook, SMTP, and Teams runtime validated on Windows |
-| M5 | Additional source adapters | 🚧 RansomLook, cross-source correlation, source health, and isolated orchestration validated on Windows; FrenchBreaches evaluation pending |
+| M5 | Multi-source coverage | ✅ Complete; RansomLook, FrenchBreaches RSS, cross-source correlation, source health, and isolated orchestration validated on Windows |
 | M6 | Hardening and v1.0.0 | Planned |
 
 The detailed acceptance criteria are tracked in the [roadmap](ROADMAP.md).

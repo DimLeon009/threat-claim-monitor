@@ -201,7 +201,7 @@ flowchart TB
 
     W00 --> W10
     W00 --> W11
-    W00 -. "when enabled" .-> W12
+    W00 -. "when enabled and due" .-> W12
     W10 --> W20
     W11 --> W20
     W12 --> W20
