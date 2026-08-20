@@ -78,7 +78,7 @@ docker compose exec postgres psql \
 
 Import `n8n/workflows/wf-10-collect-ransomware-live.json` and `n8n/workflows/wf-00-orchestrator.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new`, `Correlate collection observations`, `Record sanitized failure`, and `Record sanitized correlation failure`; credentials and environment-specific credential identifiers are intentionally absent from the committed export.
 
-In `WF-00 Orchestrator`, configure `Collect ransomware.live` to call `WF-10 Collect ransomware.live`. The database workflow identifier is intentionally absent from the committed export because it is local to each n8n instance.
+In `WF-00 Orchestrator`, configure `Collect ransomware.live` to call `WF-10 Collect ransomware.live` and assign the PostgreSQL credential to its enable gate. Migration 021 adds a parallel RansomLook gate and collector branch. Database workflow and credential identifiers are intentionally absent from the committed export because they are local to each n8n instance.
 
 Both workflows remain inactive after import. Run `WF-10` manually to establish and inspect the baseline, then test `WF-00` manually before publishing only the orchestrator. `WF-10` remains callable as a sub-workflow and does not own the schedule.
 

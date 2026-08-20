@@ -10,12 +10,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_FILE = ROOT / "n8n" / "workflows" / "wf-50-build-notification-outbox.json"
 MIGRATION_FILE = ROOT / "db" / "migrations" / "017_notification_outbox_workflow.sql"
+CROSS_SOURCE_MIGRATION_FILE = ROOT / "db" / "migrations" / "020_cross_source_correlation.sql"
 
 
 def main() -> int:
     errors: list[str] = []
     workflow = json.loads(WORKFLOW_FILE.read_text(encoding="utf-8"))
     migration = MIGRATION_FILE.read_text(encoding="utf-8")
+    cross_source_migration = CROSS_SOURCE_MIGRATION_FILE.read_text(encoding="utf-8")
     nodes = {node.get("name"): node for node in workflow.get("nodes", [])}
 
     expected_nodes = {
@@ -52,6 +54,17 @@ def main() -> int:
     ):
         if fragment not in migration:
             errors.append(f"notification producer migration is missing {fragment}")
+
+    for fragment in (
+        "CREATE OR REPLACE FUNCTION enqueue_ready_claim_notifications",
+        "outbox.claim_id = claim.id",
+        "outbox.organization_id = accepted_match.organization_id",
+        "outbox.channel = channel_config.channel",
+        "outbox.notification_type = 'new_claim'",
+        "020_cross_source_correlation",
+    ):
+        if fragment not in cross_source_migration:
+            errors.append(f"cross-source notification guard is missing {fragment}")
 
     serialized = json.dumps(workflow).lower()
     for forbidden in ("http://", "https://", "smtp", "credential", "secret", "token"):
