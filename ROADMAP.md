@@ -34,8 +34,8 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M2 | Deterministic watchlist matching and correlation | ✅ |
 | M3 | Evidence-grounded hybrid AI summaries | ✅ |
 | M4 | Auditable multi-channel notifications | ✅ |
-| M5 | Resilient multi-source coverage | 🚧 |
-| M6 | Hardened v1.0.0 portfolio release | Planned |
+| M5 | Resilient multi-source coverage | ✅ |
+| M6 | Hardened v1.0.0 portfolio release | 🚧 |
 
 ## ✅ M0 — Foundation
 
@@ -242,7 +242,7 @@ Increase coverage and source resilience while preserving a single internal obser
 - An incompatible source schema fails closed.
 - Experimental sources can be disabled without workflow edits.
 
-## M6 — Hardening and v1.0.0
+## 🚧 M6 — Hardening and v1.0.0
 
 ### Objective
 
@@ -250,7 +250,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 
 ### Deliverables
 
-- [ ] End-to-end synthetic demonstration scenario
+- [x] End-to-end synthetic demonstration scenario — runtime validated on Windows
 - [ ] Windows 11 installation validation
 - [ ] Apple Silicon installation validation
 - [ ] Backup and restore scripts and exercise
