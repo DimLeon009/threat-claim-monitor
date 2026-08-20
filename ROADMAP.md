@@ -230,9 +230,9 @@ Increase coverage and source resilience while preserving a single internal obser
 - [x] `multi_source_observed` transition
 - [ ] FrenchBreaches RSS endpoint and automation validation
 - [ ] FrenchBreaches adapter only if structured access is reliable and permitted
-- [ ] Per-source health indicators
-- [ ] Source enable/disable runbook
-- [ ] Schema-change failure tests
+- [x] Per-source health indicators
+- [x] Source enable/disable runbook
+- [x] Schema-change failure tests
 
 ### Acceptance criteria
 

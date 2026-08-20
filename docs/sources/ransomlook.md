@@ -54,9 +54,9 @@ An incompatible root wrapper, invalid content type, oversized array, or missing 
 
 ## Deployment
 
-Apply migrations `018_ransomlook_ingestion.sql` through `020_cross_source_correlation.sql`, then import `n8n/workflows/wf-11-collect-ransomlook.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new`, `Correlate collection observations`, `Record sanitized failure`, and `Record sanitized correlation failure`.
+Apply migrations `018_ransomlook_ingestion.sql` through `022_skip_unmatchable_correlation_observations.sql`, then import `n8n/workflows/wf-11-collect-ransomlook.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new`, `Correlate collection observations`, `Record sanitized failure`, and `Record sanitized correlation failure`. Assign the same credential to `Check RansomLook enabled` in WF-00.
 
-WF-11 is inactive and has no environment-specific workflow or credential identifier in the committed export. Run it manually before connecting it to WF-00. The first successful run should report `is_baseline = true`; replaying the same response should report `inserted_count = 0`.
+WF-11 is inactive and has no environment-specific workflow or credential identifier in the committed export. Run it manually before connecting it to the isolated RansomLook branch in WF-00. The first successful run should report `is_baseline = true`; replaying the same response inserts only records published since the previous run.
 
 Validate the repository contract with:
 
@@ -71,5 +71,7 @@ The official endpoint and response example are documented by [RansomLook](https:
 The first Windows smoke-test collection fetched 264 records, rejected two fully masked titles, inserted 262 historical observations, and established the silent baseline. An immediate second collection fetched 266 records and inserted only the two newly published usable observations with `is_baseline = false`. The 262 previously stored observations were not duplicated.
 
 After cross-source correlation was enabled, the updated WF-11 processed 17 newly inserted observations and persisted 17 claim links successfully. The controlled backfill processed the earlier 262-observation baseline and two subsequent observations. No monitored-organization match was produced, and historical observations remained excluded from new-claim notification eligibility.
+
+The isolated WF-00 branch was then validated enabled, disabled, and re-enabled. Disabling RansomLook suppressed only its collector while ransomware.live continued. After re-enabling, a scheduled orchestration invoked both sources and replayed without inserting or linking duplicate observations.
 
 No live victim value, response body, external URL, or credential is retained as repository evidence. Only aggregate collection counts and generated collection-run identifiers were inspected during validation.

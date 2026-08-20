@@ -78,6 +78,68 @@ An unavailable source does not mean the full platform is unhealthy. Health shoul
 
 A source schema change should fail closed: reject unmappable records and alert the operator rather than guessing fields.
 
+An individual observation whose victim label normalizes to no usable text is skipped at the correlation boundary instead of failing the entire collection run. Inspect `correlation_skipped_unmatchable_count` in collection-run metadata when investigating discrepancies between inserted and correlated counts. Skipped observations remain retained as source evidence and never create claims, matches, analyses, or notifications.
+
+Migration `021_source_health_and_switches.sql` exposes these indicators through the read-only `source_health` view. Inspect every configured source with:
+
+```sql
+SELECT
+  slug,
+  enabled,
+  health_status,
+  latest_status,
+  last_success_at,
+  consecutive_failure_count,
+  latest_response_validation,
+  latest_fetched_count,
+  latest_inserted_count,
+  latest_contract_version
+FROM source_health
+ORDER BY slug;
+```
+
+Health values are:
+
+- `disabled`: intentionally excluded from orchestration;
+- `never_run`: enabled but no collection history exists;
+- `degraded`: the latest run failed or is partial, or failures followed the latest success;
+- `stale`: no successful run occurred within three configured polling intervals;
+- `healthy`: the latest state is successful and current.
+
+### Enable or disable a source
+
+Use the bounded database function rather than editing WF-00. A short non-secret reason is mandatory and retained in source metadata:
+
+```sql
+SELECT * FROM set_source_enabled(
+  'ransomlook',
+  false,
+  'planned source maintenance'
+);
+```
+
+Re-enable the source after review:
+
+```sql
+SELECT * FROM set_source_enabled(
+  'ransomlook',
+  true,
+  'source contract revalidated'
+);
+```
+
+The function rejects URLs and secret-like words in the reason. Do not place credentials, response bodies, personal data, or endpoint tokens in operational metadata.
+
+WF-00 reads each source switch before invoking its collector. The ransomware.live and RansomLook branches are independent and use continue-on-error behavior at the sub-workflow boundary. A disabled source produces no collector execution, and a failed source does not prevent the other enabled branch from running.
+
+### Windows runtime validation
+
+The source-health contract was exercised transactionally against PostgreSQL, including degraded, disabled, recovered, and unsafe-reason rejection paths. The real health view distinguished an intentionally disabled experimental source, a stale source, and a source degraded by a partial correlation run.
+
+That partial run contained 31 inserted observations. Migration `022_skip_unmatchable_correlation_observations.sql` allowed 30 usable observations to be correlated while retaining and safely skipping one non-normalizable label; the run recovered to `succeeded` without duplicate links. The cross-source correlation runtime contract then passed, including replay idempotency and the unmatchable-label case.
+
+WF-00 was validated with both sources enabled, with RansomLook disabled, and again after re-enabling it. While RansomLook was disabled, ransomware.live continued successfully and the RansomLook collector was not invoked. A subsequent scheduled execution invoked both collectors and produced zero new links, confirming independent routing and idempotent replay.
+
 ## Outbox recovery principles
 
 - Never mark a notification as sent without an external send attempt.

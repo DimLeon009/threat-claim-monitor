@@ -15,6 +15,11 @@ VALUES
     '79000000-0000-4000-8000-000000000002',
     '10000000-0000-4000-8000-000000000002',
     now(), 'succeeded', 1, 1, '{"fixture":"cross-source-secondary"}'::jsonb
+  ),
+  (
+    '79000000-0000-4000-8000-000000000003',
+    '10000000-0000-4000-8000-000000000001',
+    now(), 'succeeded', 1, 1, '{"fixture":"unmatchable-correlation"}'::jsonb
   );
 
 INSERT INTO observations (
@@ -40,10 +45,40 @@ VALUES
     'Cross Source Example', 'cross source example', 'cross-source.invalid',
     'Synthetic Cross Actor', 'synthetic cross actor', repeat('2', 64),
     '{"fixture":"secondary"}'::jsonb, false
+  ),
+  (
+    '79000000-0000-4000-8000-000000000013',
+    '10000000-0000-4000-8000-000000000001',
+    '79000000-0000-4000-8000-000000000003',
+    'synthetic-unmatchable-correlation', '2026-08-18T12:00:00Z',
+    '*********', '*********', NULL,
+    'Synthetic Cross Actor', 'synthetic cross actor', repeat('3', 64),
+    '{"fixture":"unmatchable"}'::jsonb, false
   );
 
 SELECT * FROM correlate_collection_run_exact('79000000-0000-4000-8000-000000000001');
 SELECT * FROM correlate_collection_run_exact('79000000-0000-4000-8000-000000000002');
+SELECT * FROM correlate_collection_run_exact('79000000-0000-4000-8000-000000000003');
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM collection_runs AS run
+    WHERE run.id = '79000000-0000-4000-8000-000000000003'
+      AND run.status = 'succeeded'
+      AND run.metadata->>'correlation_status' = 'succeeded'
+      AND run.metadata->>'correlation_processed_count' = '0'
+      AND run.metadata->>'correlation_skipped_unmatchable_count' = '1'
+  ) OR EXISTS (
+    SELECT 1
+    FROM claim_observations AS link
+    WHERE link.observation_id = '79000000-0000-4000-8000-000000000013'
+  ) THEN
+    RAISE EXCEPTION 'unmatchable observation was not skipped safely';
+  END IF;
+END;
+$$;
 
 DO $$
 DECLARE

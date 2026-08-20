@@ -325,14 +325,14 @@ The reference configuration is for local development and single-host internal us
 
 The application database records collection start and finish times, item counts, status, errors, notification attempts, and analysis validation state. n8n execution retention is limited because it is diagnostic data, not the audit source of truth.
 
-Planned health indicators include:
+The `source_health` view provides:
 
 - last successful poll per source;
-- collection error rate;
-- new and duplicate observation counts;
-- pending and dead-letter notifications;
-- Ollama response and validation failures;
-- time from discovery to notification.
+- consecutive collection failures and the latest response-validation result;
+- fetched and inserted observation counts;
+- the latest observed source-contract version.
+
+Pending and dead-letter notifications remain available from the outbox, while inference response and validation failures remain available from analyses. Consolidated operational dashboards remain a Milestone 6 concern.
 
 ## Scaling boundary
 

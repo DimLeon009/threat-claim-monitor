@@ -23,6 +23,7 @@ python3 scripts/validate_source_fixtures.py
 python3 scripts/test_ransomware_live_contract.py
 python3 scripts/test_ransomlook_contract.py
 python3 scripts/test_cross_source_correlation_contract.py
+python3 scripts/test_source_health_contract.py
 python3 scripts/test_matching_contract.py
 python3 scripts/test_ai_contract.py
 python3 scripts/test_local_analysis_workflow_contract.py

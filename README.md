@@ -200,7 +200,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M2 | Deterministic matching and claim correlation | ✅ Complete; runtime validated on Windows |
 | M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
 | M4 | Auditable webhook, email, and Teams notifications | ✅ Complete; webhook, SMTP, and Teams runtime validated on Windows |
-| M5 | Additional source adapters | 🚧 RansomLook and cross-source correlation runtime validated; source health and experimental RSS work pending |
+| M5 | Additional source adapters | 🚧 RansomLook, cross-source correlation, source health, and isolated orchestration validated on Windows; FrenchBreaches evaluation pending |
 | M6 | Hardening and v1.0.0 | Planned |
 
 The detailed acceptance criteria are tracked in the [roadmap](ROADMAP.md).
