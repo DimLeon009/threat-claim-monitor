@@ -1,0 +1,59 @@
+{
+  "name": "WF-99 Receive synthetic demo webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tcm-synthetic-demo",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7d000000-0000-4000-8000-000000000099",
+      "name": "Receive synthetic notification",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-256, 0]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "javaScript",
+        "jsCode": "const body = $json.body;\nif (!body || body.contract_version !== 'notification-v1') throw new Error('Unsupported notification contract');\nif (body.organization?.name !== 'TCM Synthetic Demo Organization') throw new Error('Non-synthetic organization rejected');\nif (body.claim?.victim_name !== 'TCM Synthetic Demo Organization') throw new Error('Non-synthetic claim rejected');\nif (body.disclaimer !== 'Déclaration criminelle non vérifiée ; aucune compromission n’est confirmée.') throw new Error('Required disclaimer missing');\nreturn {json:{received:true,contract_version:body.contract_version,alert_id:body.alert_id,synthetic:true}};"
+      },
+      "id": "7d000000-0000-4000-8000-000000000098",
+      "name": "Validate synthetic payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "7d000000-0000-4000-8000-000000000097",
+      "name": "Acknowledge synthetic notification",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [256, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Receive synthetic notification": {
+      "main": [[{"node": "Validate synthetic payload", "type": "main", "index": 0}]]
+    },
+    "Validate synthetic payload": {
+      "main": [[{"node": "Acknowledge synthetic notification", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "timezone": "Europe/Paris"},
+  "versionId": "7d000000-0000-4000-8000-000000000096",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}

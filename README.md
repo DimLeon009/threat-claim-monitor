@@ -201,7 +201,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
 | M4 | Auditable webhook, email, and Teams notifications | ✅ Complete; webhook, SMTP, and Teams runtime validated on Windows |
 | M5 | Multi-source coverage | ✅ Complete; RansomLook, FrenchBreaches RSS, cross-source correlation, source health, and isolated orchestration validated on Windows |
-| M6 | Hardening and v1.0.0 | Planned |
+| M6 | Hardening and v1.0.0 | 🚧 In progress; repository-safe end-to-end synthetic demo runtime validated on Windows |
 
 The detailed acceptance criteria are tracked in the [roadmap](ROADMAP.md).
 
