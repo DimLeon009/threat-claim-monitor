@@ -154,14 +154,9 @@ WF-00 was validated with both sources enabled, with RansomLook disabled, and aga
 
 ## Backup boundary
 
-Before v1.0.0, the project will provide tested commands for:
+The [backup and restore runbook](backup-and-restore.md) provides custom-format logical backups of both PostgreSQL databases, preservation of the non-secret n8n data volume, checksums, manifest verification, and an isolated restore exercise. The original n8n encryption key remains outside the backup and must be preserved separately.
 
-- logical backup of both PostgreSQL databases;
-- preservation of the n8n data volume and encryption key;
-- restore into a clean environment;
-- documented recovery-time observations.
-
-Until that procedure is implemented, do not treat the development stack as the sole copy of important operational history.
+Do not treat the local development stack or an unverified backup as the sole copy of important operational history.
 
 ## Escalation data
 
