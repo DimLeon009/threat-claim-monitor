@@ -253,7 +253,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [x] End-to-end synthetic demonstration scenario — runtime validated on Windows
 - [ ] Windows 11 installation validation
 - [ ] Apple Silicon installation validation
-- [ ] Backup and restore scripts and exercise
+- [x] Backup and restore scripts and isolated Windows exercise
 - [ ] n8n security audit
 - [ ] Secret scanning
 - [ ] Container vulnerability scanning
@@ -316,7 +316,7 @@ Candidates are not commitments. Each requires a concrete use case and, where app
 
 Qdrant and RAG will be considered only when semantic retrieval provides measurable value that relational search and deterministic enrichment cannot provide.
 
-## Explicitly out of scope for V1
+## ❌ Explicitly out of scope for V1
 
 - direct interaction with threat actors;
 - downloading or redistributing leaked data;
