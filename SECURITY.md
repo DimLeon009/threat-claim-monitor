@@ -200,17 +200,20 @@ Before v1.0.0:
 - [ ] Enable repository secret scanning.
 - [ ] Add container vulnerability scanning.
 - [ ] Run the n8n security audit.
-- [ ] Test source response-size limits and malformed schemas.
-- [ ] Run prompt-injection regression tests.
+- [x] Test source response-size limits and malformed schemas.
+- [x] Run prompt-injection regression tests.
 - [ ] Verify SQL parameterization for all source-derived values.
-- [ ] Test notification retry and dead-letter behavior.
-- [ ] Complete backup and restore exercise.
+- [x] Test notification retry and dead-letter behavior.
+- [x] Complete backup and restore exercise.
 - [x] Review retention and deletion behavior.
 - [ ] Verify Windows and macOS network exposure.
 
 ## Threat model
 
 Assets, adversaries, abuse cases, residual risks, and STRIDE coverage are documented in the [threat model](docs/security/threat-model.md).
+
+The formal V1 review, findings, and release gates are recorded in the
+[V1 architecture and threat-model review](docs/security/v1-architecture-threat-review.md).
 
 ## Disclaimer
 

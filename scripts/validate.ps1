@@ -129,6 +129,11 @@ try {
     throw 'Operational dashboards contract validation failed.'
   }
 
+  python scripts/test_architecture_threat_model_review.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Architecture and threat-model review validation failed.'
+  }
+
   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_failure_modes.ps1
   if ($LASTEXITCODE -ne 0) {
     throw 'Failure-mode runtime suite failed.'

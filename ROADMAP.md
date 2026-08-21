@@ -260,7 +260,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [x] Failure-mode test suite — five transactionally isolated PostgreSQL contracts
 - [x] Configurable retention job — disabled-by-default, bounded, previewable, audited, and evidence-preserving
 - [x] Source and channel operational dashboards — read-only SQL views and manual n8n inspection workflow
-- [ ] Architecture and threat-model review
+- [x] Architecture and threat-model review — completed with explicit residual-risk register and open release gates
 - [ ] Release checklist, changelog, and tagged `v1.0.0`
 - [ ] Portfolio screenshots and concise demonstration guide
 

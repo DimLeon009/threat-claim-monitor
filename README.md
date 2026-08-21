@@ -201,7 +201,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
 | M4 | Auditable webhook, email, and Teams notifications | ✅ Complete; webhook, SMTP, and Teams runtime validated on Windows |
 | M5 | Multi-source coverage | ✅ Complete; RansomLook, FrenchBreaches RSS, cross-source correlation, source health, and isolated orchestration validated on Windows |
-| M6 | Hardening and v1.0.0 | 🚧 In progress; synthetic demo, backup restoration, failure-mode suite, configurable retention, and read-only operational dashboards implemented |
+| M6 | Hardening and v1.0.0 | 🚧 In progress; recovery, failure modes, retention, dashboards, and formal architecture/threat review completed with release gates still open |
 
 The detailed acceptance criteria are tracked in the [roadmap](ROADMAP.md).
 
@@ -227,6 +227,7 @@ Key documents:
 - [Data model](docs/architecture/data-model.md)
 - [ADR-0001](docs/architecture/adr/0001-minimal-v1-architecture.md)
 - [Threat model](docs/security/threat-model.md)
+- [V1 architecture and threat-model review](docs/security/v1-architecture-threat-review.md)
 - [Getting started](docs/operations/getting-started.md)
 - [Infrastructure notes](infra/README.md)
 - [Contributing](CONTRIBUTING.md)
