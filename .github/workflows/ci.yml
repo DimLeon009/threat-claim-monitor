@@ -52,6 +52,9 @@ jobs:
       - name: Validate architecture and threat-model review
         run: python scripts/test_architecture_threat_model_review.py
 
+      - name: Validate exclusive analysis provider routing
+        run: python scripts/test_analysis_provider_routing_contract.py
+
       - name: Validate repository configuration
         run: sh scripts/validate.sh
 

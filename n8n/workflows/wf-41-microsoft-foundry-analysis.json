@@ -32,7 +32,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "WITH config AS (SELECT * FROM get_enabled_microsoft_foundry_config()), jobs AS (SELECT job.* FROM config CROSS JOIN LATERAL get_pending_claim_analysis_jobs('claim-analysis-v1', 'microsoft_foundry', config.deployment_name, 10) AS job) SELECT jobs.*, config.endpoint_base_url, config.deployment_name, config.model_name, config.model_version, config.api_family, config.deployment_type, config.data_processing_scope, config.content_filter_name FROM config CROSS JOIN jobs;",
+        "query": "WITH config AS (SELECT * FROM get_enabled_microsoft_foundry_config()), jobs AS (SELECT job.* FROM config CROSS JOIN LATERAL get_routed_pending_claim_analysis_jobs('claim-analysis-v1', 'microsoft_foundry', config.deployment_name, 10) AS job) SELECT jobs.*, config.endpoint_base_url, config.deployment_name, config.model_name, config.model_version, config.api_family, config.deployment_type, config.data_processing_scope, config.content_filter_name FROM config CROSS JOIN jobs;",
         "options": {"queryBatching": "single"}
       },
       "id": "dd0902b4-98e7-4b91-8ed6-d53235240d30",

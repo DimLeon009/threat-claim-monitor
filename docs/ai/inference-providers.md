@@ -11,6 +11,49 @@ Threat Claim Monitor supports two inference providers without giving either prov
 
 Provider selection is configuration, not model output. An Ollama error never causes an automatic Foundry request.
 
+## Exclusive orchestration mode
+
+Migration `026_analysis_provider_routing.sql` adds one database-controlled route
+with exactly two accepted values: `ollama` and `microsoft_foundry`. The default
+is `ollama`; there is no dual mode and no automatic provider fallback.
+
+WF-00 consumes the selected analysis queue every minute independently of its
+15-minute collection cycle. Its single manual trigger launches both phases for
+operator validation. The two database gates are mutually exclusive, so
+exactly one of WF-40 or WF-41 can run during an analysis cycle. WF-40 and WF-41
+also use the routed queue function, providing a second database-level check if
+a sub-workflow is started directly.
+
+Inspect the route without changing it:
+
+```sql
+SELECT * FROM get_analysis_routing_decision();
+```
+
+Select local inference:
+
+```sql
+SELECT * FROM set_analysis_routing_provider(
+  'ollama',
+  'reviewed local inference selection'
+);
+```
+
+Select Foundry only after its reviewed provider configuration is enabled:
+
+```sql
+SELECT * FROM set_analysis_routing_provider(
+  'microsoft_foundry',
+  'reviewed cloud inference selection'
+);
+```
+
+A provider change records a new `effective_from` timestamp. Claims older than
+that timestamp are not implicitly reprocessed by the new provider. Repeating
+the same selection is idempotent and does not move the timestamp. Historical
+backfill, if ever required, must use a separate reviewed process with an
+explicit volume and cost preview.
+
 ## Shared contract
 
 Both providers use:
@@ -79,7 +122,9 @@ Global, data-zone, and regional deployments have different processing-location p
 
 Authentication failure, quota exhaustion, rate limiting, content filtering, timeout, invalid output, or provider unavailability produces a sanitized allow-listed failure and the same deterministic fallback. WF-41 recognizes both direct HTTP status fields and n8n's nested `error.status` shape. Repository-safe synthetic cases cover 401, 403, 429, content-filter rejection, timeout, and provider unavailability. Raw provider responses and authentication details are not persisted.
 
-The local provider remains independently runnable. Cloud use is never an implicit recovery action.
+The local provider remains independently runnable when it is the selected
+route. A failure produces the selected provider workflow's deterministic
+fallback; cloud use is never an implicit recovery action.
 
 ## Workflow validation
 

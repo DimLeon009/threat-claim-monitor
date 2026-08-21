@@ -86,7 +86,7 @@ def main() -> int:
         "F-02",
         "F-05",
         "Do not tag v1.0.0",
-        "analysis invocation",
+        "Migration 026",
         "selected n8n image",
     ):
         if fragment not in REVIEW:

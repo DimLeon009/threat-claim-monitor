@@ -134,6 +134,11 @@ try {
     throw 'Architecture and threat-model review validation failed.'
   }
 
+  python scripts/test_analysis_provider_routing_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Analysis provider routing contract validation failed.'
+  }
+
   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_failure_modes.ps1
   if ($LASTEXITCODE -ne 0) {
     throw 'Failure-mode runtime suite failed.'
@@ -147,6 +152,11 @@ try {
   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_operational_dashboards.ps1
   if ($LASTEXITCODE -ne 0) {
     throw 'Operational dashboards runtime validation failed.'
+  }
+
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_analysis_provider_routing.ps1
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Analysis provider routing runtime validation failed.'
   }
 
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')

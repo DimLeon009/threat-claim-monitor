@@ -229,11 +229,11 @@ The committed workflow exports remain inactive and contain no credential
 identifiers. Publication state, credential assignment, and channel enablement
 are runtime configuration and must be reviewed after import.
 
-The current WF-00 export invokes the three collectors only. WF-40 and WF-41
-accept parent-workflow invocation but are not connected by the committed WF-00
-export. Automated analysis-provider routing is therefore a release gate: it
-must be wired and validated, or the manual operational dependency must be
-explicitly accepted before v1.0.0.
+WF-00 runs collection gates every 15 minutes and consumes the analysis queue on
+an independent one-minute schedule. PostgreSQL selects exactly one ready
+provider route: `ollama` invokes WF-40, while `microsoft_foundry` invokes WF-41.
+There is no dual mode or automatic local-to-cloud fallback. Provider changes
+are non-retroactive by default through a recorded `effective_from` boundary.
 
 Workflows are exported to `n8n/workflows` and reviewed like source code. Credentials and internal n8n identifiers must be removed or documented before committing exports.
 
