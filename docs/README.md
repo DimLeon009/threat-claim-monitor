@@ -89,6 +89,7 @@ This directory contains the technical, operational, and security documentation f
 | [Security policy](../SECURITY.md) | Disclosure process and repository security requirements |
 | [Threat model](security/threat-model.md) | Assets, adversaries, boundaries, abuse cases, and controls |
 | [V1 architecture and threat-model review](security/v1-architecture-threat-review.md) | Reviewed deployment evidence, findings, residual risks, and release gates |
+| [Security scanning](security/security-scanning.md) | Complete-history secret detection, container vulnerability gates, and triage |
 
 ## Documentation conventions
 

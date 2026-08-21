@@ -1,0 +1,21 @@
+{
+  "contract_version": "tcm-trivy-exceptions-v1",
+  "exceptions": [
+    {
+      "image": "postgres:17.10-alpine3.23",
+      "vulnerability_id": "CVE-2025-68121",
+      "target": "usr/local/bin/gosu",
+      "package": "stdlib",
+      "installed_version": "v1.24.6",
+      "expires_on": "2026-11-20",
+      "decision": "not_affected",
+      "review_owner": "repository maintainer",
+      "rationale": "The advisory affects crypto/tls session resumption. gosu only resolves a local user, changes process credentials, and executes the requested command; the affected TLS symbols are not reachable in this binary.",
+      "references": [
+        "https://pkg.go.dev/vuln/GO-2026-4337",
+        "https://github.com/tianon/gosu/blob/master/SECURITY.md",
+        "https://github.com/tianon/gosu/blob/master/govulncheck-with-excludes.sh"
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@
 # Runtime data
 data/
 backups/
+security-reports/
 *.log
 
 # Editors and operating systems
