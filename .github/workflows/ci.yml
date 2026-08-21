@@ -43,6 +43,9 @@ jobs:
       - name: Validate deterministic matching contract
         run: python scripts/test_matching_contract.py
 
+      - name: Validate configurable retention contract
+        run: python scripts/test_retention_contract.py
+
       - name: Validate repository configuration
         run: sh scripts/validate.sh
 
