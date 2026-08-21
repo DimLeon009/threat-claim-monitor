@@ -76,8 +76,8 @@ def main() -> None:
     require("run: sh scripts/validate.sh" in CI
             and "sh scripts/test_failure_modes.sh" in VALIDATE_SH,
             "CI does not execute the transactional failure-mode suite")
-    require("docker compose down -v" in CI,
-            "CI does not remove its ephemeral failure-mode database")
+    require("docker compose --env-file .env.example down -v" in CI,
+            "CI does not remove its ephemeral failure-mode database with explicit safe configuration")
 
     print("Failure-mode suite contract validation passed (5 isolated runtime scenarios).")
 

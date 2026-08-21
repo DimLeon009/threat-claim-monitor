@@ -48,4 +48,4 @@ jobs:
 
       - name: Remove ephemeral failure-mode database
         if: always()
-        run: docker compose down -v
+        run: docker compose --env-file .env.example down -v
