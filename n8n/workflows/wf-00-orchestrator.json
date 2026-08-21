@@ -28,6 +28,79 @@
     },
     {
       "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "8a000000-0000-4000-8000-000000000002",
+      "name": "Run analysis every minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [-576, 720]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT selected_provider FROM get_analysis_routing_decision() WHERE route_ready = true AND selected_provider = 'ollama';",
+        "options": {}
+      },
+      "id": "8a000000-0000-4000-8000-000000000003",
+      "name": "Check local analysis selected",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-320, 528]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT selected_provider FROM get_analysis_routing_decision() WHERE route_ready = true AND selected_provider = 'microsoft_foundry';",
+        "options": {}
+      },
+      "id": "8a000000-0000-4000-8000-000000000004",
+      "name": "Check Foundry analysis selected",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-320, 752]
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": "",
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "8a000000-0000-4000-8000-000000000005",
+      "name": "Run local analysis",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [-64, 528],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "source": "database",
+        "workflowId": "",
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "8a000000-0000-4000-8000-000000000006",
+      "name": "Run Foundry analysis",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [-64, 752],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
         "operation": "executeQuery",
         "query": "SELECT slug FROM sources WHERE slug = 'ransomware-live' AND enabled = true;",
         "options": {}
@@ -117,7 +190,9 @@
       "main": [[
         {"node": "Check ransomware.live enabled", "type": "main", "index": 0},
         {"node": "Check RansomLook enabled", "type": "main", "index": 0},
-        {"node": "Check FrenchBreaches due", "type": "main", "index": 0}
+        {"node": "Check FrenchBreaches due", "type": "main", "index": 0},
+        {"node": "Check local analysis selected", "type": "main", "index": 0},
+        {"node": "Check Foundry analysis selected", "type": "main", "index": 0}
       ]]
     },
     "Run every 15 minutes": {
@@ -125,6 +200,12 @@
         {"node": "Check ransomware.live enabled", "type": "main", "index": 0},
         {"node": "Check RansomLook enabled", "type": "main", "index": 0},
         {"node": "Check FrenchBreaches due", "type": "main", "index": 0}
+      ]]
+    },
+    "Run analysis every minute": {
+      "main": [[
+        {"node": "Check local analysis selected", "type": "main", "index": 0},
+        {"node": "Check Foundry analysis selected", "type": "main", "index": 0}
       ]]
     },
     "Check ransomware.live enabled": {
@@ -135,6 +216,12 @@
     },
     "Check FrenchBreaches due": {
       "main": [[{"node": "Collect FrenchBreaches", "type": "main", "index": 0}]]
+    },
+    "Check local analysis selected": {
+      "main": [[{"node": "Run local analysis", "type": "main", "index": 0}]]
+    },
+    "Check Foundry analysis selected": {
+      "main": [[{"node": "Run Foundry analysis", "type": "main", "index": 0}]]
     }
   },
   "active": false,
@@ -142,7 +229,7 @@
     "executionOrder": "v1",
     "timezone": "Europe/Paris"
   },
-  "versionId": "1e9ef28f-0bb9-4ae3-9a5d-030dc1e34269",
+  "versionId": "8a000000-0000-4000-8000-000000000007",
   "meta": {
     "templateCredsSetupCompleted": false
   },

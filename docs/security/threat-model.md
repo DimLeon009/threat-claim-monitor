@@ -273,7 +273,7 @@ remediation. An operator must still investigate and act.
 | ID | Residual risk | Current treatment | v1.0.0 gate |
 |---|---|---|:---:|
 | R-01 | n8n or bundled sandbox dependency has an unresolved critical finding | Keep localhost-only and do not release until a corrected stable image passes scanning | Yes |
-| R-02 | WF-00 does not invoke WF-40 or WF-41 in the committed export | Wire and validate provider routing, or formally accept manual analysis operation | Yes |
+| R-02 | A provider switch could cross the local/cloud boundary or trigger unexpected historical cost | Closed for V1 by exclusive database routing, Foundry readiness checks, and a non-retroactive effective date | No |
 | R-03 | Notification delivery is at-least-once | Stable alert ID, outbox lease, bounded retry, and receiver idempotency | No |
 | R-04 | Model output can be inaccurate despite schema validity | Evidence references, uncertainty, deterministic authority, and analyst review | No |
 | R-05 | Backups are not encrypted by repository tooling | Store in protected encrypted operator-managed storage | Yes for production |
@@ -300,7 +300,7 @@ Open before v1.0.0 where applicable:
 - complete source-derived SQL parameterization review;
 - stable corrected n8n image validation;
 - Apple Silicon installation and network-exposure validation;
-- automated analysis-provider orchestration decision;
+- runtime verification of the selected analysis route after every workflow import;
 - protected backup-storage decision for production use.
 
 Review this model whenever a service, source class, authentication mechanism,

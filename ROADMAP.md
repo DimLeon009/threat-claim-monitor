@@ -261,6 +261,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [x] Configurable retention job — disabled-by-default, bounded, previewable, audited, and evidence-preserving
 - [x] Source and channel operational dashboards — read-only SQL views and manual n8n inspection workflow
 - [x] Architecture and threat-model review — completed with explicit residual-risk register and open release gates
+- [x] Exclusive local/cloud analysis orchestration — database-selected, fail-closed, and non-retroactive
 - [ ] Release checklist, changelog, and tagged `v1.0.0`
 - [ ] Portfolio screenshots and concise demonstration guide
 

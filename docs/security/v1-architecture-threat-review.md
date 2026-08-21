@@ -1,7 +1,7 @@
 # V1 architecture and threat-model review
 
 - **Review date:** 2026-08-21
-- **Scope:** repository state after migrations 001–025 and all committed workflows WF-00–WF-99
+- **Scope:** repository state after migrations 001–026 and all committed workflows WF-00–WF-99
 - **Status:** Completed with open release gates
 
 ## Review objective
@@ -47,7 +47,7 @@ database contents were intentionally outside the repository review.
 
 | ID | Severity | Finding | Decision or required action | Status |
 |---|---|---|---|---|
-| F-01 | High | The committed WF-00 export invokes collectors but does not invoke WF-40 or WF-41 | Wire and validate explicit provider routing, or formally accept and document manual analysis operation | Open release gate |
+| F-01 | High | The original WF-00 export invoked collectors but not WF-40 or WF-41 | Migration 026 and the updated WF-00 now select exactly one ready provider every minute, with no dual mode, implicit fallback, or historical backfill | Closed |
 | F-02 | Critical when exploitable | A stable n8n image must not ship with an unresolved critical container or sandbox finding | Keep the service localhost-only and block v1.0.0 until the selected stable image passes the defined scan and audit | Open release gate |
 | F-03 | Medium | Notification channels and dispatchers are separate runtime switches | Keep each channel disabled until its dispatcher, credential, and destination are reviewed together | Controlled operational gate |
 | F-04 | Medium | Backup confidentiality depends on operator-managed storage | Require protected encrypted storage and separate preservation of `N8N_ENCRYPTION_KEY` for production | Open production gate |
@@ -96,10 +96,11 @@ and encryption therefore remain deployment responsibilities.
 The architecture is coherent for a localhost-only, single-operator V1 and the
 threat model now covers every implemented external and destructive boundary.
 
-Do not tag v1.0.0 until the release-gate findings in the residual risk register
-are closed or explicitly accepted with documented rationale. In particular,
-the selected n8n image must pass security validation and the analysis invocation
-path must be deterministic and demonstrated end to end.
+Do not tag v1.0.0 until the remaining release-gate findings in the residual risk
+register are closed or explicitly accepted with documented rationale. In
+particular, the selected n8n image must pass security validation. The analysis
+invocation design gate was closed by migration 026 and must still receive a
+runtime smoke test after importing the updated workflows.
 
 ## Review triggers
 

@@ -68,7 +68,7 @@ def main() -> int:
     )
     for fragment in (
         "get_enabled_microsoft_foundry_config()",
-        "get_pending_claim_analysis_jobs('claim-analysis-v1', 'microsoft_foundry'",
+        "get_routed_pending_claim_analysis_jobs('claim-analysis-v1', 'microsoft_foundry'",
         "config.deployment_name",
     ):
         if fragment not in load_query:

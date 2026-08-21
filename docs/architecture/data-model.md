@@ -146,7 +146,7 @@ Migration `022_skip_unmatchable_correlation_observations` makes collection-run c
 
 ### `analyses`
 
-Stores a local-model result or deterministic fallback.
+Stores a selected-provider result or deterministic fallback.
 
 Reproducibility fields include:
 
@@ -161,10 +161,23 @@ Reproducibility fields include:
 - sanitized error;
 - bounded inference metadata: completion reason, token counts, and duration.
 
-The uniqueness constraint prevents repeated analysis of the same claim, prompt version, input, provider, and deployment. Ollama and Microsoft Foundry may therefore evaluate the same bounded input independently without weakening per-deployment idempotency.
+The uniqueness constraint prevents repeated analysis of the same claim, prompt
+version, input, provider, and deployment. Provider-aware history remains
+possible without weakening per-deployment idempotency, while migration
+`026_analysis_provider_routing.sql` ensures that the automatic V1 path selects
+only one provider for newly eligible or updated claims.
 Only claims with an accepted organization match and current non-historical evidence enter the analysis queue. The database revalidates the output shape and every referenced evidence identifier before persistence. A model error stores only an allow-listed failure code translated to a fixed sanitized message; raw model or transport errors are never persisted.
 
 Foundry records additionally require an allow-listed provider metadata object containing the model version, API family, deployment type, data-processing scope, and content-filter name. Provider metadata rejects endpoint, token, key, authorization, and secret fields. Existing analysis envelopes without a provider remain compatible and are recorded as Ollama with the model tag as deployment name.
+
+### `analysis_routing_policy`
+
+Stores one exclusive automatic route: `ollama` or `microsoft_foundry`. The
+default is local. A Foundry route cannot be selected until its non-secret
+provider configuration is complete and enabled. Every real provider change
+records an `effective_from` boundary and a sanitized reason; repeating the same
+selection does not move that boundary. Routed queues exclude older claims so a
+mode change cannot cause an implicit historical cloud backfill.
 
 ## Delivery entities
 

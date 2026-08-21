@@ -47,7 +47,7 @@ def main() -> int:
         errors.append("committed WF-40 export must not contain credential identifiers")
 
     load_query = nodes.get("Load pending analysis jobs", {}).get("parameters", {}).get("query", "")
-    if "get_pending_claim_analysis_jobs('claim-analysis-v1', 10)" not in load_query:
+    if "get_routed_pending_claim_analysis_jobs('claim-analysis-v1', 'ollama'" not in load_query:
         errors.append("WF-40 must load bounded claim-analysis-v1 jobs")
 
     build_code = nodes.get("Build Ollama request", {}).get("parameters", {}).get("jsCode", "")

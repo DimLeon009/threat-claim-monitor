@@ -77,9 +77,12 @@ def main() -> int:
         "Check RansomLook enabled",
         "Check FrenchBreaches due",
     }
-    for trigger in ("Run orchestration manually", "Run every 15 minutes"):
-        if set(targets(connections, trigger)) != expected_fanout:
-            errors.append(f"{trigger} must fan out to both independent source gates")
+    if not expected_fanout.issubset(
+        set(targets(connections, "Run orchestration manually"))
+    ):
+        errors.append("manual orchestration must include every independent source gate")
+    if set(targets(connections, "Run every 15 minutes")) != expected_fanout:
+        errors.append("Run every 15 minutes must target only the independent source gates")
 
     gate_targets = {
         "Check ransomware.live enabled": "Collect ransomware.live",
