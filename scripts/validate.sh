@@ -41,6 +41,7 @@ python3 scripts/test_backup_restore_contract.py
 python3 scripts/test_failure_mode_suite_contract.py
 python3 scripts/test_retention_contract.py
 python3 scripts/test_operational_dashboards_contract.py
+python3 scripts/test_architecture_threat_model_review.py
 sh scripts/test_failure_modes.sh
 sh scripts/test_retention.sh
 sh scripts/test_operational_dashboards.sh

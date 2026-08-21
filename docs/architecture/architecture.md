@@ -44,7 +44,10 @@ The platform records what a source reported. It never equates publication on a c
 
 ### Minimum useful infrastructure
 
-V1 excludes components that do not solve a current requirement. Qdrant, RAG, Redis, Kubernetes, a public API, and a dashboard remain outside the deployment.
+V1 excludes components that do not solve a current requirement. Qdrant, RAG,
+Redis, Kubernetes, a public API, and a custom end-user interface remain outside
+the deployment. Read-only operational SQL views and a manual n8n inspection
+workflow are included for operators.
 
 ### Safe retries
 
@@ -139,6 +142,8 @@ PostgreSQL provides:
 - evidence history;
 - migration tracking;
 - outbox concurrency control;
+- bounded retention and retention audit history;
+- read-only source and notification operational views;
 - reviewable operational queries.
 
 See the [data model](data-model.md).
@@ -190,30 +195,45 @@ flowchart TB
     W00["WF-00 Orchestrator"]
     W10["WF-10 ransomware.live"]
     W11["WF-11 RansomLook"]
-    W12["WF-12 FrenchBreaches"]
-    W20["WF-20 Normalize and correlate"]
-    W30["WF-30 Match organizations"]
+    W12["WF-12 FrenchBreaches RSS"]
+    DB["PostgreSQL correlation and exact matching"]
     W40["WF-40 Local analysis"]
     W41["WF-41 Microsoft Foundry analysis"]
-    W50["WF-50 Build outbox"]
-    W60["WF-60 Dispatch notifications"]
-    W90["WF-90 Health and errors"]
+    W50["WF-50 Build notification outbox"]
+    W60["WF-60 Generic webhook"]
+    W61["WF-61 SMTP email"]
+    W62["WF-62 Teams Workflows"]
+    W70["WF-70 Configurable retention"]
+    W71["WF-71 Operational dashboards"]
+    W99["WF-99 Synthetic receiver"]
 
     W00 --> W10
     W00 --> W11
     W00 -. "when enabled and due" .-> W12
-    W10 --> W20
-    W11 --> W20
-    W12 --> W20
-    W20 --> W30
-    W30 -->|"accepted match + local selected"| W40
-    W30 -->|"accepted match + cloud selected"| W41
+    W10 --> DB
+    W11 --> DB
+    W12 --> DB
+    DB -. "configured invocation" .-> W40
+    DB -. "configured invocation" .-> W41
     W40 --> W50
     W41 --> W50
     W50 --> W60
-    W00 --> W90
-    W60 --> W90
+    W50 --> W61
+    W50 --> W62
+    W60 -. "synthetic test only" .-> W99
+    W70 --> DB
+    W71 -. "read only" .-> DB
 ```
+
+The committed workflow exports remain inactive and contain no credential
+identifiers. Publication state, credential assignment, and channel enablement
+are runtime configuration and must be reviewed after import.
+
+The current WF-00 export invokes the three collectors only. WF-40 and WF-41
+accept parent-workflow invocation but are not connected by the committed WF-00
+export. Automated analysis-provider routing is therefore a release gate: it
+must be wired and validated, or the manual operational dependency must be
+explicitly accepted before v1.0.0.
 
 Workflows are exported to `n8n/workflows` and reviewed like source code. Credentials and internal n8n identifiers must be removed or documented before committing exports.
 
@@ -297,6 +317,20 @@ Source text is delimited as data, truncated to the required evidence, and paired
 
 Webhook URLs and SMTP credentials are secrets. Notification text is escaped for the target format. Raw source payloads are never forwarded.
 
+### Boundary E — n8n to Microsoft Foundry
+
+Cloud inference is explicit rather than an automatic fallback. Only bounded,
+allow-listed public metadata crosses the HTTPS boundary. Authentication remains
+in the n8n credential store, and provider, deployment, model, processing scope,
+and content-filter provenance are persisted with the result.
+
+### Boundary F — operator and backup storage
+
+The local operator can publish workflows, assign credentials, enable channels,
+change retention, and restore both databases. Backup directories and the n8n
+encryption key are therefore high-value administrative assets. They must be
+stored separately and protected outside the repository.
+
 The complete abuse-case analysis is in the [threat model](../security/threat-model.md).
 
 ## Network exposure
@@ -350,6 +384,7 @@ Queue mode, workers, Redis, partitioning, or a dedicated API become candidates o
 | ADR | Decision | Status |
 |---|---|---|
 | [ADR-0001](adr/0001-minimal-v1-architecture.md) | n8n + PostgreSQL in Compose, Ollama native | Accepted |
+| [ADR-0002](adr/0002-hybrid-local-foundry-inference.md) | Explicit hybrid Ollama and Microsoft Foundry inference | Accepted |
 
 New decisions are required when a change introduces a persistent service, changes a trust boundary, alters the evidence model, or makes an existing deployment incompatible.
 
@@ -358,11 +393,11 @@ New decisions are required when a change introduces a persistent service, change
 ```mermaid
 flowchart LR
     V1["V1<br/>Ransomware claims"] --> V2["V2<br/>Confirmation and enrichment"]
-    V2 --> V3["V3<br/>Dashboard and API"]
+    V2 --> V3["V3<br/>Product UI and API"]
     V3 --> V4["V4<br/>IOC and semantic research"]
 
     V2 -.-> CERT["CERT-FR / HIBP"]
-    V3 -.-> UI["Read-only dashboard"]
+    V3 -.-> UI["Dedicated end-user interface"]
     V4 -.-> MISP["MISP / IOC management"]
     V4 -.-> RAG["Qdrant only if justified"]
 ```

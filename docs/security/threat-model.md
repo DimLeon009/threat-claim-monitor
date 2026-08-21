@@ -2,7 +2,10 @@
 
 ## Scope
 
-This threat model covers the single-host V1 deployment: n8n and PostgreSQL in Docker Compose, Ollama on the host, public CTI sources, and outbound notification channels.
+This threat model covers the single-host V1 deployment: n8n and PostgreSQL in
+Docker Compose, Ollama on the host, optional Microsoft Foundry inference, public
+CTI sources, outbound notification channels, local backup and restore, bounded
+retention, and read-only operational dashboards.
 
 It does not claim to cover a future Internet-facing multi-user deployment, direct dark-web collection, or enterprise identity integration.
 
@@ -27,6 +30,9 @@ It does not claim to cover a future Internet-facing multi-user deployment, direc
 | Workflow definitions | Trusted code/configuration | Pipeline manipulation or secret exfiltration |
 | Analysis prompts and schemas | Trusted configuration | Hallucination, prompt injection, or unsafe output |
 | Notification history | Audit data | Loss of accountability or duplicate delivery confusion |
+| Microsoft Foundry credential | Secret | Unauthorized inference use, cost, or data disclosure |
+| Backups and n8n encryption key | Critical administrative data | Complete configuration, credential, and evidence disclosure or unrecoverable restore |
+| Retention policy | Trusted operational configuration | Premature metadata deletion or unbounded database growth |
 
 ## Adversaries and failure sources
 
@@ -38,6 +44,9 @@ It does not claim to cover a future Internet-facing multi-user deployment, direc
 - malformed or unexpectedly large external responses;
 - model hallucination or prompt-injection compliance;
 - ordinary network, storage, and process failure.
+- a compromised container image, workflow dependency, or sandbox package;
+- an operator applying unsafe publication, channel, retention, or restore configuration;
+- cloud inference outage, quota exhaustion, content-filter drift, or credential misuse.
 
 ## Trust boundaries
 
@@ -47,15 +56,20 @@ flowchart LR
     N["n8n processing boundary"]
     D[("PostgreSQL trust store")]
     L["Ollama untrusted inference output"]
+    F["Microsoft Foundry cloud boundary"]
     C["External notification channels"]
     O["Local operator"]
+    B["Protected backup storage"]
 
     U -->|"hostile content"| N
     O -->|"authenticated local access"| N
     N -->|"parameterized SQL"| D
     N -->|"bounded evidence"| L
     L -->|"validate before use"| N
+    N -->|"explicit bounded HTTPS request"| F
+    F -->|"validate before use"| N
     N -->|"escaped payload"| C
+    O -->|"backup and restore"| B
 ```
 
 ## Primary abuse cases and controls
@@ -155,6 +169,73 @@ flowchart LR
 - per-channel audit attempts;
 - credential rotation procedure before production use.
 
+### Silent local-to-cloud inference failover
+
+**Scenario:** an Ollama outage silently sends monitored data to Microsoft
+Foundry, changes the processing boundary, and creates unexpected cost.
+
+**Controls:**
+
+- provider selection is explicit configuration;
+- Ollama failure never triggers automatic Foundry fallback;
+- only allow-listed public metadata may be sent;
+- provider and deployment provenance is persisted;
+- both providers share the same schema and semantic validation contract.
+
+**Residual risk:** an authorized operator can still select an unsuitable region,
+deployment, or credential. Cloud activation requires a separate configuration
+review.
+
+### Compromised n8n image or JavaScript sandbox dependency
+
+**Scenario:** a vulnerable dependency in the n8n image allows workflow code to
+escape its intended sandbox or access process-level capabilities.
+
+**Controls:**
+
+- n8n remains bound to localhost;
+- PostgreSQL is not published to the host;
+- no Docker socket or privileged container is provided;
+- images are version-pinned;
+- committed workflows and Code nodes are reviewed;
+- container scanning and the n8n audit are release gates.
+
+**Residual risk:** network isolation cannot fully contain arbitrary code running
+inside the trusted n8n container. A stable image with unresolved critical
+findings must not be used for the v1.0.0 release.
+
+### Backup disclosure or unusable restore
+
+**Scenario:** a backup directory or its encryption key is exposed, lost, or
+restored with incompatible configuration.
+
+**Controls:**
+
+- both PostgreSQL databases and the n8n data volume are captured;
+- the manifest is verified during restore;
+- restore is tested in an isolated Compose project;
+- the n8n encryption key is preserved separately;
+- backups are excluded from Git and must be stored securely.
+
+**Residual risk:** repository tooling does not provide an encrypted remote
+backup store. Storage protection remains an operator responsibility.
+
+### Unsafe retention or misleading dashboard state
+
+**Scenario:** retention removes evidence, or an aggregate dashboard hides a
+failure that requires investigation.
+
+**Controls:**
+
+- retention is disabled by default, bounded, previewable, and audited;
+- only terminal collection runs without observations are eligible;
+- evidence, analyses, matches, notifications, and attempts are preserved;
+- dashboard views are read-only and expose deterministic classifications;
+- raw payloads, errors, credentials, and lease tokens are excluded.
+
+**Residual risk:** dashboards are diagnostic snapshots, not paging or automatic
+remediation. An operator must still investigate and act.
+
 ## STRIDE summary
 
 | Category | Relevant example | Main controls |
@@ -165,6 +246,7 @@ flowchart LR
 | Information disclosure | Secrets in Git or logs | `.gitignore`, credential store, sanitization |
 | Denial of service | Oversized feed or unavailable source | Timeouts, limits, isolated adapters, retries |
 | Elevation of privilege | Source content influencing workflow decisions | Deterministic control path and no model tools |
+| Elevation of privilege | Sandbox escape inside n8n | Pinned images, least exposure, scanning release gate |
 
 ## Data classification
 
@@ -182,16 +264,46 @@ flowchart LR
 - External endpoints support TLS where applicable.
 - The project is not exposed directly to the public Internet.
 - Notification recipients are authorized to receive the monitored CTI metadata.
+- The configured Microsoft Foundry deployment is approved for the selected data-processing scope.
+- Backup storage permissions and encryption are managed outside this repository.
+- Workflow publication and credential assignment are privileged operator actions.
 
-## Security validation backlog
+## Residual risk register
+
+| ID | Residual risk | Current treatment | v1.0.0 gate |
+|---|---|---|:---:|
+| R-01 | n8n or bundled sandbox dependency has an unresolved critical finding | Keep localhost-only and do not release until a corrected stable image passes scanning | Yes |
+| R-02 | WF-00 does not invoke WF-40 or WF-41 in the committed export | Wire and validate provider routing, or formally accept manual analysis operation | Yes |
+| R-03 | Notification delivery is at-least-once | Stable alert ID, outbox lease, bounded retry, and receiver idempotency | No |
+| R-04 | Model output can be inaccurate despite schema validity | Evidence references, uncertainty, deterministic authority, and analyst review | No |
+| R-05 | Backups are not encrypted by repository tooling | Store in protected encrypted operator-managed storage | Yes for production |
+| R-06 | Apple Silicon behavior has not yet been validated for the release candidate | Complete macOS installation and smoke test | Yes |
+| R-07 | Notification channels and dispatchers require explicit runtime activation | Keep channels disabled until matching dispatcher and credential are reviewed | Yes for live delivery |
+
+## Security validation status
+
+Completed and evidenced in repository contracts or runtime exercises:
+
+- malformed source schemas, timeouts, and bounded adapter inputs;
+- synthetic prompt-injection fixture and output validation;
+- notification retry, stale lease, dead-letter, and requeue behavior;
+- isolated backup and restore exercise;
+- bounded evidence-preserving retention;
+- read-only operational dashboard data minimization;
+- Windows localhost binding and PostgreSQL non-publication.
+
+Open before v1.0.0 where applicable:
 
 - automated secret scanning;
 - dependency and container vulnerability scanning;
 - n8n security audit in CI or release procedure;
-- response-size and URL allow-list tests;
-- prompt-injection regression corpus;
-- backup encryption and restore exercise;
-- formal retention job and deletion verification.
+- complete source-derived SQL parameterization review;
+- stable corrected n8n image validation;
+- Apple Silicon installation and network-exposure validation;
+- automated analysis-provider orchestration decision;
+- protected backup-storage decision for production use.
 
-Review this model whenever a service, source class, authentication mechanism, public endpoint, or new data category is introduced.
-
+Review this model whenever a service, source class, authentication mechanism,
+public endpoint, new data category, inference provider, destructive operation,
+or critical dependency finding is introduced. The formal V1 review is recorded
+in [V1 architecture and threat-model review](v1-architecture-threat-review.md).

@@ -49,6 +49,9 @@ jobs:
       - name: Validate operational dashboards contract
         run: python scripts/test_operational_dashboards_contract.py
 
+      - name: Validate architecture and threat-model review
+        run: python scripts/test_architecture_threat_model_review.py
+
       - name: Validate repository configuration
         run: sh scripts/validate.sh
 
