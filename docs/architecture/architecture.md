@@ -332,7 +332,12 @@ The `source_health` view provides:
 - fetched and inserted observation counts;
 - the latest observed source-contract version.
 
-Pending and dead-letter notifications remain available from the outbox, while inference response and validation failures remain available from analyses. Consolidated operational dashboards remain a Milestone 6 concern.
+Migration 025 exposes consolidated, read-only operational views for source
+health, notification-channel delivery, and a global attention summary. These
+views contain classifications, counts, and timestamps only; they exclude source
+payloads, victim data, raw errors, notification bodies, destinations,
+deduplication keys, response excerpts, and lease tokens. Inference response and
+validation failures remain available from analyses for targeted investigation.
 
 ## Scaling boundary
 

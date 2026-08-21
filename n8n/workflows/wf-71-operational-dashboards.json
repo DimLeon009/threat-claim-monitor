@@ -1,0 +1,64 @@
+{
+  "name": "WF-71 Operational dashboards",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "7f100000-0000-4000-8000-000000000001",
+      "name": "Refresh dashboards manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-304, 0]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM operational_dashboard_summary;",
+        "options": {"queryBatching": "single"}
+      },
+      "id": "7f100000-0000-4000-8000-000000000002",
+      "name": "Load operational summary",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [0, -160]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM operational_source_dashboard ORDER BY slug;",
+        "options": {"queryBatching": "single"}
+      },
+      "id": "7f100000-0000-4000-8000-000000000003",
+      "name": "Load source dashboard",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM operational_notification_dashboard ORDER BY channel;",
+        "options": {"queryBatching": "single"}
+      },
+      "id": "7f100000-0000-4000-8000-000000000004",
+      "name": "Load channel dashboard",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [0, 160]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Refresh dashboards manually": {
+      "main": [[
+        {"node": "Load operational summary", "type": "main", "index": 0},
+        {"node": "Load source dashboard", "type": "main", "index": 0},
+        {"node": "Load channel dashboard", "type": "main", "index": 0}
+      ]]
+    }
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1", "timezone": "Europe/Paris"},
+  "versionId": "7f100000-0000-4000-8000-000000000005",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}
