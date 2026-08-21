@@ -70,6 +70,13 @@ Collection runs support source-health reporting without depending on short-lived
 
 Migration `021_source_health_and_switches.sql` adds the read-only `source_health` view over sources and collection runs. It derives the latest run, last success and failure, consecutive failures, response-validation state, collection counts, contract version, and a deterministic `disabled`, `never_run`, `degraded`, `stale`, or `healthy` status. The view creates no duplicate health state or additional retention requirement.
 
+Migration `024_configurable_retention.sql` adds a disabled-by-default retention
+policy and an audit record for bounded cleanup jobs. Only terminal collection
+runs with no linked observations can be removed. The latest run, latest success,
+and latest failed or partial run per source remain available for health
+diagnostics. Business evidence and notification records are outside this
+automatic-retention boundary.
+
 ### `observations`
 
 An observation is one source’s representation of a claim.
@@ -225,4 +232,4 @@ Retention will become configurable before v1.0.0. Deletion must preserve referen
 
 ## Future extensions
 
-Possible additions include analyst comments, official confirmation evidence, notification subscriptions, and retention jobs. Persisted source-health snapshots are unnecessary until a historical reporting use case exists. IOC storage and vector embeddings are deliberately not part of this schema until their use cases are implemented.
+Possible additions include analyst comments, official confirmation evidence, and notification subscriptions. Persisted source-health snapshots are unnecessary until a historical reporting use case exists. IOC storage and vector embeddings are deliberately not part of this schema until their use cases are implemented.

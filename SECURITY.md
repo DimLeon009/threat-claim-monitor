@@ -205,7 +205,7 @@ Before v1.0.0:
 - [ ] Verify SQL parameterization for all source-derived values.
 - [ ] Test notification retry and dead-letter behavior.
 - [ ] Complete backup and restore exercise.
-- [ ] Review retention and deletion behavior.
+- [x] Review retention and deletion behavior.
 - [ ] Verify Windows and macOS network exposure.
 
 ## Threat model
@@ -215,4 +215,3 @@ Assets, adversaries, abuse cases, residual risks, and STRIDE coverage are docume
 ## Disclaimer
 
 This project provides defensive automation and is not a substitute for incident response, legal advice, forensic investigation, or authoritative breach confirmation. Operators are responsible for validating alerts and complying with applicable law and source terms.
-

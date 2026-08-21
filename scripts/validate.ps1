@@ -119,9 +119,19 @@ try {
     throw 'Failure-mode suite contract validation failed.'
   }
 
+  python scripts/test_retention_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Configurable retention contract validation failed.'
+  }
+
   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_failure_modes.ps1
   if ($LASTEXITCODE -ne 0) {
     throw 'Failure-mode runtime suite failed.'
+  }
+
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_retention.ps1
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Configurable retention runtime validation failed.'
   }
 
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
