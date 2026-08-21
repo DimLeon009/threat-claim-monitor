@@ -36,6 +36,7 @@ This directory contains the technical, operational, and security documentation f
 | [Backup and restore](operations/backup-and-restore.md) | Dual-database backup, n8n volume preservation, isolated restore, and verification |
 | [Failure-mode validation](operations/failure-mode-validation.md) | Transactionally isolated correlation, source-health, inference, retry, and dead-letter tests |
 | [Configurable retention](operations/configurable-retention.md) | Conservative collection-run cleanup, preview, scheduling, audit, and n8n execution-log settings |
+| [Operational dashboards](operations/operational-dashboards.md) | Read-only source health, notification delivery, and global attention views |
 | [Infrastructure](../infra/README.md) | Compose topology, volumes, networking, and image policy |
 
 ### Development

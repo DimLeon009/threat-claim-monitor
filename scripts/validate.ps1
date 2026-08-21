@@ -124,6 +124,11 @@ try {
     throw 'Configurable retention contract validation failed.'
   }
 
+  python scripts/test_operational_dashboards_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Operational dashboards contract validation failed.'
+  }
+
   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_failure_modes.ps1
   if ($LASTEXITCODE -ne 0) {
     throw 'Failure-mode runtime suite failed.'
@@ -132,6 +137,11 @@ try {
   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_retention.ps1
   if ($LASTEXITCODE -ne 0) {
     throw 'Configurable retention runtime validation failed.'
+  }
+
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_operational_dashboards.ps1
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Operational dashboards runtime validation failed.'
   }
 
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')

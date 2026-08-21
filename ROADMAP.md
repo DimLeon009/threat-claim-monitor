@@ -259,7 +259,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [ ] Container vulnerability scanning
 - [x] Failure-mode test suite — five transactionally isolated PostgreSQL contracts
 - [x] Configurable retention job — disabled-by-default, bounded, previewable, audited, and evidence-preserving
-- [ ] Source and channel operational dashboards in n8n or SQL views
+- [x] Source and channel operational dashboards — read-only SQL views and manual n8n inspection workflow
 - [ ] Architecture and threat-model review
 - [ ] Release checklist, changelog, and tagged `v1.0.0`
 - [ ] Portfolio screenshots and concise demonstration guide

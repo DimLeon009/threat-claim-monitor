@@ -40,8 +40,10 @@ python3 scripts/test_end_to_end_demo_contract.py
 python3 scripts/test_backup_restore_contract.py
 python3 scripts/test_failure_mode_suite_contract.py
 python3 scripts/test_retention_contract.py
+python3 scripts/test_operational_dashboards_contract.py
 sh scripts/test_failure_modes.sh
 sh scripts/test_retention.sh
+sh scripts/test_operational_dashboards.sh
 
 for migration in db/migrations/*.sql; do
   filename=$(basename "$migration")

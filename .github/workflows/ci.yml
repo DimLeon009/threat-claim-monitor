@@ -46,6 +46,9 @@ jobs:
       - name: Validate configurable retention contract
         run: python scripts/test_retention_contract.py
 
+      - name: Validate operational dashboards contract
+        run: python scripts/test_operational_dashboards_contract.py
+
       - name: Validate repository configuration
         run: sh scripts/validate.sh
 
