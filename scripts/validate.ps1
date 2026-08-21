@@ -114,6 +114,16 @@ try {
     throw 'Backup and restore contract validation failed.'
   }
 
+  python scripts/test_failure_mode_suite_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Failure-mode suite contract validation failed.'
+  }
+
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_failure_modes.ps1
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Failure-mode runtime suite failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'

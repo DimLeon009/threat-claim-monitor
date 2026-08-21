@@ -257,7 +257,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [ ] n8n security audit
 - [ ] Secret scanning
 - [ ] Container vulnerability scanning
-- [ ] Failure-mode test suite
+- [x] Failure-mode test suite — five transactionally isolated PostgreSQL contracts
 - [ ] Configurable retention job
 - [ ] Source and channel operational dashboards in n8n or SQL views
 - [ ] Architecture and threat-model review

@@ -177,7 +177,7 @@ BEGIN
 
   IF stored_result.created IS DISTINCT FROM true
     OR stored_result.validation_status <> 'fallback'
-    OR stored_result.error_message <> 'local analysis output invalid; deterministic fallback stored'
+    OR stored_result.error_message <> 'analysis output invalid; deterministic fallback stored'
   THEN
     RAISE EXCEPTION 'fallback analysis was not stored with a sanitized failure';
   END IF;
@@ -209,7 +209,7 @@ BEGIN
     FROM analyses
     WHERE claim_id = '70000000-0000-4000-8000-000000000002'
       AND validation_status = 'fallback'
-      AND error_message = 'local analysis output invalid; deterministic fallback stored'
+      AND error_message = 'analysis output invalid; deterministic fallback stored'
       AND error_message NOT LIKE '%Synthetic fallback description%'
   ) THEN
     RAISE EXCEPTION 'stored fallback error is missing or unsafe';
