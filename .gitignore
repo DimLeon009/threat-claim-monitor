@@ -9,6 +9,7 @@ backups/
 
 # Editors and operating systems
 .DS_Store
+security-reports/
 Thumbs.db
 .idea/
 .vscode/

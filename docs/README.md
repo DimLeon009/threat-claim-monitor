@@ -34,6 +34,7 @@ This directory contains the technical, operational, and security documentation f
 | [Health and recovery](operations/health-and-recovery.md) | Health checks, common failure modes, safe restart, and recovery boundaries |
 | [End-to-end synthetic demo](operations/end-to-end-synthetic-demo.md) | Safe M6 collection-to-webhook scenario, verification, and scoped cleanup |
 | [Backup and restore](operations/backup-and-restore.md) | Dual-database backup, n8n volume preservation, isolated restore, and verification |
+| [Failure-mode validation](operations/failure-mode-validation.md) | Transactionally isolated correlation, source-health, inference, retry, and dead-letter tests |
 | [Infrastructure](../infra/README.md) | Compose topology, volumes, networking, and image policy |
 
 ### Development

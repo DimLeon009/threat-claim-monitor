@@ -45,3 +45,7 @@ jobs:
 
       - name: Validate repository configuration
         run: sh scripts/validate.sh
+
+      - name: Remove ephemeral failure-mode database
+        if: always()
+        run: docker compose down -v
