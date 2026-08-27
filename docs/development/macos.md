@@ -84,6 +84,17 @@ sh scripts/backup.sh backups
 The generated directory contains sensitive operational data and encrypted n8n
 credentials. Keep it outside Git and preserve `N8N_ENCRYPTION_KEY` separately.
 
+## Apple Silicon runtime validation
+
+The release-candidate stack was validated on Apple Silicon with Docker Desktop
+on 2026-08-27. PostgreSQL and n8n ran as native `linux/arm64` images. n8n 2.36.7
+contained vm2 3.11.6 and remained bound to localhost only.
+
+Host-native Ollama 0.32.14 served `qwen3:8b-q4_K_M` with the pinned digest.
+The n8n container reached Ollama through `host.docker.internal`, the complete
+repository validation passed, and the macOS backup procedure created a verified
+manifest before restarting n8n successfully.
+
 ## Resource guidance
 
 The foundation stack is lightweight. Qwen3 8B requires substantially more memory than n8n and PostgreSQL; stop other memory-intensive applications if inference becomes slow. The smaller Qwen3 4B variant is an explicit fallback, not a silent model substitution.
