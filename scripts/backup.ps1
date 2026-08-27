@@ -65,9 +65,12 @@ try {
   }
   $n8nWasRunning = $runningServices -contains 'n8n'
 
-  $resolvedDestination = [IO.Path]::GetFullPath(
-    (Join-Path (Get-Location) $DestinationDirectory)
-  )
+  $destinationPath = if ([IO.Path]::IsPathRooted($DestinationDirectory)) {
+    $DestinationDirectory
+  } else {
+    Join-Path (Get-Location) $DestinationDirectory
+  }
+  $resolvedDestination = [IO.Path]::GetFullPath($destinationPath)
   $backupName = "tcm-backup-$([DateTime]::UtcNow.ToString('yyyyMMddTHHmmssZ'))"
   $backupDirectory = Join-Path $resolvedDestination $backupName
   if (Test-Path -LiteralPath $backupDirectory) {
@@ -102,7 +105,7 @@ try {
     (Join-Path $backupDirectory 'n8n.dump')
   )
 
-  Invoke-Compose -Arguments @('create', 'n8n')
+  Invoke-Compose -Arguments @('up', '--no-start', '--no-deps', '--no-recreate', 'n8n')
   $archiveCommand = "tar -czf /home/node/.n8n/$n8nArchiveName --exclude=./config --exclude=./$n8nArchiveName -C /home/node/.n8n ."
   Invoke-Compose -Arguments @(
     'run', '--rm', '--no-deps', '--user', 'node', '--entrypoint', 'sh',

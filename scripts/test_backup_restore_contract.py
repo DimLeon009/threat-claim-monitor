@@ -39,6 +39,10 @@ def main() -> None:
         "stop', 'n8n",
     ):
         require(fragment in BACKUP, f"Backup safety contract is missing: {fragment}")
+    require("[IO.Path]::IsPathRooted($DestinationDirectory)" in BACKUP,
+            "Windows backup must accept both absolute and repository-relative destinations")
+    require("'up', '--no-start', '--no-deps', '--no-recreate', 'n8n'" in BACKUP,
+            "Windows backup must not recreate n8n or its PostgreSQL dependency")
 
     for fragment in (
         "pg_dump",
@@ -53,7 +57,7 @@ def main() -> None:
         "backup_duration_seconds",
         "Backup duration:",
         "compose stop n8n",
-        "compose create --no-recreate n8n",
+        "compose up --no-start --no-deps --no-recreate n8n",
     ):
         require(fragment in BACKUP_SH, f"macOS backup safety contract is missing: {fragment}")
 

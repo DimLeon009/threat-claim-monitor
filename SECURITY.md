@@ -161,6 +161,9 @@ Schema-valid output may still be factually wrong. Human validation remains requi
 - Do not run privileged containers.
 - Do not publish PostgreSQL for convenience.
 - Review new volume mounts for secret or host-filesystem exposure.
+- Keep unverified community packages and unused Python Code-node execution disabled.
+- Keep the unused n8n public API, public workflow templates, and community-package installation disabled.
+- Bound Code-node execution time and Compression-node decompression size and entry count.
 - Run container vulnerability scanning before v1.0.0 releases.
 
 ## Notification security
@@ -192,14 +195,16 @@ Errors persisted in PostgreSQL should be concise, sanitized, and sufficient for 
 - Security updates may bypass normal roadmap ordering but not review and validation.
 - Major n8n or PostgreSQL upgrades require migration and rollback planning.
 
+Repository security gates and local reproduction commands are documented in the [security scanning runbook](docs/security/security-scanning.md). Gitleaks scans the complete Git history with redacted output. Trivy records all container findings and blocks every `CRITICAL` result unless an exact, reviewed, unexpired `not_affected` exception matches the current image finding.
+
 ## Security validation checklist
 
 Before v1.0.0:
 
 - [ ] Enable GitHub private vulnerability reporting.
 - [ ] Enable repository secret scanning.
-- [ ] Add container vulnerability scanning.
-- [ ] Run the n8n security audit.
+- [x] Add container vulnerability scanning.
+- [x] Run the n8n security audit.
 - [x] Test source response-size limits and malformed schemas.
 - [x] Run prompt-injection regression tests.
 - [ ] Verify SQL parameterization for all source-derived values.

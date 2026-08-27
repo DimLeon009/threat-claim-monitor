@@ -254,9 +254,9 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [ ] Windows 11 installation validation
 - [x] Apple Silicon installation validation — Docker Desktop ARM64, native Ollama connectivity, repository validation, and macOS backup verified
 - [x] Backup and restore scripts and isolated Windows exercise
-- [ ] n8n security audit
-- [ ] Secret scanning
-- [ ] Container vulnerability scanning
+- [x] n8n security audit — runtime reviewed and hardened on Windows
+- [x] Secret scanning — complete Git history validated with no leaks
+- [x] Container vulnerability scanning — pinned Trivy gate validated against the exact PostgreSQL and n8n images
 - [x] Failure-mode test suite — five transactionally isolated PostgreSQL contracts
 - [x] Configurable retention job — disabled-by-default, bounded, previewable, audited, and evidence-preserving
 - [x] Source and channel operational dashboards — read-only SQL views and manual n8n inspection workflow

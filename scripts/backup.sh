@@ -118,7 +118,7 @@ for database in threat_claim_monitor n8n; do
     "$backup_directory/$database.dump"
 done
 
-compose create --no-recreate n8n >/dev/null
+compose up --no-start --no-deps --no-recreate n8n >/dev/null
 archive_command="tar -czf /home/node/.n8n/$n8n_archive_name --exclude=./config --exclude=./$n8n_archive_name -C /home/node/.n8n ."
 compose run --rm --no-deps --user node --entrypoint sh n8n -c "$archive_command"
 n8n_archive_created=true

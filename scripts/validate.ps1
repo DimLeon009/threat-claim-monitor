@@ -159,6 +159,11 @@ try {
     throw 'Analysis provider routing runtime validation failed.'
   }
 
+  python scripts/test_security_scanning_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Security scanning contract validation failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'
