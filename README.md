@@ -125,7 +125,7 @@ HTML scraping is excluded whenever a structured public feed is available. Direct
 
 | Area | Technology | Responsibility |
 |---|---|---|
-| Orchestration | n8n 2.32.6 | Scheduling, adapters, retries, processing and dispatch |
+| Orchestration | n8n 2.36.7 | Scheduling, adapters, retries, processing and dispatch |
 | Relational storage | PostgreSQL 17.10 | Evidence, configuration, correlation and notification state |
 | Local inference | Ollama | Host-native model serving |
 | Reference model | Qwen3 8B Q4_K_M | French-language structured summarization |

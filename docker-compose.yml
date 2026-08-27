@@ -23,7 +23,7 @@ services:
       - backend
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION:-2.32.6}
+    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION:-2.36.7}
     restart: unless-stopped
     depends_on:
       postgres:

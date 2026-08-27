@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKUP = (ROOT / "scripts" / "backup.ps1").read_text(encoding="utf-8")
+BACKUP_SH = (ROOT / "scripts" / "backup.sh").read_text(encoding="utf-8")
 RESTORE = (ROOT / "scripts" / "restore.ps1").read_text(encoding="utf-8")
 RUNBOOK = (ROOT / "docs" / "operations" / "backup-and-restore.md").read_text(encoding="utf-8")
 
@@ -20,6 +21,7 @@ def require(condition: bool, message: str) -> None:
 def main() -> None:
     for database in ("threat_claim_monitor", "n8n"):
         require(database in BACKUP, f"Backup omits database {database}")
+        require(database in BACKUP_SH, f"macOS backup omits database {database}")
         require(database in RESTORE, f"Restore omits database {database}")
 
     for fragment in (
@@ -39,6 +41,23 @@ def main() -> None:
         require(fragment in BACKUP, f"Backup safety contract is missing: {fragment}")
 
     for fragment in (
+        "pg_dump",
+        "--format custom",
+        "n8n-data.tar.gz",
+        "--exclude=./config",
+        "tcm-backup-v1",
+        "hashlib.sha256",
+        "schema_migrations",
+        "application_row_counts",
+        "original_encryption_key_required",
+        "backup_duration_seconds",
+        "Backup duration:",
+        "compose stop n8n",
+        "compose create --no-recreate n8n",
+    ):
+        require(fragment in BACKUP_SH, f"macOS backup safety contract is missing: {fragment}")
+
+    for fragment in (
         "ConfirmReplaceTargetDatabases",
         "ConfirmOriginalEncryptionKey",
         "checksum mismatch",
@@ -56,12 +75,16 @@ def main() -> None:
 
     require("ComposeProjectName" in BACKUP and "ComposeProjectName" in RESTORE,
             "Isolated Compose project support is required")
+    require("compose_project_name" in BACKUP_SH,
+            "macOS backup must support an isolated Compose project")
     require(".env" not in "\n".join(
         line for line in BACKUP.splitlines() if "copy" in line.lower()
     ), "Backup must never copy .env")
 
     for forbidden in ("N8N_ENCRYPTION_KEY=", "POSTGRES_PASSWORD=", "api-key", "sig="):
         require(forbidden not in BACKUP, f"Backup script contains secret-like material: {forbidden}")
+        require(forbidden not in BACKUP_SH,
+                f"macOS backup script contains secret-like material: {forbidden}")
         require(forbidden not in RESTORE, f"Restore script contains secret-like material: {forbidden}")
 
     for phrase in (

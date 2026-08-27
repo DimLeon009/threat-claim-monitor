@@ -61,7 +61,7 @@ def main() -> int:
         "think:false",
         "temperature:0",
         "num_ctx:4096",
-        "num_predict:512",
+        "num_predict:1024",
     ):
         if fragment not in build_code:
             errors.append(f"Ollama request builder is missing {fragment}")

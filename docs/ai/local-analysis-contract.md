@@ -17,7 +17,7 @@ The primary profile is `qwen3:8b-q4_K_M`; `qwen3:4b-q4_K_M` is the explicit lowe
 | Thinking | Disabled |
 | Streaming | Disabled |
 | Context limit | 4096 tokens |
-| Output limit | 512 tokens |
+| Output limit | 1024 tokens |
 
 The connectivity check rejects an installed model whose digest differs from the profile. The 4B fallback is not silently selected: it has its own profile and must be installed and chosen explicitly.
 

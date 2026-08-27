@@ -74,6 +74,16 @@ docker compose down
 
 Never use `docker compose down --volumes` as a routine restart command.
 
+Create a verified local backup before a version update or other stateful
+maintenance:
+
+```sh
+sh scripts/backup.sh backups
+```
+
+The generated directory contains sensitive operational data and encrypted n8n
+credentials. Keep it outside Git and preserve `N8N_ENCRYPTION_KEY` separately.
+
 ## Resource guidance
 
 The foundation stack is lightweight. Qwen3 8B requires substantially more memory than n8n and PostgreSQL; stop other memory-intensive applications if inference becomes slow. The smaller Qwen3 4B variant is an explicit fallback, not a silent model substitution.
@@ -91,4 +101,3 @@ Change `N8N_PORT` in `.env`; the container continues to listen on port 5678 inte
 ### Files have unexpected executable bits
 
 The repository defines line endings through `.gitattributes`. Shell scripts may be invoked with `sh script-name.sh`, so executable-bit differences between Windows and macOS do not affect CI.
-
