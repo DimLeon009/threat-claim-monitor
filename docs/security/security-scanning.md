@@ -47,6 +47,8 @@ Trivy scans the exact images configured by Compose:
 
 The JSON report contains all severities. The evaluator prints bounded counts and fails when at least one unreviewed `CRITICAL` finding exists. `HIGH` findings remain visible for review but do not yet block this pre-release gate. The short-lived, digest-pinned Trivy container receives the Docker engine socket only while scanning so it can inspect already-downloaded images; application containers never receive that socket.
 
+CI pulls each reviewed image index by digest before invoking Trivy, so the scanner never falls back to an implicit remote lookup. The n8n release is pulled from the project's official `ghcr.io/n8n-io/n8n` package and locally tagged with the `docker.n8n.io/n8nio/n8n` Compose name. Both official registry references resolve to the same reviewed multi-architecture digest. This avoids registry rate-limit fallback without changing the scanned artifact or the exception identity.
+
 Run the scans on Windows:
 
 ```powershell

@@ -87,7 +87,22 @@ def main() -> None:
     require(CHECKOUT in WORKFLOW, "Checkout action is not commit pinned")
     require(UPLOAD in WORKFLOW, "Artifact action is not commit pinned")
     require("fetch-depth: 0" in WORKFLOW, "CI secret scan lacks complete Git history")
-    require("if: always()" in WORKFLOW, "Trivy report is lost when threshold enforcement fails")
+    require(
+        "postgres:17.10-alpine3.23@sha256:8189a1f6e40904781fc9e2612687877791d21679866db58b1de996b31fc312e4"
+        in WORKFLOW,
+        "CI PostgreSQL pull is not pinned to the reviewed image index digest",
+    )
+    require(
+        "ghcr.io/n8n-io/n8n:2.36.7@sha256:14c4285bc3034dc5b51034aea393711d27053588e460722bce523453a626f23c"
+        in WORKFLOW,
+        "CI n8n pull does not use the digest-equivalent official GHCR image",
+    )
+    require('docker pull "$SOURCE_IMAGE"' in WORKFLOW,
+            "CI does not pull the exact image before asking Trivy for a local scan")
+    require('docker tag "$SOURCE_IMAGE" "$SCAN_IMAGE"' in WORKFLOW,
+            "CI does not preserve the Compose image name for report evaluation")
+    require("hashFiles(format('security-reports/{0}.json', matrix.name))" in WORKFLOW,
+            "CI attempts to upload a Trivy report even when image acquisition failed")
     require("retention-days: 14" in WORKFLOW, "Security report retention is not bounded")
     require("permissions:\n  contents: read" in WORKFLOW, "Security workflow permissions are not read-only")
     require("@master" not in WORKFLOW and "@latest" not in WORKFLOW,
