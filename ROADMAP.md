@@ -252,7 +252,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 
 - [x] End-to-end synthetic demonstration scenario — runtime validated on Windows
 - [ ] Windows 11 installation validation
-- [ ] Apple Silicon installation validation
+- [x] Apple Silicon installation validation — Docker Desktop ARM64, native Ollama connectivity, repository validation, and macOS backup verified
 - [x] Backup and restore scripts and isolated Windows exercise
 - [ ] n8n security audit
 - [ ] Secret scanning

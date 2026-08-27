@@ -125,7 +125,7 @@ HTML scraping is excluded whenever a structured public feed is available. Direct
 
 | Area | Technology | Responsibility |
 |---|---|---|
-| Orchestration | n8n 2.32.6 | Scheduling, adapters, retries, processing and dispatch |
+| Orchestration | n8n 2.36.7 | Scheduling, adapters, retries, processing and dispatch |
 | Relational storage | PostgreSQL 17.10 | Evidence, configuration, correlation and notification state |
 | Local inference | Ollama | Host-native model serving |
 | Reference model | Qwen3 8B Q4_K_M | French-language structured summarization |
@@ -201,7 +201,7 @@ See the [installation guide](docs/operations/getting-started.md) and platform-sp
 | M3 | Evidence-grounded hybrid AI analysis | ✅ Complete; Ollama and Microsoft Foundry runtime, failure paths, and contract parity validated |
 | M4 | Auditable webhook, email, and Teams notifications | ✅ Complete; webhook, SMTP, and Teams runtime validated on Windows |
 | M5 | Multi-source coverage | ✅ Complete; RansomLook, FrenchBreaches RSS, cross-source correlation, source health, and isolated orchestration validated on Windows |
-| M6 | Hardening and v1.0.0 | 🚧 In progress; recovery, retention, dashboards, formal security review, and exclusive local/cloud analysis orchestration implemented |
+| M6 | Hardening and v1.0.0 | 🚧 In progress; recovery, retention, dashboards, formal security review, exclusive local/cloud analysis orchestration, and Apple Silicon runtime validation implemented |
 
 The detailed acceptance criteria are tracked in the [roadmap](ROADMAP.md).
 

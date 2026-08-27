@@ -13,7 +13,18 @@ The backup contains operational data and encrypted n8n credentials. Treat the wh
 
 The original `N8N_ENCRYPTION_KEY` is deliberately not copied. Store it separately in an approved password manager. Restoring the database with another key makes existing n8n credentials unreadable.
 
-## Create a backup on Windows
+## Create a backup
+
+macOS or Linux:
+
+```sh
+sh scripts/backup.sh backups
+```
+
+If `POSTGRES_USER` differs from `tcm_admin`, pass it as the second argument. To
+target another Compose project, pass its name as the third argument.
+
+Windows:
 
 Run from the repository root while PostgreSQL is healthy:
 
@@ -36,7 +47,7 @@ backups/tcm-backup-YYYYMMDDTHHMMSSZ/
 
 The `backups/` directory is ignored by Git. This is not encryption: copy the completed backup to protected storage and never commit, email, or attach it to an issue or pull request.
 
-If `POSTGRES_USER` differs from `tcm_admin`, pass `-PostgresUser`. To target another Compose project, pass `-ComposeProjectName`.
+On Windows, if `POSTGRES_USER` differs from `tcm_admin`, pass `-PostgresUser`. To target another Compose project, pass `-ComposeProjectName`.
 
 ## Restore only into an isolated project first
 

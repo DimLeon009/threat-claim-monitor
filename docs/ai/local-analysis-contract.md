@@ -17,7 +17,13 @@ The primary profile is `qwen3:8b-q4_K_M`; `qwen3:4b-q4_K_M` is the explicit lowe
 | Thinking | Disabled |
 | Streaming | Disabled |
 | Context limit | 4096 tokens |
-| Output limit | 512 tokens |
+| Output limit | 1024 tokens |
+
+The 1,024-token output limit was confirmed during the Apple Silicon runtime
+validation. Six identical trials with a 512-token limit returned truncated
+invalid JSON. Three trials with the 1,024-token limit completed with
+`done_reason = stop`, produced 542 output tokens, and passed schema and semantic
+validation.
 
 The connectivity check rejects an installed model whose digest differs from the profile. The 4B fallback is not silently selected: it has its own profile and must be installed and chosen explicitly.
 
