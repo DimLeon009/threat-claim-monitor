@@ -25,12 +25,16 @@ $resolvedReports = [IO.Path]::GetFullPath(
 )
 [IO.Directory]::CreateDirectory($resolvedReports) | Out-Null
 $reportMount = "$resolvedReports`:/reports"
+$cacheDirectory = Join-Path $resolvedReports 'trivy-cache'
+[IO.Directory]::CreateDirectory($cacheDirectory) | Out-Null
+$cacheMount = "$cacheDirectory`:/root/.cache/trivy"
 
 foreach ($entry in $images.GetEnumerator()) {
   $reportPath = Join-Path $resolvedReports "$($entry.Key).json"
   & docker run --rm --volume $reportMount `
+    --volume $cacheMount `
     --volume '/var/run/docker.sock:/var/run/docker.sock' $trivyImage `
-    image --skip-version-check --scanners vuln --format json `
+    image --cache-dir /root/.cache/trivy --skip-version-check --scanners vuln --format json `
     --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL `
     --output "/reports/$($entry.Key).json" $entry.Value
   if ($LASTEXITCODE -ne 0) {

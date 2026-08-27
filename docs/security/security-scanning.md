@@ -59,7 +59,7 @@ Run them on macOS or Linux:
 sh scripts/security/scan-containers.sh
 ```
 
-Local JSON reports are written under `security-reports/`, which Git ignores. CI retains each report as a repository-access-controlled artifact for 14 days. Reports contain package and vulnerability metadata, not application secrets, but should still not be published without review.
+Local JSON reports and the reusable Trivy vulnerability-database cache are written under `security-reports/`, which Git ignores. Reusing the cache avoids downloading the database separately for every image while Trivy still applies its normal freshness checks. CI retains each report as a repository-access-controlled artifact for 14 days. Reports contain package and vulnerability metadata, not application secrets, but should still not be published without review.
 
 ## Vulnerability review
 
@@ -74,6 +74,18 @@ For every `CRITICAL` finding:
 If no compatible fixed image exists, do not silently ignore the result. An exception is permitted only when applicability has been reviewed and the affected execution path is demonstrably unreachable. `security/trivy-exceptions.json` binds the decision to the exact image name, vulnerability, target binary, package, and installed version. It also requires an owner, rationale, references, and expiry date. Missing, expired, stale, broader, or unmatched exceptions fail closed.
 
 The current PostgreSQL image contains `gosu` built with Go `1.24.6`, which Trivy associates with `CVE-2025-68121`. The official [Go advisory](https://pkg.go.dev/vuln/GO-2026-4337) affects TLS session resumption. The official [gosu security guidance](https://github.com/tianon/gosu/blob/master/SECURITY.md) requires call-graph applicability rather than treating every compiled standard-library symbol as reachable. `gosu` performs local identity resolution, credential switching, and process execution; it does not exercise the affected TLS path. The exact `not_affected` exception expires on 20 November 2026 and must be removed earlier when the pinned PostgreSQL image no longer contains the finding.
+
+### Validation evidence — 27 August 2026
+
+The local release-gate reproduction completed with the pinned scanners and images:
+
+- Gitleaks `v8.30.1` scanned all 25 Git commits and reported no leaks;
+- Trivy `v0.74.0` scanned `postgres:17.10-alpine3.23` and reported 1 `UNKNOWN`, 14 `LOW`, 27 `MEDIUM`, 23 `HIGH`, and 1 `CRITICAL` finding;
+- the PostgreSQL `CRITICAL` finding was the exact reviewed `CVE-2025-68121` `gosu` exception described above, so no unreviewed critical finding remained;
+- Trivy scanned `docker.n8n.io/n8nio/n8n:2.36.7` at image digest `sha256:14c4285bc3034dc5b51034aea393711d27053588e460722bce523453a626f23c` and reported 12 `LOW`, 12 `MEDIUM`, 3 `HIGH`, and no `UNKNOWN` or `CRITICAL` finding;
+- both container gates passed and their local JSON reports remained under the ignored `security-reports/` directory.
+
+These counts are time-bound evidence, not a permanent allow-list. A later advisory-database update may change them and must be evaluated afresh.
 
 ## Boundaries
 
@@ -99,3 +111,15 @@ Review the report rather than treating every listed node as an exploitable defec
 - Previous workflow versions should not remain in the live n8n instance once their repository exports and rollback evidence are preserved.
 
 The self-hosted instance disables diagnostics, personalization, the public API, public workflow templates, community-package installation, unverified packages, and unused Python Code-node execution. Version notifications remain enabled so supported security updates stay visible.
+
+### Runtime audit evidence — 27 August 2026
+
+After the backed-up upgrade from n8n `2.35.5` to `2.36.7`, the native audit completed successfully. Its findings were reviewed as follows:
+
+- the reported PostgreSQL nodes either execute constant control queries or use the repository-reviewed parameterization and persistence contracts for dynamic values;
+- the reported Code and HTTP Request nodes are required adapters whose input allow-lists, destination constraints, output validation, timeouts, and sanitized failure paths are covered by repository tests;
+- the unused `Microsoft Teams Workflow signature` credential belongs to the intentionally dormant Teams dispatcher and must be deleted if that channel is retired, or rotated before production activation;
+- the instance report confirmed that community packages, templates, the public API, and diagnostics are disabled;
+- n8n started its internal JavaScript task runner, left Python unavailable, applied its internal migrations, and reactivated the seven expected production workflows.
+
+The audit is a review aid rather than a zero-finding gate. Any new node, credential, or enabled capability requires a fresh disposition.

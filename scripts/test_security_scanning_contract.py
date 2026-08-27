@@ -80,6 +80,10 @@ def main() -> None:
                 "Trivy cannot inspect images already present in the Docker engine")
         require("--skip-version-check" in content, "Trivy version notices are not suppressed")
 
+    for content in (CONTAINER_PS, CONTAINER_SH):
+        require("/root/.cache/trivy" in content,
+                "Trivy vulnerability database cache is not persisted between local image scans")
+
     require(CHECKOUT in WORKFLOW, "Checkout action is not commit pinned")
     require(UPLOAD in WORKFLOW, "Artifact action is not commit pinned")
     require("fetch-depth: 0" in WORKFLOW, "CI secret scan lacks complete Git history")

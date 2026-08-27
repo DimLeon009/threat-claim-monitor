@@ -203,8 +203,8 @@ Before v1.0.0:
 
 - [ ] Enable GitHub private vulnerability reporting.
 - [ ] Enable repository secret scanning.
-- [ ] Add container vulnerability scanning.
-- [ ] Run the n8n security audit.
+- [x] Add container vulnerability scanning.
+- [x] Run the n8n security audit.
 - [x] Test source response-size limits and malformed schemas.
 - [x] Run prompt-injection regression tests.
 - [ ] Verify SQL parameterization for all source-derived values.

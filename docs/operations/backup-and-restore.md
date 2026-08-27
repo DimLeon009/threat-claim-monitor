@@ -33,6 +33,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/backup.ps1 `
   -DestinationDirectory backups
 ```
 
+The destination may be repository-relative, as above, or an absolute path to
+protected storage outside the repository, for example `C:\Dev\tcm-backups`.
+
 The script briefly stops n8n to keep its database and volume consistent, creates a timestamped directory, verifies the files, removes bounded container-side temporary files, and restarts n8n if it was initially running.
 
 Expected files:
