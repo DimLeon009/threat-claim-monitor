@@ -2,7 +2,7 @@
 
 ## Scope
 
-Milestone 3 uses host-native Ollama only to summarize bounded normalized evidence in French. The model has no tools, retrieval, browser, credentials, workflow control, or authority over organization matching, confidence, verification, notifications, or operational actions.
+V1 uses host-native Ollama only to summarize bounded normalized evidence in French. The model has no tools, retrieval, browser, credentials, workflow control, or authority over organization matching, confidence, verification, notifications, or operational actions.
 
 The primary profile is `qwen3:8b-q4_K_M`; `qwen3:4b-q4_K_M` is the explicit lower-memory fallback. Profiles, runtime limits, prompts, and the output schema live under `ai/` and are reviewed like application code.
 
@@ -44,7 +44,13 @@ The JSON Schema is supplied both in the prompt and as Ollama’s `format` value.
 
 `additionalProperties` is false. Local semantic validation also rejects unknown evidence identifiers, URLs, control-field names, and claims that an incident or compromise is confirmed. Invalid output is discarded and replaced by the deterministic fallback; it never blocks claim processing.
 
-Ollama documents JSON Schema objects in `format`, temperature zero for more deterministic output, `think = false`, and `keep_alive = 0` for immediate unloading. See the official [structured-output](https://docs.ollama.com/capabilities/structured-outputs), [chat API](https://docs.ollama.com/api/chat), and [thinking](https://docs.ollama.com/capabilities/thinking) documentation.
+WF-40 uses a `5m` keep-alive window to avoid reloading the model between bounded
+jobs. The standalone smoke test can request immediate unloading afterward.
+Ollama documents JSON Schema objects in `format`, temperature zero for more
+deterministic output, and `think = false`. See the official
+[structured-output](https://docs.ollama.com/capabilities/structured-outputs),
+[chat API](https://docs.ollama.com/api/chat), and
+[thinking](https://docs.ollama.com/capabilities/thinking) documentation.
 
 ## Workflow and persistence
 

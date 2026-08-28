@@ -5,7 +5,7 @@
 - macOS on Apple Silicon
 - Docker Desktop with Docker Compose v2
 - Git
-- native Ollama from Milestone 3 onward
+- native Ollama when local AI analysis is selected
 
 ## Why Ollama runs natively
 
@@ -13,7 +13,7 @@ Docker Desktop on macOS does not provide Linux containers with direct Apple Meta
 
 ```mermaid
 flowchart LR
-    B["Browser"] -->|"localhost:5678"| N["n8n container"]
+    B["Browser"] -->|"localhost:N8N_PORT"| N["n8n container"]
     N --> P[("PostgreSQL container")]
     N -->|"host.docker.internal:11434"| O["Native Ollama + Metal"]
     N --> I["Public CTI APIs"]
@@ -39,11 +39,14 @@ docker compose up -d
 docker compose ps
 ```
 
-Open <http://localhost:5678> and create the local owner account.
+Open the host port configured by `N8N_PORT` (5678 by default), create the local
+owner account, then complete
+[workflow deployment](../operations/workflow-deployment.md). A fresh n8n
+database contains no project workflows or credentials.
 
 ## Ollama
 
-When Milestone 3 begins:
+When local AI analysis is selected:
 
 ```sh
 ollama pull qwen3:8b-q4_K_M

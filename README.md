@@ -159,6 +159,7 @@ Versions are pinned in `.env.example` and updated deliberately through reviewed 
 ├── n8n/
 │   └── workflows/            Version-controlled workflow exports
 ├── scripts/                  Cross-platform repository validation
+├── SUPPORT.md                Help, issue, pull-request, and security-report routing
 ├── .env.example              Safe configuration template
 ├── docker-compose.yml        Local reference deployment
 └── ROADMAP.md                Milestones and acceptance criteria
@@ -168,10 +169,11 @@ Versions are pinned in `.env.example` and updated deliberately through reviewed 
 
 ### Prerequisites
 
+- Git and Python 3
 - Windows 11 or macOS on Apple Silicon
 - Docker Desktop with Docker Compose v2
 - 4 GB of free memory for the foundation stack
-- Ollama only from Milestone 3 onward
+- Ollama and additional memory when local AI analysis is selected
 
 ### Windows
 
@@ -191,7 +193,16 @@ sh scripts/validate.sh
 docker compose up -d
 ```
 
-Open <http://localhost:5678> and create the local n8n owner account. PostgreSQL initializes the n8n database, the application database, migration history, monitored organizations, aliases, and initial sources on first start.
+Open `http://localhost:<N8N_PORT>` using the value from `.env` and create the
+local n8n owner account. PostgreSQL initializes both databases, migration
+history, monitored organizations, aliases, and initial sources on first start.
+
+A fresh n8n database contains **zero workflows and zero credentials**. Starting
+Compose is therefore only the platform step, not a complete application
+deployment. Continue with the [workflow deployment
+guide](docs/operations/workflow-deployment.md) to import the 13 sanitized
+exports, create the PostgreSQL credential, connect sub-workflows, establish
+silent baselines, and publish only the reviewed schedules.
 
 See the [installation guide](docs/operations/getting-started.md) and platform-specific development guides for [Windows](docs/development/windows.md) and [macOS](docs/development/macos.md).
 
@@ -233,8 +244,11 @@ Key documents:
 - [Threat model](docs/security/threat-model.md)
 - [V1 architecture and threat-model review](docs/security/v1-architecture-threat-review.md)
 - [Getting started](docs/operations/getting-started.md)
+- [Workflow deployment](docs/operations/workflow-deployment.md)
+- [Remote administration](docs/operations/remote-administration.md)
 - [Infrastructure notes](infra/README.md)
 - [Contributing](CONTRIBUTING.md)
+- [Support and reporting](SUPPORT.md)
 
 ## 💡 Engineering philosophy
 
@@ -247,7 +261,11 @@ Key documents:
 
 ## 🤝 Contributing
 
-Contributions and constructive reviews are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), use a structured issue, and keep pull requests focused on one observable outcome.
+Contributions and constructive reviews are welcome. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md), use a structured issue, and keep pull
+requests focused on one observable outcome. For installation help, bugs,
+features, pull requests, or private security reports, use the routing guide in
+[SUPPORT.md](SUPPORT.md).
 
 ## ⚠️ Disclaimer
 

@@ -56,8 +56,9 @@ python3 scripts/validate_source_fixtures.py
 
 ## Workflow deployment
 
-Apply migrations `002_ransomware_live_ingestion.sql` through
-`007_collection_run_correlation.sql` to an existing development database before importing the workflow:
+Fresh installations apply every migration automatically. For an existing
+volume, back up first, then apply every missing migration in numeric order; do
+not skip migrations 004 through 006 or rewrite an applied file. For example:
 
 ```sh
 docker compose exec postgres psql \
@@ -73,6 +74,12 @@ docker compose exec postgres psql \
 docker compose exec postgres psql \
   --username tcm_admin \
   --dbname threat_claim_monitor \
+  --file /migrations/004_matching_normalization.sql
+
+# Continue with 005 and 006, then:
+docker compose exec postgres psql \
+  --username tcm_admin \
+  --dbname threat_claim_monitor \
   --file /migrations/007_collection_run_correlation.sql
 ```
 
@@ -80,7 +87,10 @@ Import `n8n/workflows/wf-10-collect-ransomware-live.json` and `n8n/workflows/wf-
 
 In `WF-00 Orchestrator`, configure `Collect ransomware.live` to call `WF-10 Collect ransomware.live` and assign the PostgreSQL credential to its enable gate. Migration 021 adds a parallel RansomLook gate and collector branch. Database workflow and credential identifiers are intentionally absent from the committed export because they are local to each n8n instance.
 
-Both workflows remain inactive after import. Run `WF-10` manually to establish and inspect the baseline, then test `WF-00` manually before publishing only the orchestrator. `WF-10` remains callable as a sub-workflow and does not own the schedule.
+Both exports remain inactive after import. Run `WF-10` manually to establish and
+inspect the baseline, publish it so WF-00 can call it, then test and publish
+WF-00. WF-10 does not own a schedule. See the complete
+[workflow deployment guide](../operations/workflow-deployment.md).
 
 ## Processing path
 

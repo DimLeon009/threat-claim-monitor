@@ -2,7 +2,10 @@
 
 ## Scope
 
-`find_exact_organization_matches` evaluates normalized victim evidence against enabled organizations and explicitly approved aliases. It returns candidates but does not create claims or notifications; those transactional steps belong to the next M2 increment.
+`find_exact_organization_matches` evaluates normalized victim evidence against
+enabled organizations and explicitly approved aliases. Called alone, it remains
+read-only. The implemented correlation functions persist claims, links, and
+matches; notification eligibility is handled through the durable outbox.
 
 The function implements three automatic-match methods:
 

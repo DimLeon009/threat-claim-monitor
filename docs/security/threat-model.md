@@ -277,7 +277,7 @@ remediation. An operator must still investigate and act.
 | R-03 | Notification delivery is at-least-once | Stable alert ID, outbox lease, bounded retry, and receiver idempotency | No |
 | R-04 | Model output can be inaccurate despite schema validity | Evidence references, uncertainty, deterministic authority, and analyst review | No |
 | R-05 | Backups are not encrypted by repository tooling | Local V1 is limited to protected operator storage; production is prohibited until an approved encrypted destination and recovery objectives are documented | Yes for production |
-| R-06 | Apple Silicon behavior has not yet been validated for the release candidate | Complete macOS installation and smoke test | Yes |
+| R-06 | Apple Silicon regression after dependency or workflow changes | Re-run the documented macOS installation, architecture, Ollama, workflow, and backup checks for release-impacting changes | Yes |
 | R-07 | Notification channels and dispatchers require explicit runtime activation | Keep channels disabled until matching dispatcher and credential are reviewed | Yes for live delivery |
 
 ## Security validation status

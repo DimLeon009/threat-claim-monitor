@@ -56,4 +56,6 @@ Run the contract validation with:
 python3 scripts/test_matching_contract.py
 ```
 
-The SQL migration is `004_matching_normalization.sql`. Exact organization matching and claim correlation build on these functions in the next M2 increment.
+The SQL migration is `004_matching_normalization.sql`. The implemented exact
+matching and transactional correlation functions in later migrations build on
+this normalization contract.

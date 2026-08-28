@@ -149,6 +149,11 @@ try {
     throw 'V1 release-readiness contract validation failed.'
   }
 
+  python scripts/test_documentation_coherence.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Documentation coherence validation failed.'
+  }
+
   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_failure_modes.ps1
   if ($LASTEXITCODE -ne 0) {
     throw 'Failure-mode runtime suite failed.'

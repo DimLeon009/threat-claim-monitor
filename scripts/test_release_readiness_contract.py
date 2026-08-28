@@ -34,6 +34,9 @@ def main() -> int:
     environment = read(".env.example")
     compose = read("docker-compose.yml")
     security_workflow = read(".github/workflows/security.yml")
+    support = read("SUPPORT.md")
+    workflow_deployment = read("docs/operations/workflow-deployment.md")
+    remote_administration = read("docs/operations/remote-administration.md")
 
     for fragment in (
         "## [Unreleased]",
@@ -73,6 +76,13 @@ def main() -> int:
     require("v1-release-checklist.md" in readme, "README does not link the release checklist", errors)
     require("v1-release-checklist.md" in docs_index, "documentation index omits release checklist", errors)
     require("backup-storage-decision.md" in docs_index, "documentation index omits storage decision", errors)
+    require("workflow-deployment.md" in docs_index, "documentation index omits workflow deployment", errors)
+    require("remote-administration.md" in docs_index, "documentation index omits remote administration", errors)
+    require("security/advisories/new" in support, "support guide omits private vulnerability reporting", errors)
+    require("13 sanitized" in workflow_deployment or "13 |" in workflow_deployment,
+            "workflow deployment does not cover all exports", errors)
+    require("SSH tunnel" in remote_administration,
+            "remote administration omits the private administration path", errors)
 
     for fragment in (
         "- [x] Release checklist and changelog",

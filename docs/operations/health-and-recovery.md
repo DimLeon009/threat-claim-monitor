@@ -16,7 +16,7 @@ Expected state:
 
 - PostgreSQL reports healthy;
 - n8n remains running after PostgreSQL becomes healthy;
-- <http://localhost:5678> responds locally;
+- `http://localhost:<N8N_PORT>` responds locally (5678 by default);
 - no PostgreSQL authentication loop appears in logs.
 
 ## Database verification
@@ -48,10 +48,18 @@ Do not add `--volumes`. Named volumes hold the n8n credential store and both Pos
 
 | Symptom | First checks | Safe action |
 |---|---|---|
+| Docker cannot connect to its daemon | Docker Desktop or Docker Engine status and active context | Start Docker; do not delete volumes |
+| Host port 5678 is unavailable | `N8N_PORT` and the process already using the port | Set an unused host port in `.env`, then recreate n8n |
 | n8n does not start | PostgreSQL health and credentials | Correct `.env`, restart n8n |
+| n8n opens but has no workflows | Whether this is a fresh n8n database | Follow the workflow deployment guide; this is expected on first start |
+| A node reports a missing credential | Credential name and node assignment | Create the documented credential and assign it; never paste a secret into a workflow export |
+| WF-00 reports an unpublished or missing sub-workflow | Its five Execute Sub-workflow mappings | Publish the target first and select it again in WF-00 |
+| A gate says `No output data returned` | Source switch, due time, provider route, or empty queue | Treat it as an expected skip when the corresponding condition is false |
+| Migration-dependent SQL is missing | `schema_migrations` versus `db/migrations` | Back up and apply each missing migration once in numeric order |
 | PostgreSQL is unhealthy | Logs, disk space, volume mount | Stop writes and preserve volume before deeper repair |
 | Credentials cannot be decrypted | `N8N_ENCRYPTION_KEY` consistency | Restore the original key; do not recreate credentials blindly |
 | Ollama unavailable | Host process and `/api/tags` | Use fallback path; restart Ollama independently |
+| First collector run creates no alert | `is_baseline` and inserted count | Expected: the first successful source run is historical and silent |
 | One source repeatedly fails | Last collection runs and schema errors | Disable only that source while investigating |
 | Notifications remain pending | Channel credentials and endpoint response | Correct channel, then retry outbox jobs |
 | Notifications reach dead-letter | Attempt history and sanitized errors | Resolve cause and explicitly requeue selected jobs |
@@ -171,3 +179,7 @@ When reporting an issue, include:
 - steps already attempted.
 
 Never include `.env`, authorization headers, webhook URLs, raw stolen data, or unredacted personal information.
+
+Use [Support and reporting](../../SUPPORT.md) to choose a help request, bug,
+feature request, implementation task, pull request, or private vulnerability
+report. Suspected vulnerabilities must never be posted in a public issue.

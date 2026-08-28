@@ -51,7 +51,9 @@ Migration 014 adds a bounded lease to each outbox job. A worker calls `claim_not
 
 Pending and retry jobs become eligible only when `available_at` is reached. A processing job can be reclaimed only after its lease expires. Reclaiming generates a new unpredictable lease token; the previous worker must therefore not be allowed to record a delivery result with its stale token. Lease duration is constrained to 30–900 seconds.
 
-The migration safely returns any pre-existing unleased `processing` row to `retry`. External delivery is still absent from this increment.
+Migration 014 safely returns any pre-existing unleased `processing` row to
+`retry`; it does not itself deliver externally. Delivery is implemented by the
+separate WF-60, WF-61, and WF-62 adapters.
 
 ## Delivery results, retry, and dead-letter
 

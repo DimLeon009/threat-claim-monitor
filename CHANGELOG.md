@@ -46,5 +46,11 @@ the complete V1 release candidate remains under `Unreleased`.
 - Immutable PostgreSQL migration history through migration 026.
 - Documented source switches, analysis-provider selection, notification-channel
   activation, recovery, retention, health inspection, and release procedure.
+- Beginner installation and workflow-deployment paths with explicit fresh-n8n,
+  credential, sub-workflow, baseline, and troubleshooting behavior.
+- Support routing for help, bugs, features, implementation tasks, pull requests,
+  and private vulnerability reports.
+- Remote single-administrator guidance that preserves localhost exposure through
+  SSH or VPN and treats public HTTPS hosting as a separate deployment review.
 
 The release commit will replace `Unreleased` with `1.0.0` and its release date.

@@ -77,6 +77,11 @@ The domain layer is implemented initially through explicit n8n transformations a
 
 ## Reference deployment
 
+The repository contains 13 sanitized, inactive workflow exports. A new n8n
+database does not import them automatically; follow
+[Workflow deployment](../operations/workflow-deployment.md) after starting the
+containers.
+
 ```mermaid
 flowchart LR
     USER["Operator browser"]
@@ -341,7 +346,10 @@ The complete abuse-case analysis is in the [threat model](../security/threat-mod
 | PostgreSQL | 5432 | None | n8n on internal network |
 | Ollama | 11434 | Host-local service | n8n through host bridge |
 
-The reference configuration is for local development and single-host internal use. Internet exposure requires an authenticated TLS reverse proxy and a separate deployment review.
+The reference configuration is for local development and single-host internal
+use. Administer a remote private host through SSH forwarding or a VPN. Internet
+exposure requires an authenticated TLS reverse proxy and a separate deployment
+review; see [Remote administration](../operations/remote-administration.md).
 
 ## Failure behavior
 
