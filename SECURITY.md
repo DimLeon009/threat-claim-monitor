@@ -207,7 +207,7 @@ Before v1.0.0:
 - [x] Run the n8n security audit.
 - [x] Test source response-size limits and malformed schemas.
 - [x] Run prompt-injection regression tests.
-- [ ] Verify SQL parameterization for all source-derived values.
+- [x] Verify SQL parameterization for all source-derived values.
 - [x] Test notification retry and dead-letter behavior.
 - [x] Complete backup and restore exercise.
 - [x] Review retention and deletion behavior.

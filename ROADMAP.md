@@ -262,6 +262,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [x] Source and channel operational dashboards — read-only SQL views and manual n8n inspection workflow
 - [x] Architecture and threat-model review — completed with explicit residual-risk register and open release gates
 - [x] Exclusive local/cloud analysis orchestration — database-selected, fail-closed, and non-retroactive
+- [x] Source-derived SQL parameterization review — explicit workflow-node inventory, positional parameters, and dynamic-SQL regression gate
 - [ ] Release checklist, changelog, and tagged `v1.0.0`
 - [ ] Portfolio screenshots and concise demonstration guide
 

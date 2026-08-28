@@ -55,6 +55,7 @@ database contents were intentionally outside the repository review.
 | F-05 | Medium | Apple Silicon installation had not been validated for the release candidate | Native ARM64 containers, localhost exposure, Ollama connectivity, repository validation, and backup were verified on Apple Silicon | Closed |
 | F-06 | Low | Workflow exports are intentionally inactive and credential-free, so Git cannot prove runtime publication state | Retain import and runtime verification steps in operations documentation | Accepted |
 | F-07 | Low | Operational dashboards are diagnostic snapshots without paging or remediation | Require operator investigation; do not add automatic requeue or source enablement | Accepted |
+| F-08 | High | Source-derived values could become SQL query text if a workflow were changed without parameterization review | All 33 PostgreSQL nodes are inventoried; 17 use positional parameters, 16 are fixed, migrations contain no dynamic SQL, and CI rejects unreviewed changes | Closed |
 
 ## Trust-boundary conclusions
 
@@ -69,8 +70,9 @@ not automatically followed.
 
 PostgreSQL is not host-published. Constraints, fixed functions, query
 replacement parameters, transaction boundaries, and immutable migrations form
-the durable validation layer. A complete source-derived SQL review remains a
-release task rather than an assumption of this documentation review.
+the durable validation layer. The complete source-derived SQL review inventories
+every PostgreSQL workflow node, prohibits expression interpolation in SQL text,
+and rejects dynamic SQL in migrations through an automated repository contract.
 
 ### Local and cloud inference
 
@@ -101,8 +103,8 @@ Do not tag v1.0.0 until the remaining release-readiness tasks and applicable
 production gates are closed or explicitly accepted with documented rationale.
 The selected n8n image, Windows and Apple Silicon installations, and exclusive
 analysis invocation route have now passed their runtime validation. The complete
-source-derived SQL review and protected production backup-storage decision remain
-explicitly open.
+source-derived SQL review is closed; the protected production backup-storage
+decision remains explicitly open.
 
 ## Review triggers
 
