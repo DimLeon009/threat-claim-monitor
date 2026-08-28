@@ -164,6 +164,11 @@ try {
     throw 'Security scanning contract validation failed.'
   }
 
+  python scripts/test_windows_installation_contract.py
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Windows clean-install contract validation failed.'
+  }
+
   $migrationFiles = @(Get-ChildItem 'db/migrations' -File -Filter '*.sql')
   if ($migrationFiles.Count -eq 0) {
     throw 'At least one database migration is required.'

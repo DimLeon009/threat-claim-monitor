@@ -58,6 +58,20 @@ Open <http://localhost:5678> and create the n8n owner account.
 
 On the first start, PostgreSQL creates the `n8n` and `threat_claim_monitor` databases and applies all migrations currently present in `db/migrations`.
 
+### Reproduce a clean Windows first start
+
+The release validation can create and remove a separate Compose project without
+changing the active installation:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_windows_installation.ps1
+```
+
+The isolated project uses fresh volumes and port `25678` by default. It verifies
+database initialization, migrations, seed data, n8n health and version, and host
+network exposure, then removes only its own temporary resources. Pass
+`-N8nPort <unused-port>` when the default test port is unavailable.
+
 ## 4. Verify the application database
 
 ```powershell

@@ -251,7 +251,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 ### Deliverables
 
 - [x] End-to-end synthetic demonstration scenario — runtime validated on Windows
-- [ ] Windows 11 installation validation
+- [x] Windows 11 installation validation — clean isolated Compose initialization, migrations, seed data, health, and network exposure verified
 - [x] Apple Silicon installation validation — Docker Desktop ARM64, native Ollama connectivity, repository validation, and macOS backup verified
 - [x] Backup and restore scripts and isolated Windows exercise
 - [x] n8n security audit — runtime reviewed and hardened on Windows
