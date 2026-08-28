@@ -90,6 +90,7 @@ This directory contains the technical, operational, and security documentation f
 | [Threat model](security/threat-model.md) | Assets, adversaries, boundaries, abuse cases, and controls |
 | [V1 architecture and threat-model review](security/v1-architecture-threat-review.md) | Reviewed deployment evidence, findings, residual risks, and release gates |
 | [Security scanning](security/security-scanning.md) | Complete-history secret detection, container vulnerability gates, and triage |
+| [SQL parameterization review](security/sql-parameterization-review.md) | Reviewed PostgreSQL-node inventory, dynamic-SQL boundary, and automated regression gate |
 
 ## Documentation conventions
 

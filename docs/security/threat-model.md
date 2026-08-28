@@ -295,11 +295,11 @@ Completed and evidenced in repository contracts or runtime exercises:
 The release candidate now has complete-history secret scanning, pinned container
 vulnerability gates, a reviewed n8n runtime audit, validated Windows and Apple
 Silicon network exposure, and runtime verification of exclusive analysis
-routing.
+routing. Every committed PostgreSQL workflow node and migration is covered by
+the automated source-derived SQL parameterization review.
 
 Remaining before v1.0.0 where applicable:
 
-- complete source-derived SQL parameterization review;
 - protected backup-storage decision for production use.
 
 Review this model whenever a service, source class, authentication mechanism,

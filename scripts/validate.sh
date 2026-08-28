@@ -43,6 +43,7 @@ python3 scripts/test_retention_contract.py
 python3 scripts/test_operational_dashboards_contract.py
 python3 scripts/test_architecture_threat_model_review.py
 python3 scripts/test_analysis_provider_routing_contract.py
+python3 scripts/test_sql_parameterization_contract.py
 sh scripts/test_failure_modes.sh
 sh scripts/test_retention.sh
 sh scripts/test_operational_dashboards.sh
