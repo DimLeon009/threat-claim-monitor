@@ -211,7 +211,7 @@ Before v1.0.0:
 - [x] Test notification retry and dead-letter behavior.
 - [x] Complete backup and restore exercise.
 - [x] Review retention and deletion behavior.
-- [ ] Verify Windows and macOS network exposure.
+- [x] Verify Windows and macOS network exposure.
 
 ## Threat model
 

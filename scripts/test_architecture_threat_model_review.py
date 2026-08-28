@@ -81,13 +81,16 @@ def main() -> int:
             errors.append(f"threat model is missing reviewed risk material: {fragment}")
 
     for fragment in (
-        "Status:** Completed with open release gates",
+        "Status:** Completed with open release-readiness and production gates",
         "F-01",
         "F-02",
         "F-05",
         "Do not tag v1.0.0",
         "Migration 026",
         "selected n8n image",
+        "| F-02 | Critical when exploitable",
+        "| F-05 | Medium",
+        "| Closed |",
     ):
         if fragment not in REVIEW:
             errors.append(f"formal review is missing a release conclusion: {fragment}")

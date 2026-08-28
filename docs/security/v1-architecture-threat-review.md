@@ -1,8 +1,9 @@
 # V1 architecture and threat-model review
 
 - **Review date:** 2026-08-21
+- **Last evidence update:** 2026-08-28
 - **Scope:** repository state after migrations 001–026 and all committed workflows WF-00–WF-99
-- **Status:** Completed with open release gates
+- **Status:** Completed with open release-readiness and production gates
 
 ## Review objective
 
@@ -18,7 +19,7 @@ recorded and testable.
 
 - Docker Compose service, network, port, volume, and environment configuration;
 - all committed n8n workflow exports from WF-00 through WF-71;
-- PostgreSQL migrations 001–025 and the data-model documentation;
+- PostgreSQL migrations 001–026 and the data-model documentation;
 - source, matching, inference, notification, backup, retention, dashboard, and
   failure-mode contracts;
 - ADR-0001 and ADR-0002;
@@ -48,10 +49,10 @@ database contents were intentionally outside the repository review.
 | ID | Severity | Finding | Decision or required action | Status |
 |---|---|---|---|---|
 | F-01 | High | The original WF-00 export invoked collectors but not WF-40 or WF-41 | Migration 026 and the updated WF-00 now select exactly one ready provider every minute, with no dual mode, implicit fallback, or historical backfill | Closed |
-| F-02 | Critical when exploitable | A stable n8n image must not ship with an unresolved critical container or sandbox finding | Keep the service localhost-only and block v1.0.0 until the selected stable image passes the defined scan and audit | Open release gate |
+| F-02 | Critical when exploitable | A stable n8n image must not ship with an unresolved critical container or sandbox finding | n8n 2.36.7 passed the pinned container gate with no critical finding; the native audit and localhost-only runtime were reviewed | Closed |
 | F-03 | Medium | Notification channels and dispatchers are separate runtime switches | Keep each channel disabled until its dispatcher, credential, and destination are reviewed together | Controlled operational gate |
 | F-04 | Medium | Backup confidentiality depends on operator-managed storage | Require protected encrypted storage and separate preservation of `N8N_ENCRYPTION_KEY` for production | Open production gate |
-| F-05 | Medium | Apple Silicon installation has not been validated for the release candidate | Complete macOS installation, network, Ollama, and synthetic smoke tests | Open release gate |
+| F-05 | Medium | Apple Silicon installation had not been validated for the release candidate | Native ARM64 containers, localhost exposure, Ollama connectivity, repository validation, and backup were verified on Apple Silicon | Closed |
 | F-06 | Low | Workflow exports are intentionally inactive and credential-free, so Git cannot prove runtime publication state | Retain import and runtime verification steps in operations documentation | Accepted |
 | F-07 | Low | Operational dashboards are diagnostic snapshots without paging or remediation | Require operator investigation; do not add automatic requeue or source enablement | Accepted |
 
@@ -96,11 +97,12 @@ and encryption therefore remain deployment responsibilities.
 The architecture is coherent for a localhost-only, single-operator V1 and the
 threat model now covers every implemented external and destructive boundary.
 
-Do not tag v1.0.0 until the remaining release-gate findings in the residual risk
-register are closed or explicitly accepted with documented rationale. In
-particular, the selected n8n image must pass security validation. The analysis
-invocation design gate was closed by migration 026 and must still receive a
-runtime smoke test after importing the updated workflows.
+Do not tag v1.0.0 until the remaining release-readiness tasks and applicable
+production gates are closed or explicitly accepted with documented rationale.
+The selected n8n image, Windows and Apple Silicon installations, and exclusive
+analysis invocation route have now passed their runtime validation. The complete
+source-derived SQL review and protected production backup-storage decision remain
+explicitly open.
 
 ## Review triggers
 

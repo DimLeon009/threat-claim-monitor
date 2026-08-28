@@ -48,6 +48,7 @@ sh scripts/test_retention.sh
 sh scripts/test_operational_dashboards.sh
 sh scripts/test_analysis_provider_routing.sh
 python3 scripts/test_security_scanning_contract.py
+python3 scripts/test_windows_installation_contract.py
 
 for migration in db/migrations/*.sql; do
   filename=$(basename "$migration")

@@ -292,15 +292,14 @@ Completed and evidenced in repository contracts or runtime exercises:
 - read-only operational dashboard data minimization;
 - Windows localhost binding and PostgreSQL non-publication.
 
-Open before v1.0.0 where applicable:
+The release candidate now has complete-history secret scanning, pinned container
+vulnerability gates, a reviewed n8n runtime audit, validated Windows and Apple
+Silicon network exposure, and runtime verification of exclusive analysis
+routing.
 
-- automated secret scanning;
-- dependency and container vulnerability scanning;
-- n8n security audit in CI or release procedure;
+Remaining before v1.0.0 where applicable:
+
 - complete source-derived SQL parameterization review;
-- stable corrected n8n image validation;
-- Apple Silicon installation and network-exposure validation;
-- runtime verification of the selected analysis route after every workflow import;
 - protected backup-storage decision for production use.
 
 Review this model whenever a service, source class, authentication mechanism,
