@@ -2,6 +2,9 @@
 
 This M6 scenario proves the complete application path without representing a real incident and without contacting a real notification recipient. It creates a uniquely marked source, organization, collection run, and observation; then it exercises the production correlation, exact matching, analysis persistence, notification outbox, webhook delivery, and audit contracts.
 
+For a short reviewer-facing sequence and the mandatory screenshot-sanitization
+rules, follow the [V1 release demonstration guide](release-demonstration.md).
+
 The scenario is deliberately separate from public-source fixtures. Every inserted row carries the marker `m6-end-to-end-v1`, the organization is named `TCM Synthetic Demo Organization`, and the receiver rejects any other organization.
 
 ## Safety boundary
@@ -15,15 +18,33 @@ The scenario is deliberately separate from public-source fixtures. Every inserte
 
 ## One-time n8n setup
 
-Import `n8n/workflows/wf-99-receive-synthetic-demo.json`. Create a local Header Auth credential with a random value, attach it to `Receive synthetic notification`, publish the workflow, and keep the production URL local:
+Import `n8n/workflows/wf-99-receive-synthetic-demo.json`. Create one local
+Header Auth credential with a random value, attach that credential to `Receive
+synthetic notification`, publish and activate the workflow, and keep the
+production URL local:
 
 ```text
 http://localhost:5678/webhook/tcm-synthetic-demo
 ```
 
-In `WF-60 Dispatch generic webhook`, temporarily set `Send generic webhook` to that same URL and attach a separate outbound Header Auth credential carrying the same header name and value. Do not commit either credential or the edited endpoint. Pause the scheduled triggers for WF-50 and WF-60 while running the demonstration manually.
+In `WF-60 Dispatch generic webhook`, temporarily set `Send generic webhook` to
+that exact URL and attach the same Header Auth credential object. Explicitly
+replace both sanitized placeholders: the imported export deliberately contains
+the inert `webhook.example.invalid` URL and no usable credential assignment.
+Save WF-60 after selecting the URL and credential, but keep it unpublished and
+execute it only manually. Do not commit the credential assignment or edited
+endpoint. Pause the scheduled triggers for WF-50 and WF-60 while running the
+demonstration manually.
 
 Inside the n8n container, `localhost:5678` addresses n8n itself. The host UI may still be exposed on another port such as `15678`.
+
+Before creating the outbox job, verify in the n8n editor that WF-60 no longer
+references `webhook.example.invalid` or a deleted credential. A failure recorded
+as `notification credential is unavailable` means the node still references a
+missing credential ID. `getaddrinfo ENOTFOUND webhook.example.invalid` means the
+sanitized URL was not replaced. Correct and save both fields before restarting
+the synthetic scenario; do not repeatedly dispatch the same retry job while
+configuration is unresolved.
 
 ## Run the scenario on Windows
 
@@ -72,7 +93,8 @@ The scenario was exercised successfully on Windows 11 on 20 August 2026. One non
 
 ## Cleanup
 
-After capturing sanitized evidence, remove only the demonstration rows:
+After capturing evidence that passes the release guide's sanitization review,
+remove only the demonstration rows:
 
 ```powershell
 Get-Content -Raw scripts/demo/cleanup_end_to_end.sql |

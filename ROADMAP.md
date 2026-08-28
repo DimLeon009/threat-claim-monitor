@@ -35,7 +35,7 @@ Dates are assigned through GitHub milestones and issues after the preceding depe
 | M3 | Evidence-grounded hybrid AI summaries | ✅ |
 | M4 | Auditable multi-channel notifications | ✅ |
 | M5 | Resilient multi-source coverage | ✅ |
-| M6 | Hardened v1.0.0 portfolio release | 🚧 |
+| M6 | Hardened v1.0.0 release | 🚧 |
 
 ## ✅ M0 — Foundation
 
@@ -246,7 +246,7 @@ Increase coverage and source resilience while preserving a single internal obser
 
 ### Objective
 
-Release a demonstrable, recoverable, and professionally documented V1 suitable for internal use and portfolio presentation.
+Release a demonstrable, recoverable, and professionally documented V1 suitable for internal use and technical evaluation.
 
 ### Deliverables
 
@@ -266,7 +266,7 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [x] Release checklist and changelog — controlled final validation, signed-tag, rollback, and release-note procedure
 - [x] Enable hosted GitHub security controls — private reporting, Secret Scanning, Push Protection, Dependabot security updates, and required security checks
 - [ ] Tag and publish `v1.0.0` after every release gate passes
-- [ ] Portfolio screenshots and concise demonstration guide
+- [x] Release screenshots and concise demonstration guide
 
 ### Acceptance criteria
 

@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEMO_DIR = ROOT / "scripts" / "demo"
 WORKFLOW_PATH = ROOT / "n8n" / "workflows" / "wf-99-receive-synthetic-demo.json"
+RUNBOOK_PATH = ROOT / "docs" / "operations" / "end-to-end-synthetic-demo.md"
 
 EXPECTED_SCRIPTS = {
     "seed_end_to_end.sql",
@@ -35,6 +36,13 @@ def main() -> None:
     combined = "\n".join(
         (DEMO_DIR / script).read_text(encoding="utf-8")
         for script in sorted(EXPECTED_SCRIPTS)
+    )
+    analysis_script = (DEMO_DIR / "store_deterministic_analysis.sql").read_text(
+        encoding="utf-8"
+    )
+    require(
+        analysis_script.isascii(),
+        "Fallback demo SQL must remain ASCII-safe when piped by Windows PowerShell",
     )
     require(FIXTURE_MARKER in combined, "M6 fixture marker is missing")
     require(DEMO_ORGANIZATION in combined, "M6 synthetic organization is missing")
@@ -74,6 +82,16 @@ def main() -> None:
     serialized = json.dumps(workflow, ensure_ascii=False).lower()
     require("webhook.example" not in serialized, "Demo receiver contains an external endpoint")
     require("http://" not in serialized and "https://" not in serialized, "Demo receiver contains a URL")
+
+    runbook = RUNBOOK_PATH.read_text(encoding="utf-8")
+    for fragment in (
+        "same Header Auth credential object",
+        "webhook.example.invalid",
+        "notification credential is unavailable",
+        "getaddrinfo ENOTFOUND webhook.example.invalid",
+        "keep it unpublished",
+    ):
+        require(fragment in runbook, f"Demo runbook omits runtime safeguard: {fragment}")
 
     print("End-to-end synthetic demo contract validation passed.")
 

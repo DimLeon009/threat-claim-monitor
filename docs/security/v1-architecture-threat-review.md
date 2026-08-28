@@ -106,8 +106,8 @@ analysis invocation route have now passed their runtime validation. The complete
 source-derived SQL review is closed. The backup-storage decision is accepted for
 the local release scope and remains a mandatory production control. Hosted
 GitHub security settings and required security checks were verified on
-2026-08-28. The remaining release checklist and portfolio-demonstration work
-must be completed before tagging.
+2026-08-28. The sanitized release demonstration is complete; the remaining
+release-checklist gates must pass before tagging.
 
 ## Review triggers
 

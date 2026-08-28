@@ -301,9 +301,9 @@ the automated source-derived SQL parameterization review.
 The backup-storage decision is explicit: local V1 use requires protected
 operator storage, while production remains prohibited until the controls in the
 [backup-storage decision](backup-storage-decision.md) are satisfied. Hosted
-GitHub security controls were enabled and verified on 2026-08-28. The remaining
-release checklist and portfolio-demonstration items must still be completed
-before `v1.0.0` is tagged.
+GitHub security controls were enabled and verified on 2026-08-28. The sanitized
+release demonstration is complete; the remaining release-checklist gates must
+still pass before `v1.0.0` is tagged.
 
 Review this model whenever a service, source class, authentication mechanism,
 public endpoint, new data category, inference provider, destructive operation,

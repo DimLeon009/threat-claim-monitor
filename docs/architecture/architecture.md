@@ -26,7 +26,7 @@ The architecture is intentionally small enough for one engineer to operate while
 | High false-positive cost | Exact matching for automatic alerts; ambiguity goes to review |
 | Untrusted CTI content | Validation, bounded storage, prompt isolation, and no model authority |
 | Notification retries | PostgreSQL transactional outbox and attempt history |
-| Portfolio quality | Versioned workflows, migrations, ADRs, CI, and operational documentation |
+| Operational quality | Versioned workflows, migrations, ADRs, CI, and operational documentation |
 
 ## Design principles
 

@@ -6,8 +6,8 @@
 
 ## Decision
 
-Threat Claim Monitor V1 is a local, single-operator, portfolio and internal
-evaluation release. Repository tooling creates integrity-checked backups but
+Threat Claim Monitor V1 is a local, single-operator release for technical and
+internal evaluation. Repository tooling creates integrity-checked backups but
 does not encrypt them. The release therefore does not claim production backup
 storage or authorize an Internet-facing or shared production deployment.
 

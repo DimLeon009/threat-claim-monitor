@@ -75,13 +75,13 @@ BEGIN
     'input_hash', resolved_input_hash,
     'output_payload', jsonb_build_object(
       'language', 'fr',
-      'summary_fr', 'Une source synthétique signale une déclaration de démonstration concernant une organisation fictive.',
+      'summary_fr', U&'Une source synth\00E9tique signale une d\00E9claration de d\00E9monstration concernant une organisation fictive.',
       'observed_facts', jsonb_build_array(jsonb_build_object(
-        'statement_fr', 'Une observation synthétique M6 a traversé la corrélation déterministe.',
+        'statement_fr', U&'Une observation synth\00E9tique M6 a travers\00E9 la corr\00E9lation d\00E9terministe.',
         'evidence_ids', jsonb_build_array(resolved_evidence_id)
       )),
       'uncertainties', jsonb_build_array(
-        'Cette donnée est exclusivement synthétique et ne représente aucun incident réel.'
+        U&'Cette donn\00E9e est exclusivement synth\00E9tique et ne repr\00E9sente aucun incident r\00E9el.'
       ),
       'disclaimer', U&'D\00E9claration criminelle non v\00E9rifi\00E9e ; aucune compromission n\2019est confirm\00E9e.'
     ),

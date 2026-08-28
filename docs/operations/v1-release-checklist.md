@@ -2,7 +2,7 @@
 
 This checklist is the controlled path from the M6 release candidate to the
 annotated `v1.0.0` tag. Run it from a clean `main` checkout after every V1 pull
-request, including the portfolio demonstration increment, has been merged.
+request, including the release demonstration increment, has been merged.
 
 Do not create the tag from a feature branch or while any mandatory item remains
 open. Commands in this document are examples for the operator; repository
@@ -18,7 +18,7 @@ automation does not create tags or GitHub releases.
   artifacts contain no private organization watchlist name or domain; every
   bundled organization remains visibly `[Synthetic]` with a `.invalid` domain.
 - [ ] The backup-storage decision remains valid for the intended deployment.
-- [ ] The release is described as local, single-operator, and portfolio-ready;
+- [ ] The release is described as local, single-operator, and evaluation-ready;
   it is not presented as an Internet-facing production service.
 
 ## 2. Confirm exact dependencies and artifacts
@@ -75,6 +75,8 @@ tagging; this dated evidence is not a permanent guarantee.
   does not silently backfill historical claims.
 - [ ] The synthetic demonstration succeeds without contacting a real notification
   destination or retaining its temporary data.
+- [ ] The six release-demonstration captures pass the irreversible-redaction
+  and metadata review in `release-demonstration.md` and render from a clean clone.
 
 ## 5. Run final validation
 
@@ -110,8 +112,8 @@ git status --short
   `1.0.0 - YYYY-MM-DD`.
 - [ ] Update README and ROADMAP from M6 in progress to V1 released.
 - [ ] Record the exact validation evidence without secrets or raw source data.
-- [ ] Review installation, demonstration, recovery, security, and known-limit
-  links from a clean browser session.
+- [ ] Review installation, release demonstration, recovery, security, and
+  known-limit links from a clean browser session.
 - [ ] Merge the final release-documentation pull request and wait for all required
   checks on `main`.
 

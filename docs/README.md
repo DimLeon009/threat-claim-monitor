@@ -35,6 +35,7 @@ architecture](architecture/architecture.md), [data model](architecture/data-mode
 | [Health and recovery](operations/health-and-recovery.md) | Health checks, common failure modes, safe restart, and recovery boundaries |
 | [Remote administration](operations/remote-administration.md) | SSH/VPN administration, server limits, and separate public-HTTPS requirements |
 | [End-to-end synthetic demo](operations/end-to-end-synthetic-demo.md) | Safe M6 collection-to-webhook scenario, verification, and scoped cleanup |
+| [V1 release demonstration](operations/release-demonstration.md) | Five-minute reviewer narrative, required captures, sanitization, and publication checks |
 | [V1 release checklist](operations/v1-release-checklist.md) | Final hosted controls, validation, signed-tag, and release verification procedure |
 | [Backup and restore](operations/backup-and-restore.md) | Dual-database backup, n8n volume preservation, isolated restore, and verification |
 | [Failure-mode validation](operations/failure-mode-validation.md) | Transactionally isolated correlation, source-health, inference, retry, and dead-letter tests |

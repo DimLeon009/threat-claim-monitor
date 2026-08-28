@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import re
+import struct
 import sys
 from pathlib import Path
 
@@ -31,6 +32,7 @@ def main() -> int:
     local_ai = read("docs/ai/local-analysis-contract.md")
     readme = read("README.md")
     release_checklist = read("docs/operations/v1-release-checklist.md")
+    release_demo = read("docs/operations/release-demonstration.md")
     initial_migration = read("db/migrations/001_initial_schema.sql")
 
     organization_seed = initial_migration.split("INSERT INTO organizations", 1)[1].split(
@@ -51,6 +53,45 @@ def main() -> int:
             "release checklist omits private-watchlist artifact review", errors)
     require("pre-v1 seed sanitization" in release_checklist,
             "release checklist omits the migration-baseline exception", errors)
+    release_capture_filenames = (
+        "01-workflows.png",
+        "02-synthetic-correlation.png",
+        "03-build-request-output.png",
+        "03-synthetic-analysis.png",
+        "04-local-webhook-delivery.png",
+        "04-persist-webhook-delivery.png",
+    )
+    for filename in release_capture_filenames:
+        require(filename in release_demo,
+                f"release demonstration omits capture {filename}", errors)
+        capture_path = ROOT / "docs" / "assets" / "release-demo" / filename
+        require(capture_path.is_file(),
+                f"release demonstration capture does not exist: {filename}", errors)
+        if capture_path.is_file():
+            capture = capture_path.read_bytes()
+            require(capture.startswith(b"\x89PNG\r\n\x1a\n"),
+                    f"release demonstration capture is not a PNG: {filename}", errors)
+            offset = 8
+            chunk_types: set[bytes] = set()
+            while offset + 12 <= len(capture):
+                chunk_length = struct.unpack(">I", capture[offset:offset + 4])[0]
+                chunk_types.add(capture[offset + 4:offset + 8])
+                offset += 12 + chunk_length
+            forbidden_metadata = {b"tEXt", b"zTXt", b"iTXt", b"eXIf"}
+            require(not chunk_types.intersection(forbidden_metadata),
+                    f"release demonstration capture contains metadata: {filename}", errors)
+    for fragment in (
+        "TCM Synthetic Demo Organization",
+        "sig=",
+        "irreversible",
+        "Remove image metadata",
+        "cleanup_end_to_end.sql",
+        "exactly one local request",
+    ):
+        require(fragment in release_demo,
+                f"release demonstration omits safety contract: {fragment}", errors)
+    require("six release-demonstration captures" in release_checklist,
+            "release checklist omits demonstration capture review", errors)
 
     for fragment in (
         "actions/workflows/ci.yml/badge.svg?branch=main",
