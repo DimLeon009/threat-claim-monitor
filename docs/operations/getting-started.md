@@ -107,8 +107,10 @@ owner account and keep its password outside the repository.
 
 On a new PostgreSQL volume, initialization creates both databases, applies all
 26 migrations in `db/migrations`, and seeds three source definitions plus the
-initial organization watchlist. It does not import n8n workflows or create n8n
-credentials.
+synthetic organization watchlist. Every bundled organization is visibly marked
+`[Synthetic]` and uses a reserved `.invalid` domain. Replace this demonstration
+configuration locally before monitoring an approved organization. Initialization
+does not import n8n workflows or create n8n credentials.
 
 Useful checks:
 

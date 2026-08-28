@@ -2,13 +2,14 @@
 
 > Self-hosted monitoring of public ransomware and data-leak claims, with deterministic organization matching, local AI summaries, and auditable notifications.
 
-![Project status](https://img.shields.io/badge/status-M6%20hardening%20in%20progress-yellow)
-![Next milestone](https://img.shields.io/badge/next-M6%20V1.0.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![CI](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/ci.yml)
+[![Security scanning](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/security.yml)
+![Project status](https://img.shields.io/badge/status-v1.0.0%20release%20candidate-orange)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![Docker Compose](https://img.shields.io/badge/runtime-Docker%20Compose-2496ED?logo=docker&logoColor=white)
-![n8n](https://img.shields.io/badge/orchestration-n8n-EA4B71?logo=n8n&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/database-PostgreSQL-4169E1?logo=postgresql&logoColor=white)
-![Ollama](https://img.shields.io/badge/AI-Ollama-black)
+![n8n 2.36.7](https://img.shields.io/badge/n8n-2.36.7-EA4B71?logo=n8n&logoColor=white)
+![PostgreSQL 17.10](https://img.shields.io/badge/PostgreSQL-17.10-4169E1?logo=postgresql&logoColor=white)
+![Inference](https://img.shields.io/badge/AI-Ollama%20%2B%20Microsoft%20Foundry-5C2D91)
 
 ## 📖 Overview
 
@@ -16,13 +17,15 @@ Threat Claim Monitor is an open-source defensive Cyber Threat Intelligence proje
 
 The platform collects structured OSINT feeds, preserves the original observation, correlates duplicates, applies deterministic matching rules, and produces a concise notification for security teams. An explicitly selected local or enterprise-cloud language model can summarize the available evidence, but it never decides whether an organization matches and never promotes a criminal claim to a confirmed incident.
 
-The initial monitored organizations are:
+Fresh installations contain only a synthetic demonstration watchlist:
 
-- Capifrance
-- Optimhome
-- Digit RE Group
+- Aster Habitat `[Synthetic]`
+- Boreal Homes `[Synthetic]`
+- Cobalt Property Group `[Synthetic]`
 
-The watchlist is stored in PostgreSQL and can be extended without changing workflow code.
+These names and `.invalid` domains do not represent real organizations. The
+watchlist is stored in PostgreSQL and must be replaced with approved local
+configuration without changing workflow code.
 
 ## 🎯 Problem statement
 

@@ -29,6 +29,40 @@ def main() -> int:
     remote = read("docs/operations/remote-administration.md")
     support = read("SUPPORT.md")
     local_ai = read("docs/ai/local-analysis-contract.md")
+    readme = read("README.md")
+    release_checklist = read("docs/operations/v1-release-checklist.md")
+    initial_migration = read("db/migrations/001_initial_schema.sql")
+
+    organization_seed = initial_migration.split("INSERT INTO organizations", 1)[1].split(
+        "ON CONFLICT (normalized_name)", 1
+    )[0]
+    organization_alias_seed = initial_migration.split(
+        "INSERT INTO organization_aliases", 1
+    )[1].split("ON CONFLICT (organization_id", 1)[0]
+    require(organization_seed.count("[Synthetic]") == 3,
+            "every default organization must be visibly synthetic", errors)
+    require(organization_seed.count(".invalid") == 3,
+            "every default organization domain must use the reserved .invalid TLD", errors)
+    require(organization_alias_seed.count(".invalid") == 6,
+            "every default domain alias must use the reserved .invalid TLD", errors)
+    require("synthetic demonstration watchlist" in readme,
+            "README does not identify the default watchlist as synthetic", errors)
+    require("no private organization watchlist name or domain" in release_checklist,
+            "release checklist omits private-watchlist artifact review", errors)
+    require("pre-v1 seed sanitization" in release_checklist,
+            "release checklist omits the migration-baseline exception", errors)
+
+    for fragment in (
+        "actions/workflows/ci.yml/badge.svg?branch=main",
+        "actions/workflows/security.yml/badge.svg?branch=main",
+        "status-v1.0.0%20release%20candidate",
+        "n8n-2.36.7",
+        "PostgreSQL-17.10",
+        "Ollama%20%2B%20Microsoft%20Foundry",
+    ):
+        require(fragment in readme, f"README badge contract omits: {fragment}", errors)
+    require("M6%20hardening%20in%20progress" not in readme,
+            "README still contains the obsolete M6 hardening badge", errors)
 
     workflow_paths = sorted((ROOT / "n8n" / "workflows").glob("*.json"))
     require(len(workflow_paths) == 13, "workflow deployment count is no longer 13", errors)

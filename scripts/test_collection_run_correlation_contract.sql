@@ -2,6 +2,36 @@
 
 BEGIN;
 
+-- Keep this contract independent from the operator's private watchlist. The
+-- change is scoped to this transaction and is reverted by the final ROLLBACK.
+UPDATE organizations
+SET domains = ARRAY['aster-habitat.invalid']
+WHERE id = '20000000-0000-4000-8000-000000000001';
+
+INSERT INTO organization_aliases (
+  organization_id, alias, normalized_alias, matching_mode, confidence_score
+)
+VALUES (
+  '20000000-0000-4000-8000-000000000001',
+  'Aster Habitat [Synthetic]',
+  'aster habitat synthetic',
+  'exact',
+  95
+)
+ON CONFLICT (organization_id, normalized_alias, matching_mode) DO NOTHING;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM organizations
+    WHERE id = '20000000-0000-4000-8000-000000000001'
+      AND domains = ARRAY['aster-habitat.invalid']
+  ) THEN
+    RAISE EXCEPTION 'synthetic matching fixture organization is unavailable';
+  END IF;
+END;
+$$;
+
 INSERT INTO collection_runs (
   id, source_id, finished_at, status, fetched_count, inserted_count, metadata
 )
@@ -26,7 +56,7 @@ VALUES
     '10000000-0000-4000-8000-000000000001',
     '40000000-0000-4000-8000-000000000001',
     'synthetic-run-correlation-001', '2026-05-01T10:00:00Z', '2026-05-01T10:00:00Z',
-    'CAPIFRANCE', 'capifrance', 'portal.capifrance.fr', 'Run Test Actor',
+    'ASTER HABITAT SYNTHETIC', 'aster habitat synthetic', 'portal.aster-habitat.invalid', 'Run Test Actor',
     'run test actor', repeat('7', 64), '{}', false
   ),
   (
@@ -34,7 +64,7 @@ VALUES
     '10000000-0000-4000-8000-000000000001',
     '40000000-0000-4000-8000-000000000001',
     'synthetic-run-correlation-002', '2026-05-02T10:00:00Z', '2026-05-02T10:00:00Z',
-    'Capifrance', 'capifrance', 'capifrance.fr', 'Run Test Actor',
+    'Aster Habitat [Synthetic]', 'aster habitat synthetic', 'aster-habitat.invalid', 'Run Test Actor',
     'run test actor', repeat('8', 64), '{}', false
   );
 

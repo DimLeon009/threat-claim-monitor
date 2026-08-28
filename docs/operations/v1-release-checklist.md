@@ -14,6 +14,9 @@ automation does not create tags or GitHub releases.
 - [ ] The V1 architecture and threat model match the deployed local topology.
 - [ ] The release contains no real victim fixture, stolen content, personal data,
   credential value, webhook signature, API key, or `.env` file.
+- [ ] The tagged snapshot, release notes, screenshots, logs, and uploaded
+  artifacts contain no private organization watchlist name or domain; every
+  bundled organization remains visibly `[Synthetic]` with a `.invalid` domain.
 - [ ] The backup-storage decision remains valid for the intended deployment.
 - [ ] The release is described as local, single-operator, and portfolio-ready;
   it is not presented as an Internet-facing production service.
@@ -26,7 +29,8 @@ automation does not create tags or GitHub releases.
   scans have no unhandled critical finding.
 - [ ] Qwen3 `8b-q4_K_M` model name, digest, context limit, and output limit agree
   across the profile, workflow export, tests, and documentation.
-- [ ] Every migration is immutable, sequential, and represented in a clean
+- [ ] The documented pre-v1 seed sanitization is complete; the resulting
+  migration baseline is frozen, sequential, and represented in a clean
   installation.
 - [ ] Every V1 workflow export is sanitized, version controlled, and imports
   without embedded credentials.

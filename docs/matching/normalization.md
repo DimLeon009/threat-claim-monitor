@@ -16,7 +16,7 @@ No fuzzy score can produce an automatic match. The initial M2 increment implemen
 4. collapse whitespace and trim;
 5. return `NULL` for an empty result.
 
-For example, `Digit Ré Group` and `DIGIT-RE__Group` both normalize to `digit re group`. `Cap France` remains `cap france`; normalization never joins tokens to manufacture a match with `Capifrance`.
+For example, `Groupe Étoile` and `GROUPE-ETOILE` both normalize to `groupe etoile`. `AsterHabitat` remains `asterhabitat`; normalization never splits tokens to manufacture a match with the synthetic name `Aster Habitat`.
 
 `normalize_threat_actor` first uses the same transformation, then resolves enabled canonical names and administrator-approved exact aliases through the table-driven contract documented in `threat-actor-aliases.md`. Unknown actors keep their normalized input, and ambiguous configuration fails closed.
 
@@ -40,9 +40,9 @@ The project does not guess a public suffix from arbitrary source text. `domain_m
 
 Therefore:
 
-- `portal.capifrance.fr` matches approved domain `capifrance.fr`;
-- `notcapifrance.fr` does not match;
-- `capifrance.fr.evil.invalid` does not match.
+- `portal.aster-habitat.invalid` matches approved synthetic domain `aster-habitat.invalid`;
+- `notaster-habitat.invalid` does not match;
+- `aster-habitat.invalid.evil.invalid` does not match.
 
 `extract_approved_registered_domain` evaluates an array of approved domains and returns the longest valid boundary match. This avoids unsafe last-two-label heuristics for multi-label public suffixes.
 

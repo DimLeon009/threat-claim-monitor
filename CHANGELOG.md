@@ -39,6 +39,10 @@ the complete V1 release candidate remains under `Unreleased`.
   of unparameterized source-derived SQL and migration-time dynamic SQL.
 - Formal V1 architecture and threat-model review with documented residual risks
   and deployment gates.
+- Replaced the pre-release organization seed, matching corpus, and examples with
+  visibly synthetic names and reserved `.invalid` domains. This one-time,
+  seed-only sanitization of migration 001 does not alter existing databases;
+  migrations become strictly immutable at the v1.0.0 baseline.
 
 ### Operations
 
