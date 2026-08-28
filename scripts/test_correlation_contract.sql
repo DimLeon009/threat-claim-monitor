@@ -2,6 +2,36 @@
 
 BEGIN;
 
+-- Keep this contract independent from the operator's private watchlist. The
+-- change is scoped to this transaction and is reverted by the final ROLLBACK.
+UPDATE organizations
+SET domains = ARRAY['aster-habitat.invalid']
+WHERE id = '20000000-0000-4000-8000-000000000001';
+
+INSERT INTO organization_aliases (
+  organization_id, alias, normalized_alias, matching_mode, confidence_score
+)
+VALUES (
+  '20000000-0000-4000-8000-000000000001',
+  'Aster Habitat [Synthetic]',
+  'aster habitat synthetic',
+  'exact',
+  95
+)
+ON CONFLICT (organization_id, normalized_alias, matching_mode) DO NOTHING;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM organizations
+    WHERE id = '20000000-0000-4000-8000-000000000001'
+      AND domains = ARRAY['aster-habitat.invalid']
+  ) THEN
+    RAISE EXCEPTION 'synthetic matching fixture organization is unavailable';
+  END IF;
+END;
+$$;
+
 INSERT INTO observations (
   id, source_id, source_key, discovered_at, published_at, victim_name,
   normalized_victim_name, victim_domain, threat_actor,
@@ -40,7 +70,7 @@ VALUES
     '30000000-0000-4000-8000-000000000005',
     '10000000-0000-4000-8000-000000000001',
     'synthetic-correlation-005', '2026-02-11T10:00:00Z', '2026-02-11T10:00:00Z',
-    'CAPIFRANCE', 'capifrance', 'portal.capifrance.fr', 'Synthetic Actor',
+    'ASTER HABITAT SYNTHETIC', 'aster habitat synthetic', 'portal.aster-habitat.invalid', 'Synthetic Actor',
     'synthetic actor', repeat('5', 64), '{}', false
   );
 
@@ -57,8 +87,8 @@ DECLARE
   second_claim_id uuid;
   replay_claim_id uuid;
   replay_version integer;
-  capifrance_score integer;
-  capifrance_status text;
+  aster_score integer;
+  aster_status text;
 BEGIN
   SELECT claim_id INTO first_claim_id
   FROM claim_observations
@@ -100,12 +130,12 @@ BEGIN
   END IF;
 
   SELECT match.confidence_score, match.review_status
-  INTO capifrance_score, capifrance_status
+  INTO aster_score, aster_status
   FROM organization_matches AS match
   JOIN claim_observations AS link ON link.claim_id = match.claim_id
   WHERE link.observation_id = '30000000-0000-4000-8000-000000000005';
 
-  IF capifrance_score <> 100 OR capifrance_status <> 'auto_accepted' THEN
+  IF aster_score <> 100 OR aster_status <> 'auto_accepted' THEN
     RAISE EXCEPTION 'approved domain must persist one auto-accepted score-100 match';
   END IF;
 
@@ -127,8 +157,8 @@ INSERT INTO organization_aliases (
 )
 VALUES (
   '20000000-0000-4000-8000-000000000099',
-  'Capifrance',
-  'capifrance',
+  'Aster Habitat [Synthetic]',
+  'aster habitat synthetic',
   'exact',
   95
 );
@@ -141,8 +171,8 @@ INSERT INTO observations (
 VALUES (
   '30000000-0000-4000-8000-000000000006',
   '10000000-0000-4000-8000-000000000001',
-  'synthetic-correlation-006', '2026-02-12T10:00:00Z', 'Capifrance',
-  'capifrance', 'Collision Actor', 'collision actor', repeat('6', 64), '{}', false
+  'synthetic-correlation-006', '2026-02-12T10:00:00Z', 'Aster Habitat [Synthetic]',
+  'aster habitat synthetic', 'Collision Actor', 'collision actor', repeat('6', 64), '{}', false
 );
 
 SELECT * FROM correlate_observation_exact('30000000-0000-4000-8000-000000000006');

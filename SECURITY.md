@@ -23,7 +23,10 @@ Do not open a public issue for a vulnerability that could expose:
 - a reliable workflow-bypass or prompt-injection path;
 - personal data.
 
-Use GitHub private vulnerability reporting after it is enabled on the published repository. Until then, contact the repository owner privately through an agreed organizational channel.
+Use GitHub [private vulnerability
+reporting](https://github.com/DimLeon009/threat-claim-monitor/security/advisories/new).
+Do not disclose the issue first through a public issue, pull request, discussion,
+workflow export, or commit.
 
 Include:
 
@@ -59,7 +62,8 @@ The project monitors public metadata for defensive awareness. It does not need s
 - n8n binds to localhost in the reference Compose file.
 - PostgreSQL has no published host port.
 - only n8n receives outbound network access;
-- remote access requires a separate authenticated TLS design.
+- private remote administration uses an approved VPN or SSH tunnel;
+- public remote access requires a separate authenticated TLS design and review.
 
 ### Evidence with uncertainty
 
@@ -201,8 +205,10 @@ Repository security gates and local reproduction commands are documented in the 
 
 Before v1.0.0:
 
-- [ ] Enable GitHub private vulnerability reporting.
-- [ ] Enable repository secret scanning.
+- [x] Enable GitHub private vulnerability reporting.
+- [x] Enable repository secret scanning.
+- [x] Enable repository push protection.
+- [x] Enable Dependabot security updates.
 - [x] Add container vulnerability scanning.
 - [x] Run the n8n security audit.
 - [x] Test source response-size limits and malformed schemas.

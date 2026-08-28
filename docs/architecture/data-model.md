@@ -10,6 +10,7 @@ Migration `001_initial_schema.sql` creates the foundation schema.
 
 ```mermaid
 erDiagram
+    SCHEMA_MIGRATIONS
     SOURCES ||--o{ COLLECTION_RUNS : executes
     SOURCES ||--o{ OBSERVATIONS : produces
     COLLECTION_RUNS o|--o{ OBSERVATIONS : fetches
@@ -20,12 +21,26 @@ erDiagram
     CLAIMS ||--o{ ORGANIZATION_MATCHES : evaluated_against
     ORGANIZATIONS ||--o{ ORGANIZATION_MATCHES : matched_by
     CLAIMS ||--o{ ANALYSES : summarized_by
+    ANALYSIS_PROVIDER_CONFIGS ||--o{ ANALYSES : identifies_provider
+    ANALYSIS_PROVIDER_CONFIGS ||--o| ANALYSIS_ROUTING_POLICY : selected_by
     CLAIMS ||--o{ NOTIFICATION_OUTBOX : creates
     ORGANIZATIONS ||--o{ NOTIFICATION_OUTBOX : receives
+    NOTIFICATION_CHANNEL_CONFIGS ||--o{ NOTIFICATION_OUTBOX : enables_channel
     NOTIFICATION_OUTBOX ||--o{ NOTIFICATION_ATTEMPTS : records
+    RETENTION_POLICY ||--o{ RETENTION_RUNS : audits
 ```
 
+The diagram includes logical relationships as well as foreign keys. Provider and
+channel links use constrained names rather than foreign keys so historical
+records remain readable when configuration is disabled.
+
 ## Configuration entities
+
+### `schema_migrations`
+
+Records each applied migration version. This revision has 26 migrations, from
+`001_initial_schema.sql` through `026_analysis_provider_routing.sql`. Applied
+migration files are immutable.
 
 ### `sources`
 
@@ -59,6 +74,17 @@ Aliases should be narrow. Generic terms, product names, and ambiguous abbreviati
 ### `threat_actors` and `threat_actor_aliases`
 
 These tables define administrator-approved canonical threat-group names and exact aliases used only for correlation identity. Normalized names are unique within each table, disabled mappings do not resolve, and a name that points to multiple enabled actors fails closed. Unknown actors remain usable under ordinary text normalization; the system never invents an alias through fuzzy similarity.
+
+### `analysis_provider_configs`
+
+Stores reviewed, non-secret inference settings. Authentication remains in n8n
+credentials, and secret-like configuration keys or values are rejected.
+
+### `retention_policy` and `retention_runs`
+
+`retention_policy` is the singleton, disabled-by-default cleanup configuration.
+`retention_runs` audits previews and bounded deletion jobs. Retention does not
+delete observations, claims, analyses, or notification evidence.
 
 ## Evidence entities
 
@@ -209,6 +235,17 @@ Records every channel attempt, including timestamp, success, response status, bo
 
 Migration 015 makes result persistence atomic with the outbox state transition. Response excerpts are truncated and secret-like content is replaced rather than persisted. Five consecutive failures move a job to `dead_letter`; manual requeue preserves these attempt rows.
 
+## Read-only operational views
+
+- `source_health` derives source cadence, failure streak, validation state, and
+  deterministic health;
+- `operational_source_dashboard` adds source attention levels and reasons;
+- `operational_notification_dashboard` summarizes queue, retry, lease, sent,
+  and dead-letter state per channel;
+- `operational_dashboard_summary` provides the compact totals used by WF-71.
+
+See [Operational dashboards](../operations/operational-dashboards.md).
+
 ## State invariants
 
 1. Source observations are immutable evidence; corrections create new evidence or explicit state updates.
@@ -224,14 +261,19 @@ Migration 015 makes result persistence atomic with the outbox state transition. 
 | Data | Initial policy |
 |---|---|
 | Sources, organizations, aliases | Retain while configuration or history references them |
+| Terminal collection runs without observations | Configurable 90-day default window; cleanup disabled until explicitly enabled |
 | Claims and matches | Retain for project history |
 | Normalized observations | Retain for history |
-| Raw payload field | Minimize at ingestion; eligible for clearing after 180 days |
+| Allow-listed raw payload field | Minimize at ingestion and retain with its observation; no automated V1 clearing |
 | Analyses | Retain with model and prompt provenance |
 | Notification attempts | Retain for audit; review policy before production use |
 | Successful n8n executions | 14 days |
 
-Retention will become configurable before v1.0.0. Deletion must preserve referential integrity and the evidence required to explain sent alerts.
+The implemented application retention is configurable, disabled by default,
+bounded per run, previewable, and audited. It removes only eligible terminal
+collection-run bookkeeping that has no linked observation. Deletion preserves
+the evidence required to explain claims and sent alerts. n8n execution pruning
+is a separate platform setting.
 
 ## Migration rules
 

@@ -5,7 +5,17 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: Do not include credentials, personal data, or leaked material.
+      value: >-
+        Do not include credentials, .env contents, webhook URLs, personal data,
+        real victim data, source payloads, or backups. Suspected security
+        vulnerabilities must use private vulnerability reporting instead.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.0.0 or git rev-parse --short HEAD
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:
@@ -27,9 +37,27 @@ body:
       placeholder: Windows 11 or macOS 15 Apple Silicon
     validations:
       required: true
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment mode
+      options:
+        - Windows local reference stack
+        - macOS Apple Silicon reference stack
+        - Remote private server
+        - Public or modified deployment
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
       label: Sanitized evidence
+      description: Include bounded status or logs and replace sensitive values with [REDACTED].
       render: shell
-
+  - type: textarea
+    id: recovery
+    attributes:
+      label: Safe recovery already attempted
+      description: State the documented restart, rollback, or restore step tried; write "None" when not applicable.
+    validations:
+      required: true

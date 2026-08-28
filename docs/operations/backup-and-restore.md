@@ -4,6 +4,9 @@ This M6 procedure preserves the two PostgreSQL databases and the non-secret port
 
 The backup contains operational data and encrypted n8n credentials. Treat the whole directory as sensitive even though the n8n configuration file and `.env` are excluded.
 
+The accepted local-release scope and the controls required before production are
+defined in the [backup-storage decision](../security/backup-storage-decision.md).
+
 ## What is preserved
 
 - `threat_claim_monitor`: sources, monitored organizations, collection history, observations, claims, matches, analyses, notification outbox, and delivery attempts;

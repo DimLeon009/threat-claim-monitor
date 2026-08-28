@@ -165,7 +165,7 @@ def main() -> int:
             errors.append(f"email escaping fixture is missing {escaped_marker}")
 
     serialized = json.dumps(workflow).lower()
-    for forbidden in ("smtp.example.com", "@digitregroup.com", "password", "api-key"):
+    for forbidden in ("smtp.example.com", "@cobalt-property.invalid", "password", "api-key"):
         if forbidden in serialized:
             errors.append(f"committed WF-61 contains forbidden material: {forbidden}")
 

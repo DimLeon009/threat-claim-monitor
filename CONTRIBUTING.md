@@ -14,6 +14,10 @@ Read:
 
 Search existing issues before opening a new one. Security vulnerabilities must follow the private reporting process in `SECURITY.md` and must not be disclosed in a public issue.
 
+Use [SUPPORT.md](SUPPORT.md) to choose between installation help, a bug report,
+a feature request, an implementation task, a pull request, and a private
+vulnerability report.
+
 ## Development principles
 
 - One issue and one observable outcome per pull request.
@@ -105,9 +109,9 @@ Use stable ordered names:
 ```text
 WF-00 Orchestrator
 WF-10 Collect ransomware.live
-WF-20 Normalize and correlate
-WF-60 Dispatch notifications
-WF-90 Error handler
+WF-40 Local analysis
+WF-60 Dispatch generic webhook
+WF-70 Configurable retention
 ```
 
 Node names should describe outcomes, for example `Insert observation if new`, not `Postgres 3`.

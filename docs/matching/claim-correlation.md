@@ -4,7 +4,9 @@
 
 `correlate_observation_exact` turns one stored observation into durable domain state in a single PostgreSQL transaction. It creates or reuses a claim, links the observation exactly once, advances the evidence version, and persists deterministic organization matches.
 
-The function never sends a notification. Historical-baseline suppression remains available on the linked observation and will be enforced by the later notification producer.
+The function never sends a notification. Historical-baseline suppression remains
+available on the linked observation and is enforced by the implemented WF-50
+notification producer and database eligibility contract.
 
 ## Correlation key and window
 

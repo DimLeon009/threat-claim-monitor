@@ -6,7 +6,7 @@
 - Docker Desktop using Linux containers
 - PowerShell 5.1 or PowerShell 7
 - Git for Windows
-- Ollama for Windows from Milestone 3 onward
+- native Ollama when local AI analysis is selected
 
 WSL2 may be used by Docker Desktop, but repository commands are designed to work directly from PowerShell.
 
@@ -14,7 +14,7 @@ WSL2 may be used by Docker Desktop, but repository commands are designed to work
 
 ```mermaid
 flowchart LR
-    B["Browser"] -->|"localhost:5678"| N["n8n container"]
+    B["Browser"] -->|"localhost:N8N_PORT"| N["n8n container"]
     N --> P[("PostgreSQL container")]
     N -->|"host.docker.internal:11434"| O["Native Ollama"]
     N --> I["Public CTI APIs"]
@@ -51,6 +51,9 @@ docker compose up -d
 docker compose ps
 ```
 
+Then complete [workflow deployment](../operations/workflow-deployment.md). A
+fresh n8n database contains no project workflows or credentials.
+
 ## Isolated clean-install validation
 
 Before a release, reproduce first-start behavior without touching the active
@@ -84,7 +87,8 @@ targeted.
 
 ## Ollama
 
-Install Ollama natively rather than adding it to the default Compose stack. Later milestones use:
+Install Ollama natively rather than adding it to the default Compose stack when
+the local analysis provider is selected:
 
 ```powershell
 ollama pull qwen3:8b-q4_K_M
@@ -131,4 +135,9 @@ Confirm Ollama responds on Windows, verify `OLLAMA_BASE_URL`, and check that Doc
 
 ### OneDrive synchronization
 
-The repository may live inside OneDrive, but container data is stored in named Docker volumes rather than synchronized folders. Avoid moving a running repository or editing generated runtime data through OneDrive.
+Keep the working repository outside OneDrive and other live synchronization
+folders when possible, for example `C:\Dev\threat-claim-monitor`. Docker data is
+stored in named volumes, but synchronization can still interfere with `.git`
+lock files, rebases, directory deletion, and executable metadata. Stop commands,
+copy or clone the repository to the new location, verify `git status` and
+`git fsck --full`, then resume work. Do not move a running repository.

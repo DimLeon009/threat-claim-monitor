@@ -1,6 +1,6 @@
 # Generic webhook adapter
 
-`WF-60 Dispatch generic webhook` is the first external notification adapter. It consumes only `notification-v1` jobs from the durable outbox and sends the complete JSON object with HTTPS `POST`.
+`WF-60 Dispatch generic webhook` is the V1 generic webhook adapter. It consumes only `notification-v1` jobs from the durable outbox and sends the complete JSON object with HTTPS `POST`.
 
 ## Security boundary
 

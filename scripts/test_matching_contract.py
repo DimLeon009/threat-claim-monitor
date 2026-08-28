@@ -30,19 +30,19 @@ REVIEW_TEST_FILE = REPOSITORY_ROOT / "scripts/test_review_candidate_contract.sql
 DOMAIN_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
 ORGANIZATIONS = (
     {
-        "name": "Capifrance",
-        "domains": ("capifrance.fr",),
-        "aliases": (("Capifrance", 95),),
+        "name": "Aster Habitat [Synthetic]",
+        "domains": ("aster-habitat.invalid",),
+        "aliases": (("Aster Habitat [Synthetic]", 95),),
     },
     {
-        "name": "Optimhome",
-        "domains": ("optimhome.com",),
-        "aliases": (("Optimhome", 95),),
+        "name": "Boreal Homes [Synthetic]",
+        "domains": ("boreal-homes.invalid",),
+        "aliases": (("Boreal Homes [Synthetic]", 95),),
     },
     {
-        "name": "Digit RE Group",
-        "domains": ("digitregroup.com",),
-        "aliases": (("Digit RE Group", 95), ("DigitRE Group", 90)),
+        "name": "Cobalt Property Group [Synthetic]",
+        "domains": ("cobalt-property.invalid",),
+        "aliases": (("Cobalt Property Group [Synthetic]", 95), ("CobaltProperty Group [Synthetic]", 90)),
     },
 )
 

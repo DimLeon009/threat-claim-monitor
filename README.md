@@ -2,13 +2,14 @@
 
 > Self-hosted monitoring of public ransomware and data-leak claims, with deterministic organization matching, local AI summaries, and auditable notifications.
 
-![Project status](https://img.shields.io/badge/status-M6%20hardening%20in%20progress-yellow)
-![Next milestone](https://img.shields.io/badge/next-M6%20V1.0.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![CI](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/ci.yml)
+[![Security scanning](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/DimLeon009/threat-claim-monitor/actions/workflows/security.yml)
+![Project status](https://img.shields.io/badge/status-v1.0.0%20release%20candidate-orange)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ![Docker Compose](https://img.shields.io/badge/runtime-Docker%20Compose-2496ED?logo=docker&logoColor=white)
-![n8n](https://img.shields.io/badge/orchestration-n8n-EA4B71?logo=n8n&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/database-PostgreSQL-4169E1?logo=postgresql&logoColor=white)
-![Ollama](https://img.shields.io/badge/AI-Ollama-black)
+![n8n 2.36.7](https://img.shields.io/badge/n8n-2.36.7-EA4B71?logo=n8n&logoColor=white)
+![PostgreSQL 17.10](https://img.shields.io/badge/PostgreSQL-17.10-4169E1?logo=postgresql&logoColor=white)
+![Inference](https://img.shields.io/badge/AI-Ollama%20%2B%20Microsoft%20Foundry-5C2D91)
 
 ## 📖 Overview
 
@@ -16,13 +17,15 @@ Threat Claim Monitor is an open-source defensive Cyber Threat Intelligence proje
 
 The platform collects structured OSINT feeds, preserves the original observation, correlates duplicates, applies deterministic matching rules, and produces a concise notification for security teams. An explicitly selected local or enterprise-cloud language model can summarize the available evidence, but it never decides whether an organization matches and never promotes a criminal claim to a confirmed incident.
 
-The initial monitored organizations are:
+Fresh installations contain only a synthetic demonstration watchlist:
 
-- Capifrance
-- Optimhome
-- Digit RE Group
+- Aster Habitat `[Synthetic]`
+- Boreal Homes `[Synthetic]`
+- Cobalt Property Group `[Synthetic]`
 
-The watchlist is stored in PostgreSQL and can be extended without changing workflow code.
+These names and `.invalid` domains do not represent real organizations. The
+watchlist is stored in PostgreSQL and must be replaced with approved local
+configuration without changing workflow code.
 
 ## 🎯 Problem statement
 
@@ -109,6 +112,10 @@ The default deployment contains only n8n and PostgreSQL. Ollama runs natively on
 
 Read the complete [architecture documentation](docs/architecture/architecture.md), [data model](docs/architecture/data-model.md), and [threat model](docs/security/threat-model.md).
 
+Release changes are collected in the [changelog](CHANGELOG.md). The controlled
+path to the first stable tag is documented in the [V1 release
+checklist](docs/operations/v1-release-checklist.md).
+
 ## 📡 Source strategy
 
 | Source | Format | V1 role | State |
@@ -155,6 +162,7 @@ Versions are pinned in `.env.example` and updated deliberately through reviewed 
 ├── n8n/
 │   └── workflows/            Version-controlled workflow exports
 ├── scripts/                  Cross-platform repository validation
+├── SUPPORT.md                Help, issue, pull-request, and security-report routing
 ├── .env.example              Safe configuration template
 ├── docker-compose.yml        Local reference deployment
 └── ROADMAP.md                Milestones and acceptance criteria
@@ -164,10 +172,11 @@ Versions are pinned in `.env.example` and updated deliberately through reviewed 
 
 ### Prerequisites
 
+- Git and Python 3
 - Windows 11 or macOS on Apple Silicon
 - Docker Desktop with Docker Compose v2
 - 4 GB of free memory for the foundation stack
-- Ollama only from Milestone 3 onward
+- Ollama and additional memory when local AI analysis is selected
 
 ### Windows
 
@@ -187,7 +196,16 @@ sh scripts/validate.sh
 docker compose up -d
 ```
 
-Open <http://localhost:5678> and create the local n8n owner account. PostgreSQL initializes the n8n database, the application database, migration history, monitored organizations, aliases, and initial sources on first start.
+Open `http://localhost:<N8N_PORT>` using the value from `.env` and create the
+local n8n owner account. PostgreSQL initializes both databases, migration
+history, monitored organizations, aliases, and initial sources on first start.
+
+A fresh n8n database contains **zero workflows and zero credentials**. Starting
+Compose is therefore only the platform step, not a complete application
+deployment. Continue with the [workflow deployment
+guide](docs/operations/workflow-deployment.md) to import the 13 sanitized
+exports, create the PostgreSQL credential, connect sub-workflows, establish
+silent baselines, and publish only the reviewed schedules.
 
 See the [installation guide](docs/operations/getting-started.md) and platform-specific development guides for [Windows](docs/development/windows.md) and [macOS](docs/development/macos.md).
 
@@ -229,8 +247,11 @@ Key documents:
 - [Threat model](docs/security/threat-model.md)
 - [V1 architecture and threat-model review](docs/security/v1-architecture-threat-review.md)
 - [Getting started](docs/operations/getting-started.md)
+- [Workflow deployment](docs/operations/workflow-deployment.md)
+- [Remote administration](docs/operations/remote-administration.md)
 - [Infrastructure notes](infra/README.md)
 - [Contributing](CONTRIBUTING.md)
+- [Support and reporting](SUPPORT.md)
 
 ## 💡 Engineering philosophy
 
@@ -243,7 +264,11 @@ Key documents:
 
 ## 🤝 Contributing
 
-Contributions and constructive reviews are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), use a structured issue, and keep pull requests focused on one observable outcome.
+Contributions and constructive reviews are welcome. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md), use a structured issue, and keep pull
+requests focused on one observable outcome. For installation help, bugs,
+features, pull requests, or private security reports, use the routing guide in
+[SUPPORT.md](SUPPORT.md).
 
 ## ⚠️ Disclaimer
 

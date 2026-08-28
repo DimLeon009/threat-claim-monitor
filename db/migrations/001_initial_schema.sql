@@ -180,20 +180,20 @@ ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO organizations (id, name, normalized_name, domains)
 VALUES
-  ('20000000-0000-4000-8000-000000000001', 'Capifrance', 'capifrance', ARRAY['capifrance.fr']),
-  ('20000000-0000-4000-8000-000000000002', 'Optimhome', 'optimhome', ARRAY['optimhome.com']),
-  ('20000000-0000-4000-8000-000000000003', 'Digit RE Group', 'digit re group', ARRAY['digitregroup.com'])
+  ('20000000-0000-4000-8000-000000000001', 'Aster Habitat [Synthetic]', 'aster habitat synthetic', ARRAY['aster-habitat.invalid']),
+  ('20000000-0000-4000-8000-000000000002', 'Boreal Homes [Synthetic]', 'boreal homes synthetic', ARRAY['boreal-homes.invalid']),
+  ('20000000-0000-4000-8000-000000000003', 'Cobalt Property Group [Synthetic]', 'cobalt property group synthetic', ARRAY['cobalt-property.invalid'])
 ON CONFLICT (normalized_name) DO NOTHING;
 
 INSERT INTO organization_aliases (organization_id, alias, normalized_alias, matching_mode, confidence_score)
 VALUES
-  ('20000000-0000-4000-8000-000000000001', 'Capifrance', 'capifrance', 'exact', 95),
-  ('20000000-0000-4000-8000-000000000001', 'capifrance.fr', 'capifrance.fr', 'domain', 100),
-  ('20000000-0000-4000-8000-000000000002', 'Optimhome', 'optimhome', 'exact', 95),
-  ('20000000-0000-4000-8000-000000000002', 'optimhome.com', 'optimhome.com', 'domain', 100),
-  ('20000000-0000-4000-8000-000000000003', 'Digit RE Group', 'digit re group', 'exact', 95),
-  ('20000000-0000-4000-8000-000000000003', 'DigitRE Group', 'digitre group', 'exact', 90),
-  ('20000000-0000-4000-8000-000000000003', 'digitregroup.com', 'digitregroup.com', 'domain', 100)
+  ('20000000-0000-4000-8000-000000000001', 'Aster Habitat [Synthetic]', 'aster habitat synthetic', 'exact', 95),
+  ('20000000-0000-4000-8000-000000000001', 'aster-habitat.invalid', 'aster-habitat.invalid', 'domain', 100),
+  ('20000000-0000-4000-8000-000000000002', 'Boreal Homes [Synthetic]', 'boreal homes synthetic', 'exact', 95),
+  ('20000000-0000-4000-8000-000000000002', 'boreal-homes.invalid', 'boreal-homes.invalid', 'domain', 100),
+  ('20000000-0000-4000-8000-000000000003', 'Cobalt Property Group [Synthetic]', 'cobalt property group synthetic', 'exact', 95),
+  ('20000000-0000-4000-8000-000000000003', 'CobaltProperty Group [Synthetic]', 'cobaltproperty group synthetic', 'exact', 90),
+  ('20000000-0000-4000-8000-000000000003', 'cobalt-property.invalid', 'cobalt-property.invalid', 'domain', 100)
 ON CONFLICT (organization_id, normalized_alias, matching_mode) DO NOTHING;
 
 INSERT INTO schema_migrations (version)

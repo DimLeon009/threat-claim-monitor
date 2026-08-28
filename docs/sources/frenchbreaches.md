@@ -43,9 +43,17 @@ An incompatible RSS shape, missing required value, duplicate GUID, unexpected ho
 
 ## Deployment
 
-Apply `db/migrations/023_frenchbreaches_rss_ingestion.sql`, then import `n8n/workflows/wf-12-collect-frenchbreaches.json`. Assign the local `PostgreSQL - Threat Claim Monitor` credential to the ingestion, correlation, and sanitized-failure PostgreSQL nodes.
+Fresh installations apply migration 023 automatically. On an existing volume,
+back up and apply it only when it is missing from `schema_migrations`. Then
+import `n8n/workflows/wf-12-collect-frenchbreaches.json` and follow the complete
+[workflow deployment guide](../operations/workflow-deployment.md). Assign the
+local `PostgreSQL - Threat Claim Monitor` credential to the ingestion,
+correlation, and sanitized-failure PostgreSQL nodes.
 
-Import the updated WF-00 export separately. Assign the same PostgreSQL credential to `Check FrenchBreaches due` and configure `Collect FrenchBreaches` to call the published WF-12. Environment-specific workflow and credential identifiers remain absent from committed exports.
+Import WF-00 separately. Assign the same PostgreSQL credential to `Check
+FrenchBreaches due`, publish WF-12, and configure `Collect FrenchBreaches` to
+call it. Environment-specific workflow and credential identifiers remain absent
+from committed exports.
 
 Enable the source only for the reviewed runtime test:
 

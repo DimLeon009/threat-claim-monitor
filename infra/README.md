@@ -75,7 +75,11 @@ The encryption key must remain stable across restarts and restores.
 - settings-file permission enforcement is enabled.
 - source and notification credentials belong in n8n credentials, not workflow exports.
 
-The local HTTP configuration is suitable only because n8n binds to localhost. Remote deployment requires TLS, authentication review, and a reverse proxy.
+The local HTTP configuration is suitable only because n8n binds to localhost.
+Private remote administration may preserve this boundary through an SSH tunnel
+or approved VPN. Public HTTPS deployment requires a separate reverse-proxy,
+authentication, task-runner, backup, and monitoring review; see [remote
+administration](../docs/operations/remote-administration.md).
 
 ## Validation
 
@@ -92,4 +96,3 @@ sh scripts/validate.sh
 ```
 
 CI runs the same Compose validation on every pull request.
-

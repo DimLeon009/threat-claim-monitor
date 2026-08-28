@@ -51,7 +51,7 @@ database contents were intentionally outside the repository review.
 | F-01 | High | The original WF-00 export invoked collectors but not WF-40 or WF-41 | Migration 026 and the updated WF-00 now select exactly one ready provider every minute, with no dual mode, implicit fallback, or historical backfill | Closed |
 | F-02 | Critical when exploitable | A stable n8n image must not ship with an unresolved critical container or sandbox finding | n8n 2.36.7 passed the pinned container gate with no critical finding; the native audit and localhost-only runtime were reviewed | Closed |
 | F-03 | Medium | Notification channels and dispatchers are separate runtime switches | Keep each channel disabled until its dispatcher, credential, and destination are reviewed together | Controlled operational gate |
-| F-04 | Medium | Backup confidentiality depends on operator-managed storage | Require protected encrypted storage and separate preservation of `N8N_ENCRYPTION_KEY` for production | Open production gate |
+| F-04 | Medium | Backup confidentiality depends on operator-managed storage | Local V1 is limited to protected operator storage; production is prohibited until the accepted backup-storage decision is satisfied | Controlled production gate |
 | F-05 | Medium | Apple Silicon installation had not been validated for the release candidate | Native ARM64 containers, localhost exposure, Ollama connectivity, repository validation, and backup were verified on Apple Silicon | Closed |
 | F-06 | Low | Workflow exports are intentionally inactive and credential-free, so Git cannot prove runtime publication state | Retain import and runtime verification steps in operations documentation | Accepted |
 | F-07 | Low | Operational dashboards are diagnostic snapshots without paging or remediation | Require operator investigation; do not add automatic requeue or source enablement | Accepted |
@@ -103,8 +103,11 @@ Do not tag v1.0.0 until the remaining release-readiness tasks and applicable
 production gates are closed or explicitly accepted with documented rationale.
 The selected n8n image, Windows and Apple Silicon installations, and exclusive
 analysis invocation route have now passed their runtime validation. The complete
-source-derived SQL review is closed; the protected production backup-storage
-decision remains explicitly open.
+source-derived SQL review is closed. The backup-storage decision is accepted for
+the local release scope and remains a mandatory production control. Hosted
+GitHub security settings and required security checks were verified on
+2026-08-28. The remaining release checklist and portfolio-demonstration work
+must be completed before tagging.
 
 ## Review triggers
 

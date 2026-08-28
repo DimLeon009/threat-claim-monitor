@@ -54,9 +54,20 @@ An incompatible root wrapper, invalid content type, oversized array, or missing 
 
 ## Deployment
 
-Apply migrations `018_ransomlook_ingestion.sql` through `022_skip_unmatchable_correlation_observations.sql`, then import `n8n/workflows/wf-11-collect-ransomlook.json` into n8n. Assign the local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if new`, `Correlate collection observations`, `Record sanitized failure`, and `Record sanitized correlation failure`. Assign the same credential to `Check RansomLook enabled` in WF-00.
+Fresh installations apply these migrations automatically. On an existing volume,
+back up and apply every missing migration from 018 through 022 once, in numeric
+order. Then import `n8n/workflows/wf-11-collect-ransomlook.json` and follow the
+[workflow deployment guide](../operations/workflow-deployment.md). Assign the
+local `PostgreSQL - Threat Claim Monitor` credential to `Insert observations if
+new`, `Correlate collection observations`, `Record sanitized failure`, and
+`Record sanitized correlation failure`, and to `Check RansomLook enabled` in
+WF-00.
 
-WF-11 is inactive and has no environment-specific workflow or credential identifier in the committed export. Run it manually before connecting it to the isolated RansomLook branch in WF-00. The first successful run should report `is_baseline = true`; replaying the same response inserts only records published since the previous run.
+WF-11 is inactive and has no environment-specific workflow or credential
+identifier in the committed export. Run it manually before connecting it to the
+isolated RansomLook branch in WF-00, then publish it so WF-00 can call it. The
+first successful run should report `is_baseline = true`; replaying the same
+response inserts only records published since the previous run.
 
 Validate the repository contract with:
 

@@ -263,7 +263,9 @@ Release a demonstrable, recoverable, and professionally documented V1 suitable f
 - [x] Architecture and threat-model review — completed with explicit residual-risk register and open release gates
 - [x] Exclusive local/cloud analysis orchestration — database-selected, fail-closed, and non-retroactive
 - [x] Source-derived SQL parameterization review — explicit workflow-node inventory, positional parameters, and dynamic-SQL regression gate
-- [ ] Release checklist, changelog, and tagged `v1.0.0`
+- [x] Release checklist and changelog — controlled final validation, signed-tag, rollback, and release-note procedure
+- [x] Enable hosted GitHub security controls — private reporting, Secret Scanning, Push Protection, Dependabot security updates, and required security checks
+- [ ] Tag and publish `v1.0.0` after every release gate passes
 - [ ] Portfolio screenshots and concise demonstration guide
 
 ### Acceptance criteria

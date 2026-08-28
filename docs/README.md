@@ -4,15 +4,15 @@ This directory contains the technical, operational, and security documentation f
 
 ## Recommended reading path
 
-1. [System architecture](architecture/architecture.md)
-2. [ADR-0001: Minimal V1 architecture](architecture/adr/0001-minimal-v1-architecture.md)
-3. [ADR-0002: Hybrid local and Microsoft Foundry inference](architecture/adr/0002-hybrid-local-foundry-inference.md)
-4. [Data model](architecture/data-model.md)
-5. [Threat model](security/threat-model.md)
-6. [Matching normalization](matching/normalization.md)
-7. [Notification contract](notifications/notification-contract.md)
-8. [Getting started](operations/getting-started.md)
-9. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
+1. [Getting started](operations/getting-started.md)
+2. [Workflow deployment](operations/workflow-deployment.md)
+3. Platform guide for [Windows](development/windows.md) or [macOS](development/macos.md)
+4. [Health and recovery](operations/health-and-recovery.md)
+5. [Support and reporting](../SUPPORT.md)
+
+For architecture or contribution work, continue with the [system
+architecture](architecture/architecture.md), [data model](architecture/data-model.md),
+[ADRs](architecture/adr/README.md), and [threat model](security/threat-model.md).
 
 ## Documentation map
 
@@ -31,8 +31,11 @@ This directory contains the technical, operational, and security documentation f
 | Document | Purpose |
 |---|---|
 | [Getting started](operations/getting-started.md) | Configure, validate, start, and inspect the stack |
+| [Workflow deployment](operations/workflow-deployment.md) | Import order, credentials, sub-workflow wiring, baselines, and safe publication |
 | [Health and recovery](operations/health-and-recovery.md) | Health checks, common failure modes, safe restart, and recovery boundaries |
+| [Remote administration](operations/remote-administration.md) | SSH/VPN administration, server limits, and separate public-HTTPS requirements |
 | [End-to-end synthetic demo](operations/end-to-end-synthetic-demo.md) | Safe M6 collection-to-webhook scenario, verification, and scoped cleanup |
+| [V1 release checklist](operations/v1-release-checklist.md) | Final hosted controls, validation, signed-tag, and release verification procedure |
 | [Backup and restore](operations/backup-and-restore.md) | Dual-database backup, n8n volume preservation, isolated restore, and verification |
 | [Failure-mode validation](operations/failure-mode-validation.md) | Transactionally isolated correlation, source-health, inference, retry, and dead-letter tests |
 | [Configurable retention](operations/configurable-retention.md) | Conservative collection-run cleanup, preview, scheduling, audit, and n8n execution-log settings |
@@ -46,6 +49,7 @@ This directory contains the technical, operational, and security documentation f
 | [Windows](development/windows.md) | Docker Desktop, PowerShell, native Ollama, and local validation |
 | [macOS](development/macos.md) | Apple Silicon, Docker Desktop, native Ollama, and host networking |
 | [Contributing](../CONTRIBUTING.md) | Branches, commits, migrations, workflows, tests, and review expectations |
+| [Support and reporting](../SUPPORT.md) | Installation help, bugs, features, pull requests, and private vulnerability routing |
 
 ### Sources
 
@@ -91,6 +95,7 @@ This directory contains the technical, operational, and security documentation f
 | [V1 architecture and threat-model review](security/v1-architecture-threat-review.md) | Reviewed deployment evidence, findings, residual risks, and release gates |
 | [Security scanning](security/security-scanning.md) | Complete-history secret detection, container vulnerability gates, and triage |
 | [SQL parameterization review](security/sql-parameterization-review.md) | Reviewed PostgreSQL-node inventory, dynamic-SQL boundary, and automated regression gate |
+| [Backup-storage decision](security/backup-storage-decision.md) | Accepted local V1 storage scope and mandatory production gate |
 
 ## Documentation conventions
 

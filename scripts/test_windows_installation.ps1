@@ -99,6 +99,14 @@ try {
     throw 'The clean installation did not seed the expected source configuration.'
   }
 
+  $syntheticOrganizationCount = [int](
+    Get-PostgresScalar -Database 'threat_claim_monitor' `
+      -Query "SELECT count(*) FROM organizations WHERE name LIKE '%[Synthetic]' AND cardinality(domains) > 0 AND NOT EXISTS (SELECT 1 FROM unnest(domains) AS domain WHERE right(domain, 8) <> '.invalid');"
+  )
+  if ($syntheticOrganizationCount -ne 3) {
+    throw 'The clean installation organization seed is not fully synthetic.'
+  }
+
   $n8nVersion = (
     Invoke-IsolatedCompose -Arguments @('exec', '-T', 'n8n', 'n8n', '--version') |
       Out-String
@@ -178,6 +186,7 @@ SELECT to_regclass('public.workflow_entity') IS NOT NULL
   Write-Host "n8n version: $n8nVersion"
   Write-Host "Applied migrations: $actualMigrationCount"
   Write-Host "Seeded sources: $sourceCount"
+  Write-Host "Synthetic organizations: $syntheticOrganizationCount"
   Write-Host "n8n binding: 127.0.0.1:$N8nPort"
   Write-Host 'PostgreSQL host binding: none'
   Write-Host 'Windows clean-install runtime validation passed.' -ForegroundColor Green

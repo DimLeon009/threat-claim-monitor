@@ -1,0 +1,56 @@
+name: Installation or usage help
+description: Ask for help after following the documented troubleshooting path
+title: "[Help]: "
+labels: [help wanted]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not include credentials, .env contents, webhook URLs, personal data,
+        real victim data, source payloads, or backups. Security vulnerabilities
+        must use private vulnerability reporting instead.
+  - type: checkboxes
+    id: documentation
+    attributes:
+      label: Documentation checked
+      options:
+        - label: I followed getting started, workflow deployment, and health and recovery.
+          required: true
+        - label: I searched existing issues for the same symptom.
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.0.0 or git rev-parse --short HEAD
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform and architecture
+      placeholder: Windows 11 x86_64 or macOS Apple Silicon
+    validations:
+      required: true
+  - type: input
+    id: docker
+    attributes:
+      label: Docker and Compose versions
+      placeholder: Output versions only, without environment data
+    validations:
+      required: true
+  - type: textarea
+    id: step
+    attributes:
+      label: Exact failing step
+      description: Link the documentation section and include the exact command or UI step.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Include bounded status or log output and replace sensitive values with [REDACTED].
+      render: shell
+    validations:
+      required: true
