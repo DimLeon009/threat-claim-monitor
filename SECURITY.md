@@ -201,8 +201,10 @@ Repository security gates and local reproduction commands are documented in the 
 
 Before v1.0.0:
 
-- [ ] Enable GitHub private vulnerability reporting.
-- [ ] Enable repository secret scanning.
+- [x] Enable GitHub private vulnerability reporting.
+- [x] Enable repository secret scanning.
+- [x] Enable repository push protection.
+- [x] Enable Dependabot security updates.
 - [x] Add container vulnerability scanning.
 - [x] Run the n8n security audit.
 - [x] Test source response-size limits and malformed schemas.

@@ -109,6 +109,10 @@ The default deployment contains only n8n and PostgreSQL. Ollama runs natively on
 
 Read the complete [architecture documentation](docs/architecture/architecture.md), [data model](docs/architecture/data-model.md), and [threat model](docs/security/threat-model.md).
 
+Release changes are collected in the [changelog](CHANGELOG.md). The controlled
+path to the first stable tag is documented in the [V1 release
+checklist](docs/operations/v1-release-checklist.md).
+
 ## 📡 Source strategy
 
 | Source | Format | V1 role | State |

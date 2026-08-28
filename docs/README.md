@@ -33,6 +33,7 @@ This directory contains the technical, operational, and security documentation f
 | [Getting started](operations/getting-started.md) | Configure, validate, start, and inspect the stack |
 | [Health and recovery](operations/health-and-recovery.md) | Health checks, common failure modes, safe restart, and recovery boundaries |
 | [End-to-end synthetic demo](operations/end-to-end-synthetic-demo.md) | Safe M6 collection-to-webhook scenario, verification, and scoped cleanup |
+| [V1 release checklist](operations/v1-release-checklist.md) | Final hosted controls, validation, signed-tag, and release verification procedure |
 | [Backup and restore](operations/backup-and-restore.md) | Dual-database backup, n8n volume preservation, isolated restore, and verification |
 | [Failure-mode validation](operations/failure-mode-validation.md) | Transactionally isolated correlation, source-health, inference, retry, and dead-letter tests |
 | [Configurable retention](operations/configurable-retention.md) | Conservative collection-run cleanup, preview, scheduling, audit, and n8n execution-log settings |
@@ -91,6 +92,7 @@ This directory contains the technical, operational, and security documentation f
 | [V1 architecture and threat-model review](security/v1-architecture-threat-review.md) | Reviewed deployment evidence, findings, residual risks, and release gates |
 | [Security scanning](security/security-scanning.md) | Complete-history secret detection, container vulnerability gates, and triage |
 | [SQL parameterization review](security/sql-parameterization-review.md) | Reviewed PostgreSQL-node inventory, dynamic-SQL boundary, and automated regression gate |
+| [Backup-storage decision](security/backup-storage-decision.md) | Accepted local V1 storage scope and mandatory production gate |
 
 ## Documentation conventions
 

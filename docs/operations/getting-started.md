@@ -108,4 +108,4 @@ Stop containers without deleting data:
 docker compose down
 ```
 
-Do not use `docker compose down --volumes` unless intentionally deleting the local PostgreSQL and n8n data. Backup and restore procedures will be formalized before v1.0.0.
+Do not use `docker compose down --volumes` unless intentionally deleting the local PostgreSQL and n8n data. Create and verify a backup first by following the [backup and restore procedure](backup-and-restore.md).

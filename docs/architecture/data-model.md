@@ -231,7 +231,9 @@ Migration 015 makes result persistence atomic with the outbox state transition. 
 | Notification attempts | Retain for audit; review policy before production use |
 | Successful n8n executions | 14 days |
 
-Retention will become configurable before v1.0.0. Deletion must preserve referential integrity and the evidence required to explain sent alerts.
+Retention is configurable, disabled by default, bounded per run, previewable,
+and audited. Deletion preserves referential integrity and the evidence required
+to explain sent alerts.
 
 ## Migration rules
 

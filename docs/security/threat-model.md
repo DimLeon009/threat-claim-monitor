@@ -276,7 +276,7 @@ remediation. An operator must still investigate and act.
 | R-02 | A provider switch could cross the local/cloud boundary or trigger unexpected historical cost | Closed for V1 by exclusive database routing, Foundry readiness checks, and a non-retroactive effective date | No |
 | R-03 | Notification delivery is at-least-once | Stable alert ID, outbox lease, bounded retry, and receiver idempotency | No |
 | R-04 | Model output can be inaccurate despite schema validity | Evidence references, uncertainty, deterministic authority, and analyst review | No |
-| R-05 | Backups are not encrypted by repository tooling | Store in protected encrypted operator-managed storage | Yes for production |
+| R-05 | Backups are not encrypted by repository tooling | Local V1 is limited to protected operator storage; production is prohibited until an approved encrypted destination and recovery objectives are documented | Yes for production |
 | R-06 | Apple Silicon behavior has not yet been validated for the release candidate | Complete macOS installation and smoke test | Yes |
 | R-07 | Notification channels and dispatchers require explicit runtime activation | Keep channels disabled until matching dispatcher and credential are reviewed | Yes for live delivery |
 
@@ -298,9 +298,12 @@ Silicon network exposure, and runtime verification of exclusive analysis
 routing. Every committed PostgreSQL workflow node and migration is covered by
 the automated source-derived SQL parameterization review.
 
-Remaining before v1.0.0 where applicable:
-
-- protected backup-storage decision for production use.
+The backup-storage decision is explicit: local V1 use requires protected
+operator storage, while production remains prohibited until the controls in the
+[backup-storage decision](backup-storage-decision.md) are satisfied. Hosted
+GitHub security controls were enabled and verified on 2026-08-28. The remaining
+release checklist and portfolio-demonstration items must still be completed
+before `v1.0.0` is tagged.
 
 Review this model whenever a service, source class, authentication mechanism,
 public endpoint, new data category, inference provider, destructive operation,
